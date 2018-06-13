@@ -43,3 +43,16 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+
+keycloak:
+        user: "keycloak"
+        password: "1234567890"
+        service:
+                type: LoadBalancer
+        image:
+                repository: "thehyve/vre-keycloack"
+                tag: latest
+postgresql:
+        postgresUser: "keycloakuser"
+        postgresPassword: "123"
