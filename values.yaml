@@ -50,6 +50,7 @@ keycloak:
                 password: "1234567890"
                 service:
                        type: ClusterIP
+                       port: 80
                 image:
                        repository: "thehyve/vre-keycloack"
                        tag: latest
