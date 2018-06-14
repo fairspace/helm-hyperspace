@@ -55,7 +55,6 @@ keycloak:
                        tag: latest
                 ingress:
                        enabled: true
-                       path: /keycloak
                        hosts:
                          - keycloak.fairspace.thehyve.net
                        
