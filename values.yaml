@@ -49,15 +49,14 @@ keycloak:
                 user: "keycloak"
                 password: "1234567890"
                 service:
-                       type: ClusterIP
-                       port: 80
-                image:
-                       repository: "thehyve/vre-keycloack"
-                       tag: latest
+                       type: NodePort
                 ingress:
                        enabled: true
+                       path: /
                        hosts:
-                         - keycloak.fairspace.thehyve.net
+                         - fairspace.thehyve.net
+                       annotations:
+                              kubernetes.io/ingress.class: nginx
                        
         postgresql:
                 postgresUser: "keycloakuser"
