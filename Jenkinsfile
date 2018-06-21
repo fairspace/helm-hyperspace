@@ -16,7 +16,7 @@ pipeline {
       stage('Build helm chart') {
         steps {
           dir ('.') {
-            container('base') {
+            container('gradle') {
               sh "make build"
             }
           }
@@ -29,7 +29,7 @@ pipeline {
         }
         steps {
           dir ('.') {
-            container('base') {
+            container('gradle') {
               // Ensure the git command line tool has access to proper credentials
               sh "git config --global credential.helper store"
               sh "jx step validate --min-jx-version 1.1.73"
