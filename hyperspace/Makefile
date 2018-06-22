@@ -2,7 +2,7 @@ CHART_REPO := http://jenkins-x-chartmuseum:8080
 CURRENT=$(pwd)
 NAME := hyperspace
 OS := $(shell uname)
-RELEASE_VERSION := $(shell cat ../../VERSION)
+RELEASE_VERSION := $(shell jx-release-version)
 
 build: clean
 	helm init --client-only
