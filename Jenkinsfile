@@ -15,7 +15,7 @@ pipeline {
     stages {
       stage('Build helm chart') {
         steps {
-          dir ('.') {
+          dir ('./hyperspace') {
             container('gradle') {
               sh "make build"
             }
@@ -28,7 +28,7 @@ pipeline {
           branch 'master'
         }
         steps {
-          dir ('.') {
+          dir ('./hyperspace') {
             container('gradle') {
               // Ensure the git command line tool has access to proper credentials
               sh "git config --global credential.helper store"
