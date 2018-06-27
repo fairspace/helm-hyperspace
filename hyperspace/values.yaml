@@ -38,10 +38,10 @@ keycloak:
                          - keycloak.hyperspace.ci.test.fairdev.app
                        annotations:
                               kubernetes.io/ingress.class: nginx
-        tls:
-            - hosts:
-                  - keycloak.hyperspace.ci.test.fairdev.app
-              secretName: hyperspace-ci-test-fairdev-app                       
+                       tls:
+                         - hosts:
+                             - keycloak.hyperspace.ci.test.fairdev.app
+                           secretName: hyperspace-ci-test-fairdev-app                       
         postgresql:
                 postgresUser: "keycloakuser"
                 postgresPassword: "123"
