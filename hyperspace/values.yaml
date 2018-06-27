@@ -31,8 +31,6 @@ keycloak:
         keycloak:
                 user: "keycloak"
                 password: "1234567890"
-                service:
-                       type: NodePort
                 ingress:
                        enabled: true
                        path: /
