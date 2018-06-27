@@ -27,6 +27,9 @@ tolerations: []
 
 affinity: {}
 
+hyddperspace:
+  
+
 keycloak:
         keycloak:
                 user: "keycloak"
@@ -41,7 +44,7 @@ keycloak:
                        tls:
                          - hosts:
                              - keycloak.hyperspace.ci.test.fairdev.app
-                           secretName: hyperspace-ci-test-fairdev-app                       
+                           secretName: tls-ci-test-fairdev-app                       
         postgresql:
                 postgresUser: "keycloakuser"
                 postgresPassword: "123"
