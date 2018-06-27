@@ -1,0 +1,37 @@
+Keycloak can be accessed:
+
+* Within your cluster, at the following DNS name at port {{ .Values.keycloak.keycloak.service.port }}:
+
+  {{ template "keycloak.fullname" . }}-http.{{ .Release.Namespace }}.svc.cluster.local
+
+{{- if .Values.keycloak.keycloak.ingress.enabled }}
+
+* From outside the cluster:
+
+{{- range .Values.keycloak.keycloak.ingress.hosts }}
+  - http{{ if $.Values.keycloak.keycloak.ingress.tls }}s{{ end }}://{{ . }}
+{{- end }}
+
+{{- else }}
+
+* From outside the cluster, run these commands in the same shell:
+
+
+{{- if contains "ClusterIP" .Values.keycloak.keycloak.service.type }}
+
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l app={{ template "keycloak.name" . }},release={{ .Release.Name }} -o jsonpath="{.items[0].metadata.name}")
+  echo "Visit http://127.0.0.1:8080 to use Keycloak"
+  kubectl port-forward --namespace {{ .Release.Namespace }} $POD_NAME 8080
+
+{{- end }}
+
+{{- end }}
+
+{{- if .Release.IsInstall }}
+
+Login with the following credentials:
+Username: {{ .Values.keycloak.keycloak.username }}
+
+To retrieve the initial user password run:
+kubectl get secret --namespace {{ .Release.Namespace }} {{ template "keycloak.fullname" . }}-http -o jsonpath="{.data.password}" | base64 --decode; echo
+{{- end }}
