@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{.Release.Name}}-keycloak-configuration"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{.Release.Name}}-keycloak-configuration"
+      labels:
+        heritage: {{.Release.Service | quote }}
+        release: {{.Release.Name | quote }}
+        chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: configure-keycloak-job
+        image: "{{ .Values.configurationScripts.dockerRepository }}/{{ .Values.configurationScripts.image }}:{{ .Values.configurationScripts.tag }}"
+        imagePullPolicy: {{ .Values.configurationScripts.pullPolicy }}
+        env:
+          - name: KEYCLOAK_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{ template "keycloak.prefix" . }}-http"
+                key: password
+        command:
+        - "/opt/jboss/scripts/setup-keycloak-hyperspace.sh"
+        - "http://{{ template "keycloak.prefix" . }}-headless:8080/auth"
+        - "{{.Values.keycloak.keycloak.user}}"
+        - "curie"

@@ -24,3 +24,10 @@ keycloak:
                 - hosts:
                     - keycloak.hyperspace.ci.test.fairdev.app
                   secretName: hyperspace-ci-test-fairdev-app
+
+
+configurationScripts:
+    dockerRepository: docker-registry.jx.test.fairdev.app
+    image: fairspace/keycloak-configuration
+    tag: 0.0.6
+    pullPolicy: IfNotPresent
