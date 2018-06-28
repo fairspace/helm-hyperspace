@@ -30,3 +30,8 @@ Create chart name and version as used by the chart label.
 {{- define "helm-hyperspace.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{- define "keycloak.prefix" -}}
+{{- printf "%s-%s" .Release.Name "keycloak" | trunc 20 | trimSuffix "-" -}}
+{{- end -}}
+

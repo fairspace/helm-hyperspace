@@ -47,8 +47,8 @@ keycloak:
                 postgresPassword: "123"
 
 configurationScripts:
-  dockerRepository:
+  dockerRepository: docker-registry.jx.test.fairdev.app
   image: fairspace/keycloak-configuration
-  tag: 0.0.1
+  tag: 0.0.6
   pullPolicy: IfNotPresent
 

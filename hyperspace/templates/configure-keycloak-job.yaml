@@ -7,11 +7,9 @@ metadata:
     release: {{.Release.Name | quote }}
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
   annotations:
-    # This is what defines this resource as a hook. Without this line, the
-    # job is considered part of the release.
-#    "helm.sh/hook": post-install,post-upgrade
-#    "helm.sh/hook-weight": "-5"
-#    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
     metadata:
@@ -24,16 +22,16 @@ spec:
       restartPolicy: Never
       containers:
       - name: configure-keycloak-job
-        image: "{{ .Values.configurationScripts.repository }}/{{ .Values.configurationScripts.image }}:{{ .Values.configurationScripts.tag }}"
+        image: "{{ .Values.configurationScripts.dockerRepository }}/{{ .Values.configurationScripts.image }}:{{ .Values.configurationScripts.tag }}"
         imagePullPolicy: {{ .Values.configurationScripts.pullPolicy }}
         env:
           - name: KEYCLOAK_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: "{{.Release.Name}}-keycloak-http"
+                name: "{{ template "keycloak.prefix" . }}-http"
                 key: password
         command:
         - "/opt/jboss/scripts/setup-keycloak-hyperspace.sh"
-        - "http://{{.Release.Name}}-keycloak-headless:8080/auth"
+        - "http://{{ template "keycloak.prefix" . }}-headless:8080/auth"
         - "{{.Values.keycloak.keycloak.user}}"
         - "curie"
