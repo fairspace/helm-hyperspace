@@ -10,6 +10,7 @@ affinity: {}
 hyddperspace: null
 keycloak:
     keycloak:
+        username: keycloak
         service:
             type: NodePort
             port: 80

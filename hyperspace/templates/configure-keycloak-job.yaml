@@ -7,9 +7,9 @@ metadata:
     release: {{.Release.Name | quote }}
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
   annotations:
-    "helm.sh/hook": post-install
-    "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": hook-succeeded
+#    "helm.sh/hook": post-install
+#    "helm.sh/hook-weight": "-5"
+#    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
     metadata:
@@ -33,5 +33,5 @@ spec:
         command:
         - "/opt/jboss/scripts/setup-keycloak-hyperspace.sh"
         - "http://{{ template "keycloak.prefix" . }}-headless:8080/auth"
-        - "{{.Values.keycloak.keycloak.user}}"
+        - "{{.Values.keycloak.keycloak.username}}"
         - "curie"
