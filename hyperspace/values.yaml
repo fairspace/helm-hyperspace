@@ -24,3 +24,4 @@ keycloak:
                 - hosts:
                     - keycloak.hyperspace.ci.test.fairdev.app
                   secretName: hyperspace-ci-test-fairdev-app
+ingress.controller.required: true
