@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
-    repository: nginx
-    tag: stable
+    repository: docker-registry.jx.test.fairdev.app/fairspace/hyperspace
+    tag: 0.1.27
     pullPolicy: IfNotPresent
 resources: {}
 nodeSelector: {}
@@ -30,5 +30,5 @@ ingress.controller.required: true
 configurationScripts:
     dockerRepository: docker-registry.jx.test.fairdev.app
     image: fairspace/keycloak-configuration
-    tag: 0.0.6
+    tag: 0.1.27
     pullPolicy: IfNotPresent
