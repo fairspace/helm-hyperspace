@@ -10,6 +10,7 @@ affinity: {}
 hyddperspace: null
 keycloak:
     keycloak:
+        username: keycloak
         service:
             type: NodePort
             port: 80
@@ -25,3 +26,9 @@ keycloak:
                     - keycloak.hyperspace.ci.test.fairdev.app
                   secretName: hyperspace-ci-test-fairdev-app
 ingress.controller.required: true
+
+configurationScripts:
+    dockerRepository: docker-registry.jx.test.fairdev.app
+    image: fairspace/keycloak-configuration
+    tag: 0.0.6
+    pullPolicy: IfNotPresent
