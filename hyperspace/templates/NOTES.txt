@@ -6,13 +6,11 @@ Keycloak can be accessed:
 
 keycloak-http.{{ .Release.Namespace }}.svc.cluster.local
 
-{{- if .Values.keycloak.keycloak.ingress.enabled }}
+{{- if .Values.hyperspace.ingress.enabled }}
 
 * From outside the cluster:
 
-{{- range .Values.keycloak.keycloak.ingress.hosts }}
-  - http{{ if $.Values.keycloak.keycloak.ingress.tls }}s{{ end }}://{{ . }}
-{{- end }}
+  - http{{ if $.Values.hyperspace.ingress.tls.enabled }}s{{ end }}://keycloak.{{ .Values.hyperspace.ingress.domain }}
 
 {{- else }}
 
@@ -20,7 +18,7 @@ keycloak-http.{{ .Release.Namespace }}.svc.cluster.local
 
 {{- if contains "NodePort" .Values.keycloak.keycloak.service.type }}
 
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services hyperspace-keycloak-http)
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "keycloak.prefix" .}}-http)
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 
@@ -30,12 +28,12 @@ keycloak-http.{{ .Release.Namespace }}.svc.cluster.local
   It may take a few minutes for the LoadBalancer IP to be available.
   You can watch the status of by running 'kubectl get svc -w hyperspace-keycloak-http'
 
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} hyperspace-keycloak-http -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "keycloak.prefix" .}}-http -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   echo http://$SERVICE_IP:{{ .Values.keycloak.keycloak.service.port }}
 
 {{- else if contains "ClusterIP" .Values.keycloak.keycloak.service.type }}
 
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l app=hyperspace-keycloak-http,release={{ .Release.Name }} -o jsonpath="{.items[0].metadata.name}")
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l app={{ template "keycloak.prefix" .}}-http,release={{ .Release.Name }} -o jsonpath="{.items[0].metadata.name}")
   echo "Visit http://127.0.0.1:8080 to use Keycloak"
   kubectl port-forward --namespace {{ .Release.Namespace }} $POD_NAME 8080
 

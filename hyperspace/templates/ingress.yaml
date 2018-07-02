@@ -1,0 +1,31 @@
+{{- $ingress := .Values.hyperspace.ingress -}}
+{{- if $ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "keycloak.prefix" . }}-ingress
+{{- with $ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ template "hyperspace.name" . }}
+    chart: {{ template "hyperspace.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+{{- if $ingress.tls }}
+  tls:
+    - hosts:
+      - keycloak.{{ $ingress.domain }}
+      secretName: {{ template "hyperspace.tlsSecretName" $ }}
+{{- end }}
+  rules:
+    - host: keycloak.{{ $ingress.domain }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ template "keycloak.prefix" . }}-http
+              servicePort: http
+{{- end -}}
