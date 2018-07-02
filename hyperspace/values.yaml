@@ -25,7 +25,7 @@ hyperspace:
                     kind: ClusterIssuer
                 dns01Provider: clouddns
         controller:
-            required: true
+            required: false
 
     # Scripts for setting up keycloak for hyperspace
     configurationScripts:
