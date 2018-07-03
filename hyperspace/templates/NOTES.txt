@@ -47,5 +47,5 @@ Login with the following credentials:
 Username: {{ .Values.keycloak.keycloak.username }}
 
 To retrieve the initial user password run:
-kubectl get secret --namespace {{ .Release.Namespace }} hyperspace-keycloak-http -o jsonpath="{.data.password}" | base64 --decode; echo
+kubectl get secret --namespace {{ .Release.Namespace }} {{ template "keycloak.prefix" .}}-http -o jsonpath="{.data.password}" | base64 --decode; echo
 {{- end }}
