@@ -22,6 +22,11 @@ helm repo update
 helm install --name=hyperspace chartmuseum/hyperspace --namespace=hyperspace -f config.yaml
 ```
 
+Helm install will wait for the pods to be initialized and all jobs being run. Please
+note that starting postgres sometimes takes a long time. If it takes longer than 5 minutes
+helm install will timeout and not show the installation notes. Besides that, there are no 
+problems with the installation. Consider adding `--timeout 600` to increase the timeout.
+
 ## Install on minikube
 ```
 helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
