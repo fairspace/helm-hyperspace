@@ -10,6 +10,8 @@ affinity: {}
 
 # Setup ingress for hyperspace components
 hyperspace:
+    keycloak:
+        realm:
     ingress:
         enabled: true
         domain: hyperspace.ci.test.fairdev.app
@@ -31,7 +33,7 @@ hyperspace:
     configurationScripts:
         dockerRepository: docker-registry.jx.test.fairdev.app
         image: fairspace/keycloak-configuration
-        tag: 0.0.6
+        tag: 0.0.10
         pullPolicy: IfNotPresent
 
 # Keycloak configuration
