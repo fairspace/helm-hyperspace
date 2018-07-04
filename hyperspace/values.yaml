@@ -7,28 +7,40 @@ resources: {}
 nodeSelector: {}
 tolerations: []
 affinity: {}
-hyddperspace: null
+
+# Setup ingress for hyperspace components
+hyperspace:
+    ingress:
+        enabled: true
+        domain: hyperspace.ci.test.fairdev.app
+        annotations:
+            kubernetes.io/ingress.class: nginx
+        tls:
+            enabled: true
+            secretNameOverride:
+            certificate:
+                obtain: true
+                issuerRef:
+                    name: letsencrypt-prod
+                    kind: ClusterIssuer
+                dns01Provider: clouddns
+        controller:
+            required: false
+
+    # Scripts for setting up keycloak for hyperspace
+    configurationScripts:
+        dockerRepository: docker-registry.jx.test.fairdev.app
+        image: fairspace/keycloak-configuration
+        tag: 0.0.6
+        pullPolicy: IfNotPresent
+
+# Keycloak configuration
 keycloak:
     keycloak:
         username: keycloak
         service:
-            type: NodePort
+            type: ClusterIP
             port: 80
         ingress:
-            enabled: true
-            path: /
-            hosts: 
-                - keycloak.hyperspace.ci.test.fairdev.app
-            annotations:
-                kubernetes.io/ingress.class: nginx
-            tls: 
-                - hosts:
-                    - keycloak.hyperspace.ci.test.fairdev.app
-                  secretName: hyperspace-ci-test-fairdev-app
-ingress.controller.required: true
+            enabled: false
 
-configurationScripts:
-    dockerRepository: docker-registry.jx.test.fairdev.app
-    image: fairspace/keycloak-configuration
-    tag: 0.0.6
-    pullPolicy: IfNotPresent

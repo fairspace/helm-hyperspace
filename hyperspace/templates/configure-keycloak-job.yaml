@@ -1,3 +1,4 @@
+{{- $scripts := .Values.hyperspace.configurationScripts -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -22,8 +23,8 @@ spec:
       restartPolicy: Never
       containers:
       - name: configure-keycloak-job
-        image: "{{ .Values.configurationScripts.dockerRepository }}/{{ .Values.configurationScripts.image }}:{{ .Values.configurationScripts.tag }}"
-        imagePullPolicy: {{ .Values.configurationScripts.pullPolicy }}
+        image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.tag }}"
+        imagePullPolicy: {{ $scripts.pullPolicy }}
         env:
           - name: KEYCLOAK_PASSWORD
             valueFrom:
