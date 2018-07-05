@@ -1,0 +1,6 @@
++ make tag
+sed -i -e "s/version:.*/version: 0.1.31/" Chart.yaml
+sed -i -e "s/repository: .*/repository: docker-registry.jx.test.fairdev.app\/fairspace\/hyperspace/" values.yaml
+sed -i -e "s/dockerRepository: .*/dockerRepository: docker-registry.jx.test.fairdev.app/" values.yaml
+sed -i -e "s/tag: .*/tag: 0.1.31/" values.yaml
+git add --all

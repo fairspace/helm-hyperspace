@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
-    repository: nginx
-    tag: stable
+    repository: docker-registry.jx.test.fairdev.app/fairspace/hyperspace
+    tag: 0.1.31
     pullPolicy: IfNotPresent
 resources: {}
 nodeSelector: {}
