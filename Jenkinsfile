@@ -49,7 +49,7 @@ pipeline {
             container('gradle') {
               sh "helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/"
               sh "helm repo update"
-              sh "helm install chartmuseum/hyperspace --name=hyperspace-ci --namespace=hyperspace-ci -f ../ci/ci-values.yaml"
+              sh "helm upgrade --install hyperspace-ci chartmuseum/hyperspace --namespace=hyperspace-ci -f ../ci/ci-values.yaml"
             }
           }
         }
