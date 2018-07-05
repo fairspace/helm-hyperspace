@@ -40,7 +40,7 @@ pipeline {
         }
       }
 
-      stage('Release helm chart') {
+      stage('Deploy on CI') {
         when {
           branch 'master'
         }
