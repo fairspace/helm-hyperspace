@@ -1,0 +1,5 @@
+hyperspace:
+  keycloak:
+    realm: ci
+  ingress:
+    domain: hyperspace.ci.test.fairdev.app
