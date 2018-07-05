@@ -35,4 +35,4 @@ spec:
         - "/opt/jboss/scripts/setup-keycloak-hyperspace.sh"
         - "http://{{ template "keycloak.prefix" . }}-headless:8080/auth"
         - "{{.Values.keycloak.keycloak.username}}"
-        - "{{.Values.keycloak.realm}}"
+        - "{{.Values.hyperspace.keycloak.realm}}"
