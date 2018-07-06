@@ -4,7 +4,9 @@ hyperspace:
   ingress:
     domain: hyperspace.ci.test.fairdev.app
 
-# Set password to prevent having a new password at every upgrade
+# Set passwords to prevent having a new password at every upgrade
 keycloak:
   keycloak:
       password: keycloak-ci-123
+  postgresql:
+    postgresPassword: "9FGwLKpEu$'w/knG"
