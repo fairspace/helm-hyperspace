@@ -31,7 +31,7 @@ problems with the installation. Consider adding `--timeout 600` to increase the 
 ```
 helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
 helm repo update
-helm install --name=hyperspace chartmuseum/hyperspace --namespace=hyperspace --set hyperspace.ingress.enabled=false  --set keycloak.keycloak.service.type=NodePort
+helm install --name=hyperspace chartmuseum/hyperspace --namespace=hyperspace --set hyperspace.ingress.enabled=false  --set keycloak.keycloak.service.type=NodePort --set hyperspace.keycloak.realm=hyperspace
 ```
 
 To retrieve the port that keycloak is running on, run:
@@ -43,6 +43,7 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 
 | Parameter  | Description  | Default |
 |---|---|---|
+| `hyperspace.keycloak.realm`  | Realm to be used within keycloak |  |
 | `keycloak.keycloak.service.type`  | [Servicetype](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for the Keycloak service. |  ClusterIP |
 | `ingress.enabled`  | Whether or not an ingress is setup for the hyperspace components. Should be set to false when running locally.  | true  |
 | `ingress.domain`   | Domain that is used for setting up the hyperspace. Is used as postfix for the hostname for the specific components. For example setting `fairspace.app` as domain will setup keycloak at `keycloak.fairspace.app`  | hyperspace.ci.test.fairdev.app  |
