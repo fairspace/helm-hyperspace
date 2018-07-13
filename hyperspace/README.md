@@ -56,5 +56,12 @@ To retrieve the initial user password run:
 
 `kubectl get secret --namespace hyperspace hyperspace-keycloak-http -o jsonpath="{.data.password}" | base64 --decode; echo`
 
+## Upgrading installations
+Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades 
+of the chart, as the random values may be computed again. 
 
+Other properties may contain default values, which is not advised to use. For those reasons it is strongly advised to define values for at
+least the following properties:
 
+* `keycloak.keycloak.password`
+* `keycloak.postgresql.postgresPassword`
