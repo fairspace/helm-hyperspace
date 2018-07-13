@@ -9,4 +9,4 @@ keycloak:
   keycloak:
       password: keycloak-ci-123
   postgresql:
-    postgresPassword: "9FGwLKpEu$'w/knG"
+    postgresPassword: "9FGwLKpEu$4w/knG"
