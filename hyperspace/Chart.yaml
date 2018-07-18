@@ -4,4 +4,4 @@ description: A Helm chart for Kubernetes
 name: hyperspace
 namespace: hyperspace
 icon: https://raw.githubusercontent.com/fairspace/hyperspace/master/hyperspace/logo.jpg
-version: 0.1.15-SNAPSHOT
+version: 0.1.42
