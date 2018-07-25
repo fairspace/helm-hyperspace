@@ -38,16 +38,6 @@ pipeline {
             }
           }
         }
-        stage('Hipchat notification') {
-          when {
-            branch 'master'
-          }
-          steps {
-            script {
-              hipchat.notifySuccess()
-            }
-          }
-        }
       }
 
       stage('Deploy on CI') {
@@ -61,6 +51,16 @@ pipeline {
               sh "helm repo update"
               sh "helm upgrade --install hyperspace-ci chartmuseum/hyperspace --namespace=hyperspace-ci -f ../ci/ci-values.yaml"
             }
+          }
+        }
+      }
+      stage('Hipchat notification') {
+        when {
+          branch 'master'
+        }
+        steps {
+          script {
+            hipchat.notifySuccess()
           }
         }
       }
