@@ -1,3 +1,5 @@
+@Library("hipchat") _
+
 pipeline {
     agent {
       label "jenkins-gradle"
