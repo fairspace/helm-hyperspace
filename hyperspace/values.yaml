@@ -45,4 +45,6 @@ keycloak:
             port: 80
         ingress:
             enabled: false
-
+    postgresql:
+        persistence:
+            enabled: true
