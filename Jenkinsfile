@@ -38,6 +38,16 @@ pipeline {
             }
           }
         }
+        stage('Hipchat notification') {
+          when {
+            branch 'master'
+          }
+          steps {
+            script {
+              hipchat.notifySuccess()
+            }
+          }
+        }
       }
 
       stage('Deploy on CI') {
@@ -58,6 +68,11 @@ pipeline {
     post {
       always {
         cleanWs()
+      }
+      failure {
+        script {
+          hipchat.notifyFailure()
+        }
       }
     }
 }
