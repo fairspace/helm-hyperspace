@@ -33,7 +33,7 @@ hyperspace:
     configurationScripts:
         dockerRepository: docker-registry.jx.test.fairdev.app
         image: fairspace/keycloak-configuration
-        configurationScriptsTag: 0.0.13
+        configurationScriptsTag: 0.0.23
         pullPolicy: IfNotPresent
 
 # Keycloak configuration
