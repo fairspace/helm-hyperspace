@@ -40,8 +40,6 @@ install:
 
 before_script:
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT"; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
   - export CURRENTVERSION="$(cat VERSION)"
   - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
   - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
@@ -58,12 +56,21 @@ jobs:
       script:
       - ./ci/helm/tag.sh
       - ./ci/helm/build.sh
-      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
       deploy:
-        provider: script
-        script: 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then ./ci/helm/deploy.sh demo; fi'
-        on:
-          branch: env(RELEASE_BRANCH)
+        - provider: script
+          script:
+          - ./ci/helm/release.sh
+          - ./ci/helm/deploy.sh demo
+          on:
+            branch: env(RELEASE_BRANCH)
+            condition: $TRAVIS_PULL_REQUEST = false
+        - provider: script
+          script:
+          - ./ci/helm/release.sh
+          - ./ci/helm/deploy.sh ci
+          on:
+            branch: env(SNAPSHOT_BRANCH)
+            condition: $TRAVIS_PULL_REQUEST = false
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
       stage: Versioning
