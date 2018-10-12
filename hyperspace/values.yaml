@@ -1,13 +1,3 @@
-replicaCount: 1
-image:
-    repository: nginx
-    tag: stable
-    pullPolicy: IfNotPresent
-resources: {}
-nodeSelector: {}
-tolerations: []
-affinity: {}
-
 # Setup ingress for hyperspace components
 hyperspace:
     keycloak:
