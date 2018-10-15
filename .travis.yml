@@ -62,15 +62,15 @@ jobs:
           - ./ci/helm/release.sh
           - ./ci/helm/deploy.sh demo
           on:
-            branch: env(RELEASE_BRANCH)
-            condition: $TRAVIS_PULL_REQUEST = false
+            all_branches: true
+            condition: '"$TRAVIS_BRANCH" = "$RELEASE_BRANCH"'
         - provider: script
           script:
           - ./ci/helm/release.sh
           - ./ci/helm/deploy.sh ci
           on:
-            branch: env(SNAPSHOT_BRANCH)
-            condition: $TRAVIS_PULL_REQUEST = false
+            all_branches: true
+            condition: '"$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH"'
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
       stage: Versioning
