@@ -13,7 +13,7 @@ helm package charts/${APPNAME}
 
 # Add chart to helm repo
 git clone https://github.com/fairspace/helm-repo helm-repo
-mv "$APPNAME-$(sed -n 's/^version: //p' Chart.yaml).tgz" helm-repo
+mv ${APPNAME}-*.tgz helm-repo
 
 cd helm-repo
 helm repo index --merge index.yaml .
