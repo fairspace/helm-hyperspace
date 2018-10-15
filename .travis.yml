@@ -60,19 +60,8 @@ jobs:
       - ./ci/helm/tag.sh
       - ./ci/helm/build.sh
       - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
-      deploy:
-        - provider: script
-          script:
-          - ./ci/helm/deploy.sh demo
-          on:
-            all_branches: true
-            condition: '"$TRAVIS_BRANCH" = "$RELEASE_BRANCH"'
-        - provider: script
-          script:
-          - ./ci/helm/deploy.sh ci
-          on:
-            all_branches: true
-            condition: '"$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH"'
+      - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then ./ci/helm/deploy.sh demo; fi'
+      - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then ./ci/helm/deploy.sh ci; fi'
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
       stage: Versioning
