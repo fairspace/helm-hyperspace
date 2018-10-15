@@ -40,6 +40,9 @@ install:
 
 before_script:
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT"; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
+
   - export CURRENTVERSION="$(cat VERSION)"
   - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
   - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
@@ -56,17 +59,16 @@ jobs:
       script:
       - ./ci/helm/tag.sh
       - ./ci/helm/build.sh
+      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
       deploy:
         - provider: script
           script:
-          - ./ci/helm/release.sh
           - ./ci/helm/deploy.sh demo
           on:
             all_branches: true
             condition: '"$TRAVIS_BRANCH" = "$RELEASE_BRANCH"'
         - provider: script
           script:
-          - ./ci/helm/release.sh
           - ./ci/helm/deploy.sh ci
           on:
             all_branches: true
