@@ -3,6 +3,9 @@ hyperspace:
     realm: ci
   ingress:
     domain: hyperspace.ci.fairway.app
+    tls:
+      certificate:
+        dns01Provider: azuredns
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
