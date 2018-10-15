@@ -31,12 +31,10 @@ notifications:
     format: html
     notify: true
 
-install:
-  - ./ci/helm/install_helm.sh
-  - ./ci/k8s/install_kubectl.sh
-  - export PATH="$(pwd)/linux-amd64/:$HOME/downloads/v${KUBECTL_VERSION}:/$PATH"
-  - ./ci/k8s/config_kubectl.sh
-  - helm init --client-only
+before_install:
+- ./ci/helm/install_helm.sh
+- export PATH="$(pwd)/linux-amd64/:$PATH"
+- helm init --client-only
 
 before_script:
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT"; fi'
@@ -53,9 +51,9 @@ jobs:
     - stage: Build
       name: Helm chart
       install:
-      - ./ci/helm/install_helm.sh
-      - export PATH="$(pwd)/linux-amd64/:$PATH"
-      - helm init --client-only
+      - ./ci/k8s/install_kubectl.sh
+      - export PATH="$HOME/downloads/v${KUBECTL_VERSION}:/$PATH"
+      - ./ci/k8s/config_kubectl.sh
       script:
       - ./ci/helm/tag.sh
       - ./ci/helm/build.sh
