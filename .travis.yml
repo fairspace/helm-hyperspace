@@ -2,23 +2,22 @@ language: java
 
 env:
   global:
-     - APPNAME="hyperspace"
-     - ORG="fairspace"
-     - ARTIFACT_BUILD_FILE=""
-     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
-     - DEPLOYMENT_CONFIG_DIR="./ci-deployment"
-     - DOCKER_REPO="fairspace.azurecr.io"
-     - CHART_REPO=" https://fairspace.github.io/helm-repo"
-     - RELEASE_BRANCH="master"
-     - SNAPSHOT_BRANCH="dev"
-     - DOCKER_USERNAME="fairspace"
-     - GITHUB_USERNAME="fairspace-ci"
-     - HELM_VERSION="2.10.0"
-     - KUBECTL_VERSION="1.12.0"
+    - APPNAME="hyperspace"
+    - ORG="fairspace"
+    - ARTIFACT_BUILD_FILE=""
+    - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
+    - DEPLOYMENT_CONFIG_DIR="./ci-deployment"
+    - RELEASE_BRANCH="master"
+    - SNAPSHOT_BRANCH="dev"
+    - DOCKER_USERNAME="fairspace"
+    - GITHUB_USERNAME="fairspace-ci"
 
-# Github credentials:
-# GITHUB_PASSWORD=....
-     - secure: "JGk+4XeLruK1LMZ4zJcmX4k4T7nR7DVwPcl/IaPNKaR2+MdiN2Wi5gAXrsXDDKIs4fJzHtRBK1K+VNam4K8vwb5aOX0MnYDoHPZc3ye+UYUXLlTeoozSmfMy08zGaNtz+GjP+QSzvFcRMlhFRLjJ+Cae+Rwpt9gldSLhc04VPGBCMmnHAIg86m2PFqfEfm3Kjy7HkvrPYkAN8JvMRzSjXfBi0JmDjSFuXS0mcp/UOUZLtTzfASpaApijbkp2iposBfN83TbkmnZ/DbZULHtXcKB+mZWADRsh7vyIQQQLVkRWx3HcQSJKSEyCazYoINBufKXDek8v6EbPpIupwF8MVIZTL+vZKXteaNVkcad69ZD3iBhSje8M41ev1Q+m68z6+0IFm6xwajVPL02P3P64zaqWShrG8MLwNiZ7bYmZnziik+fKLGG0/ABiiTxVbUD4qW7XHzbdDNPSE4D9xTuKg+A2naydSNAdozKZLQUNK4/sk5S4xj5Ot0An3Jt9lHKMb/ayqn2b42MfvO3b6cW2pbJTd6f79z2O3bSjL0tNAWbkLrtQLnEPcr0d/CDPBnjWWk4N+1kcOaYqd6/KegkgxXCXSwDnbEhDp/GlEKiIvGo/F3JduqMnVZFfEK8IBIL0pm1z3T7Kvv2Fq5hE19TUB22dlExwudM1nDu8UUFjuig="
+    # Github credentials:
+    # GITHUB_PASSWORD=....
+    - secure: "JGk+4XeLruK1LMZ4zJcmX4k4T7nR7DVwPcl/IaPNKaR2+MdiN2Wi5gAXrsXDDKIs4fJzHtRBK1K+VNam4K8vwb5aOX0MnYDoHPZc3ye+UYUXLlTeoozSmfMy08zGaNtz+GjP+QSzvFcRMlhFRLjJ+Cae+Rwpt9gldSLhc04VPGBCMmnHAIg86m2PFqfEfm3Kjy7HkvrPYkAN8JvMRzSjXfBi0JmDjSFuXS0mcp/UOUZLtTzfASpaApijbkp2iposBfN83TbkmnZ/DbZULHtXcKB+mZWADRsh7vyIQQQLVkRWx3HcQSJKSEyCazYoINBufKXDek8v6EbPpIupwF8MVIZTL+vZKXteaNVkcad69ZD3iBhSje8M41ev1Q+m68z6+0IFm6xwajVPL02P3P64zaqWShrG8MLwNiZ7bYmZnziik+fKLGG0/ABiiTxVbUD4qW7XHzbdDNPSE4D9xTuKg+A2naydSNAdozKZLQUNK4/sk5S4xj5Ot0An3Jt9lHKMb/ayqn2b42MfvO3b6cW2pbJTd6f79z2O3bSjL0tNAWbkLrtQLnEPcr0d/CDPBnjWWk4N+1kcOaYqd6/KegkgxXCXSwDnbEhDp/GlEKiIvGo/F3JduqMnVZFfEK8IBIL0pm1z3T7Kvv2Fq5hE19TUB22dlExwudM1nDu8UUFjuig="
+
+    # Azure credentials:
+    - secure: "mVWcD8O7ZwJh8eH0JRiXpsBv+qXihHbdIjSHN4XP/oxsCPZeGRE9L7r5qmOsipZcCfNDi298+DH5ZSlj0ef4MuGB+N+N8CsbPqYFhZsh2UkA9/pQShKONxYVP9P3sI5aCD3mcgblR5vBZAXYA5D9o5v4v7CcOc4OAlMnNnUpRAWtOqidxIyQtbRmp5T7tYidMc7Hxj0NVUz+lfG+gC5/qqxUwJXA3qdGv8+cxS5DNHhpakdjWY19/g8+XeJvHr4eEfgB8Y5VHnCj/iTEJW3yDr3EP1JbH3TXJ2iGSSzDOuSJFkNnSYV2zikI8wXbsoPLr0Yeg/a7qQgWLyJI6tRVXbbaHz0oWfI0h+4LU5saNKsZDjNiqXHbjfQVk0kzpdLTKvCiV1bUQls2evfJeodeB9IbBd5xfiB4ixRIk+fpFIBGLyyVt/P/fyuRE7ecU1AncBis+Dh3M5vrEuB2xeaYhM6B6I16jgf1FypLimV/8dMFRN559Dn7gfD5KrBqyk7pqIdm65NK7PLsdImFDoKGwRcyjCf0IkSHCQMxH1lhv099MyvAPYbe96+ZnPAMAIMxysV1PZkW+siqBNwihKOmKusyB2/XC9rBb4IGm/LHeiSVPh49NQVOZkAy5kQhlLlFHJkO3SdOdyAyEV/QDpX6QH/ZEqgIROzDx0dzzV5ytXE="
 
 cache:
   directories:
@@ -38,20 +37,14 @@ before_install:
   - export KUBE_CONFIG_ENC_KEY=$encrypted_985abdf32880_key
   - export KUBE_CONFIG_ENC_IV=$encrypted_985abdf32880_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
-  - ./ci/helm/install_helm.sh
-  - export PATH="$(pwd)/linux-amd64/:$PATH"
-  - helm init --client-only
+  - source ./ci/setup_env.sh
+  - source ./ci/helm/install_helm.sh
+  - ./ci/az/install.sh
+  - ./ci/az/login.sh
 
 before_script:
-  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export VERSION_POSTFIX="-SNAPSHOT" ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]] && [[ "$TRAVIS_PULL_REQUEST" = "false" ]]; then export SHOULD_RELEASE=1; fi'
-
-  - export CURRENTVERSION="$(cat VERSION)"
-  - export VERSION="${CURRENTVERSION}${VERSION_POSTFIX}"
-  - export CONTAINER_NAME="${DOCKER_REPO}/${ORG}/${APPNAME}:${VERSION}"
-  - export NEWVERSION="$(./ci/versioning/nextversion.sh ${CURRENTVERSION})"
+- 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
+- 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo; fi'
 
 jobs:
   include:
@@ -65,8 +58,7 @@ jobs:
       - ./ci/helm/tag.sh
       - ./ci/helm/add_repos.sh
       - ./ci/helm/build.sh
-      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh; fi'
-      - 'if [[ $SHOULD_RELEASE ]]; then helm repo update; fi'
+      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh && helm repo update; fi'
       - 'if [[ $SHOULD_RELEASE ]]; then travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
