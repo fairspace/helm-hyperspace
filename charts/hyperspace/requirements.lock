@@ -5,5 +5,8 @@ dependencies:
 - name: keycloak
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.0.0
-digest: sha256:56d7c0047620227c2959912e2e1b270fc20dfdc3e726a7a01a712cac2234fd55
-generated: 2018-06-27T17:01:22.809439186+02:00
+- name: rabbitmq
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 3.5.1
+digest: sha256:139a21d85fc3c7295fbeab801c736a2d898d6595d9c1f4f04e16cbf1c468d97a
+generated: 2018-10-31T11:05:43.5979343+01:00

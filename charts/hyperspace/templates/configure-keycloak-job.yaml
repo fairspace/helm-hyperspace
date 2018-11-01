@@ -21,6 +21,10 @@ spec:
         chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     spec:
       restartPolicy: Never
+      {{- if .Values.fairspaceImagePullSecret }}
+      imagePullSecrets:
+          - name: {{ .Values.fairspaceImagePullSecret }}
+      {{- end }}
       containers:
       - name: configure-keycloak-job
         image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.configurationScriptsTag }}"
