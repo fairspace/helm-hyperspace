@@ -1,3 +1,8 @@
+# The fairspace container images are in a private repository
+# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+# on how to store and specify the credentials for it
+fairspaceImagePullSecret:
+
 # Setup ingress for hyperspace components
 hyperspace:
     keycloak:
@@ -21,9 +26,9 @@ hyperspace:
 
     # Scripts for setting up keycloak for hyperspace
     configurationScripts:
-        dockerRepository: docker-registry.jx.test.fairdev.app
+        dockerRepository: fairspace.azurecr.io
         image: fairspace/keycloak-configuration
-        configurationScriptsTag: 0.0.23
+        configurationScriptsTag: 0.1.0
         pullPolicy: IfNotPresent
 
 # Keycloak configuration
@@ -38,3 +43,12 @@ keycloak:
     postgresql:
         persistence:
             enabled: true
+
+# RabbitMQ configuration
+rabbitmq:
+    ingress:
+        enabled: false
+    persistence:
+        enabled: true
+    rabbitmq:
+        username: rabbitmq
