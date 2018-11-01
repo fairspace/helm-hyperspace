@@ -51,3 +51,6 @@ Create a name for the tls secret for hyperspace
 {{- end -}}
 {{- end -}}
 
+{{- define "rabbitmq.prefix" -}}
+{{- printf "%s-%s" .Release.Name "rabbitmq" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}

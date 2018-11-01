@@ -3,7 +3,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "rabbitmq.fullname" . }}-ingress
+  name: {{ template "rabbitmq.prefix" . }}-ingress
 {{- with $ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
@@ -26,6 +26,6 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: {{ template "rabbitmq.fullname" . }}
+              serviceName: {{ template "rabbitmq.prefix" . }}
               servicePort: {{ .Values.rabbitmq.rabbitmq.managerPort }}
 {{- end -}}
