@@ -11,7 +11,8 @@ env:
     - SNAPSHOT_BRANCH="dev"
     - DOCKER_USERNAME="fairspace"
     - GITHUB_USERNAME="fairspace-ci"
-    - KUBERNETES_CONTEXT="FairspaceDemoCluster"
+    - RELEASE_CONTEXT="FairspaceDemoCluster"
+    - SNAPSHOT_CONTEXT="FairspaceCICluster"
 
     # Github credentials:
     # GITHUB_PASSWORD=....
@@ -42,10 +43,8 @@ before_install:
   - source ./ci/helm/install_helm.sh
   - ./ci/az/install.sh
   - ./ci/az/login.sh
-
-before_script:
-- 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci; fi'
-- 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT"; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo KUBERNETES_CONTEXT="$RELEASE_CONTEXT"; fi'
 
 jobs:
   include:
