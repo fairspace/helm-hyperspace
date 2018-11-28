@@ -51,14 +51,18 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 | `ingress.tls.secretNameOverride`  | If set, this secret name is used for loading certificates for TLS. | `tls-<release name>` |
 | `ingress.tls.certificate.obtain`  | If set, a `Certificate` object will be created, such that [cert-manager](https://cert-manager.readthedocs.io/en/latest/) will request a certificate automatically. | true |
 | `ingress.controller.required`  | If set to true, an nginx-ingress controller will be installed along with the application. | false |
+| `bastionserver.enabled` | If set to true, starts a bastion server for logging in on cluster nodes | true |
+| `bastionserver.image` | Image name to use for bastion server | fairspace.azurecr.io/fairspace/ssh-bastionserver |
+| `bastionserver.version`| Version of bastion server image to user | latest |
+| `bastionserver.permit_access_cidr | IP ranges to permit access to bastion server | none |
 
 To retrieve the initial user password run:
 
 `kubectl get secret --namespace hyperspace hyperspace-keycloak-http -o jsonpath="{.data.password}" | base64 --decode; echo`
 
 ## Upgrading installations
-Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades 
-of the chart, as the random values may be computed again. 
+Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades
+of the chart, as the random values may be computed again.
 
 Other properties may contain default values, which is not advised to use. For those reasons it is strongly advised to define values for at
 least the following properties:

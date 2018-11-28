@@ -52,3 +52,10 @@ rabbitmq:
         enabled: true
     rabbitmq:
         username: rabbitmq
+
+# Configuration of SSH bastion server for access to AKS nodes
+bastionserver:
+  enabled: true
+  image: fairspace.azurecr.io/fairspace/ssh-bastionserver
+  version: latest
+

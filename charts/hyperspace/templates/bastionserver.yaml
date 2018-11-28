@@ -1,0 +1,59 @@
+{{- $bastionserver:= .Values.bastionserver -}}
+{{- if $bastionserver.enabled -}}
+{{- $bastionserver_externalport  := $bastionserver.externalport  | default 22 -}}
+{{- $bastionserver_containerport := $bastionserver.containerport | default 22 -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ssh-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ssh-server
+    spec:
+      containers:
+      - name: ssh-server
+        image: {{ printf "%s:%s" $bastionserver.image $bastionserver.version | quote }}
+        imagePullPolicy: Always
+        ports:
+          - containerPort: {{ $bastionserver_containerport }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssh-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: LoadBalancer
+  selector:
+    app: ssh-server
+  ports:
+  - port: {{ $bastionserver_externalport }}
+    targetPort: {{ $bastionserver_containerport }}
+    protocol: TCP
+    name: ssh
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ssh-network-policy
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: ssh-server
+  policyTypes:
+  - Ingress
+  ingress:
+  {{- range $bastionserver.permit_access_cidr }}
+  - from:
+    - ipBlock:
+        cidr: {{ . }}
+  {{ end -}}
+{{ indent 2 "ports:" }}
+    - protocol: TCP
+      port: {{ $bastionserver_externalport }}
+{{- end -}}

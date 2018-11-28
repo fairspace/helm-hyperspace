@@ -20,3 +20,10 @@ rabbitmq:
     password: "X6SXtXV3Jzg4gyVR"
     erlangCookie: "x6w5BVsp8HaQ3uXMvpt5YE46tSBARTNv"
     diskFreeLimit: '"1GiB"'
+
+bastionserver:
+  enabled: true
+  image: fairspace.azurecr.io/fairspace/ssh-bastionserver
+  version: 0.0.10
+  permit_access_cidr:
+  - 91.206.81.2/32
