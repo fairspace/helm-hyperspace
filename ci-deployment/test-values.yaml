@@ -5,7 +5,7 @@ hyperspace:
     domain: hyperspace.test.fairway.app
     tls:
       certificate:
-        dns01Provider: azuredns-ci
+        dns01Provider: azuredns-test
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
