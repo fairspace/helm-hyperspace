@@ -48,13 +48,17 @@ before_install:
 
 jobs:
   include:
-    - stage: Build
-      name: Helm chart
+    - if: ( branch = env(RELEASE_BRANCH) OR BRANCH = env(SNAPSHOT_BRANCH) ) AND type != "pull_request"
+      stage: Prepare_Deploy
       install:
-      - ./ci/k8s/install_kubectl.sh
-      - export PATH="$HOME/downloads/v${KUBECTL_VERSION}:$PATH"
+       - ./ci/k8s/install_kubectl.sh
+       - export PATH="$HOME/downloads/v${KUBECTL_VERSION}:$PATH"
+      script:
       - ./ci/k8s/config_kubectl.sh
       - ./ci/k8s/switch_context.sh
+    - stage: Build
+      name: Helm chart
+      install: skip
       script:
       - ./ci/helm/tag.sh
       - ./ci/helm/add_repos.sh
