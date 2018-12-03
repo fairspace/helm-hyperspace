@@ -48,7 +48,7 @@ before_install:
 
 jobs:
   include:
-    - if: ( branch = env(RELEASE_BRANCH) OR BRANCH = env(SNAPSHOT_BRANCH) ) AND type != "pull_request"
+    - if: ( branch = env(RELEASE_BRANCH) OR branch = env(SNAPSHOT_BRANCH) ) AND type != "pull_request"
       stage: Prepare_Deploy
       install:
        - ./ci/k8s/install_kubectl.sh
