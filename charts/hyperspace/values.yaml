@@ -33,6 +33,7 @@ hyperspace:
 
 # Keycloak configuration
 keycloak:
+    enabled: true
     keycloak:
         username: keycloak
         service:
