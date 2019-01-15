@@ -63,4 +63,9 @@ jobs:
 
 notifications:
   slack:
-    secure: "dpJL60bCwWHBbY23/6gTUWjLFo5FXp2+56k6EoxtFFwH7a8I9RAnuxHgbNknVypY115GgSpueSSbePaSlbGeHqZ/AQ1e6q2r80RQPBe+lFSc3+0DTkq00p97xqqFjpSSTE4+wYSGldP9GVpN89LLc9wZbSeI+GH3nr/vgMjTA8OPsUFPr49n/VNnqUm4I5SA2YKxYlVZuUoWGqWqj107LBiFFgOCUSeGgeM9wafFA86rxmkNU3h77g6N4rJrx8SUZrjFg158KHsN+nfnc6kFTHx+CJg+WSPx3T7Stf0XPPQe7pDgMpOucNH7n6duqa9V6ldhG9jati9BmSa74EzxzLGuhwVUiZgWQ0dZaND6hfTQnWk3/XKI9lNyUQ5uuCYuHaT33CiEiIt/HkigFoMgX6QkCPqk9eYAfVsOLz2nnqfmtT7AMM6xcCXrHRjJ7O/ZIo1UZaR5GwUD7j3JVA6UgNzztIBr+h/CyjvRSWQklOpVAYhCmuHJ1bEfKXfUx4Qkc0k5IaoefZ5uW5Ny64VBZoQMNt5MRxysKS9/ITqY4CALSxf0oBkQbxms5Oz967zFOWhD3+QL6sHAkLkVaUro1Y89Epm1YMqAaawC0DAFvrmeDXCITuPcDpsFHWVfpPLphxLA6d+TLZ5BNrdCpCj9GpDnFD0UkQ+wodZdfI6YaVo="
+    rooms:
+     - secure: "dpJL60bCwWHBbY23/6gTUWjLFo5FXp2+56k6EoxtFFwH7a8I9RAnuxHgbNknVypY115GgSpueSSbePaSlbGeHqZ/AQ1e6q2r80RQPBe+lFSc3+0DTkq00p97xqqFjpSSTE4+wYSGldP9GVpN89LLc9wZbSeI+GH3nr/vgMjTA8OPsUFPr49n/VNnqUm4I5SA2YKxYlVZuUoWGqWqj107LBiFFgOCUSeGgeM9wafFA86rxmkNU3h77g6N4rJrx8SUZrjFg158KHsN+nfnc6kFTHx+CJg+WSPx3T7Stf0XPPQe7pDgMpOucNH7n6duqa9V6ldhG9jati9BmSa74EzxzLGuhwVUiZgWQ0dZaND6hfTQnWk3/XKI9lNyUQ5uuCYuHaT33CiEiIt/HkigFoMgX6QkCPqk9eYAfVsOLz2nnqfmtT7AMM6xcCXrHRjJ7O/ZIo1UZaR5GwUD7j3JVA6UgNzztIBr+h/CyjvRSWQklOpVAYhCmuHJ1bEfKXfUx4Qkc0k5IaoefZ5uW5Ny64VBZoQMNt5MRxysKS9/ITqY4CALSxf0oBkQbxms5Oz967zFOWhD3+QL6sHAkLkVaUro1Y89Epm1YMqAaawC0DAFvrmeDXCITuPcDpsFHWVfpPLphxLA6d+TLZ5BNrdCpCj9GpDnFD0UkQ+wodZdfI6YaVo="
+    template:
+     - "Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository_slug}@%{branch}"
+     - "Latest commit: %{commit_message} - by %{author}"
+     - "Result:  %{result} in %{duration}"
