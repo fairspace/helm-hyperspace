@@ -25,16 +25,6 @@ cache:
   directories:
   - $HOME/downloads
 
-notifications:
-  hipchat:
-    on_pull_requests: false
-    rooms:
-      - secure: "cHmkpPo1cX2aFmPLICQ6Wai26thudHcKJT1/1O+DNX0fyUVWqr5JacXtn84cheeybEDoth2FswLyIDxvvcXgH3b1ZE6AGY9OyTISHzZ0w6oj+lQ4GtlPrWFleBAoRNok8tvw1RfzaMaE+zOquqQ43WtRbPG59TrCkkiF6d3R28Zn/OFyShU2NeQCNBj4fHhz52aTShOD8gZuu4vY0rY+mDnerMAfyAcArX8kdvH9YG8BEz43kEKJLv7AdwEk7l+r9lTmx9+A1AqrI32iEqVL39YsuyI01DfkQVZXYXgTuQQU+C9/ZmjpMgpQdjz30BEHutbptdlzvt38edUzvr9k74rg8lq/I6eiYfRWrpB09BQO7oCxT+xuwAwy62h3avsY67RZXKlldSsd5347YrTnBN8HaLxSocvZqFB2k9UEa18uSxz8C2y1I+yYD5hV1BZHqs8n0Y9I9hDMDBr/3SzQLBQ5R8Jp+GbhaLfzoPE+TgESqycN4hxncEwkxGbNMyYK7zFsWUhmiIvDYTiw7MdWC3DGlhufxO6zT4OAtHi3r6ryzhhnL70/OFCDKNkHtIB42ImLXxGMKyBzlMha7iOwh/LPjkMc3E6GTktXS1O2P4RmIJV1IeGlDcoCzuiykIh5sKg3wLvN7BiCS6vevq01N1rQ2DM1xPQzTHVMDUJXuPU="
-    template:
-      - '<a href="%{build_url}">%{repository_slug}#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> : %{author}): %{message}'
-    format: html
-    notify: true
-
 before_install:
   - export KUBE_CONFIG_ENC_KEY=$encrypted_985abdf32880_key
   - export KUBE_CONFIG_ENC_IV=$encrypted_985abdf32880_iv
@@ -70,3 +60,7 @@ jobs:
         - ./ci/helm/tag.sh
         - ./ci/versioning/add_tag_to_git.sh
         - ./ci/versioning/set_next_version.sh
+
+notifications:
+  slack:
+    secure: "dpJL60bCwWHBbY23/6gTUWjLFo5FXp2+56k6EoxtFFwH7a8I9RAnuxHgbNknVypY115GgSpueSSbePaSlbGeHqZ/AQ1e6q2r80RQPBe+lFSc3+0DTkq00p97xqqFjpSSTE4+wYSGldP9GVpN89LLc9wZbSeI+GH3nr/vgMjTA8OPsUFPr49n/VNnqUm4I5SA2YKxYlVZuUoWGqWqj107LBiFFgOCUSeGgeM9wafFA86rxmkNU3h77g6N4rJrx8SUZrjFg158KHsN+nfnc6kFTHx+CJg+WSPx3T7Stf0XPPQe7pDgMpOucNH7n6duqa9V6ldhG9jati9BmSa74EzxzLGuhwVUiZgWQ0dZaND6hfTQnWk3/XKI9lNyUQ5uuCYuHaT33CiEiIt/HkigFoMgX6QkCPqk9eYAfVsOLz2nnqfmtT7AMM6xcCXrHRjJ7O/ZIo1UZaR5GwUD7j3JVA6UgNzztIBr+h/CyjvRSWQklOpVAYhCmuHJ1bEfKXfUx4Qkc0k5IaoefZ5uW5Ny64VBZoQMNt5MRxysKS9/ITqY4CALSxf0oBkQbxms5Oz967zFOWhD3+QL6sHAkLkVaUro1Y89Epm1YMqAaawC0DAFvrmeDXCITuPcDpsFHWVfpPLphxLA6d+TLZ5BNrdCpCj9GpDnFD0UkQ+wodZdfI6YaVo="
