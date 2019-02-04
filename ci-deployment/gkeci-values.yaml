@@ -1,0 +1,22 @@
+hyperspace:
+  keycloak:
+    realm: gkeci
+  ingress:
+    domain: hyperspace.gkeci.fairway.app
+    tls:
+      certificate:
+        dns01Provider: gke
+
+# Set passwords to prevent having a new password at every upgrade
+keycloak:
+  keycloak:
+      password: keycloak-ci-123
+  postgresql:
+    postgresPassword: "9FGwLKpEu$4w/knG"
+
+rabbitmq:
+  rbacEnabled: true
+  rabbitmq:
+    password: "X6SXtXV3Jzg4gyVR"
+    erlangCookie: "x6w5BVsp8HaQ3uXMvpt5YE46tSBARTNv"
+    diskFreeLimit: '"1GiB"'
