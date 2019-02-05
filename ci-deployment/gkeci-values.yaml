@@ -6,6 +6,9 @@ hyperspace:
     tls:
       certificate:
         dns01Provider: gke
+  configurationScripts:
+    dockerRepository: eu.gcr.io/fairspace-207108
+
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
