@@ -8,6 +8,7 @@ hyperspace:
         dns01Provider: gke
   configurationScripts:
     dockerRepository: eu.gcr.io/fairspace-207108
+    image: keycloak-configuration
 
 
 # Set passwords to prevent having a new password at every upgrade
