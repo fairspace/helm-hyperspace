@@ -53,7 +53,7 @@ jobs:
       - 'if [[ "$SHOULD_RELEASE" ]]; then ./ci/helm/release.sh ; fi'
       - 'if [[ "$SHOULD_RELEASE" ]]; then ./ci/k8s/ics_kubectl.sh ; fi'
       - # Need to refresh helm repository if it's on Azure, because it times out after a while
-      - 'if [[ "$DEPLOY_PLATFORM" = "AZURE" ]] then ./ci/helm/add_repos.sh ; fi'
+      - 'if [[ "$DEPLOY_PLATFORM" = "AZURE" ]]; then ./ci/helm/add_repos.sh ; fi'
       - 'if [[ "$SHOULD_RELEASE ]]"; then travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
