@@ -35,21 +35,25 @@ before_install:
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - export BUILD_SCRIPTS_DIR=$(pwd)/ci
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" CLUSTER_NAME="$SNAPSHOT_CLUSTER_NAME" CLUSTER_ZONE="$SNAPSHOT_CLUSTER_ZONE"; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE"; fi'
+  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" DEPLOY_PLATFORM="AZURE" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE"; fi'
+  -  export INFRASTRUCTURE_PLATFORM="${DEPLOY_PLATFORM:-NONE}"
   -  source ./ci/setup_env.sh
+  -  'if [[ "$SHOULD_RELEASE" ]] ; then export NEED_INTERNAL_HELM=1 ; fi'
 
 jobs:
   include:
     - stage: Build
       name: Helm chart
-      install:
-      - source charts/.travis/install.sh
       script:
+      - 'if [[ "$SHOULD_RELEASE" ]] ; then ./ci/login-provider.sh ; fi'
       - ./ci/helm/tag.sh
       - ./ci/helm/add_repos.sh
       - ./ci/helm/build.sh
-      - 'if [[ $SHOULD_RELEASE ]]; then ./ci/helm/release.sh && helm repo update; fi'
-      - 'if [[ $SHOULD_RELEASE ]]; then travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
+      - 'if [[ "$SHOULD_RELEASE" ]]; then ./ci/helm/release.sh ; fi'
+      - 'if [[ "$SHOULD_RELEASE" ]]; then ./ci/k8s/ics_kubectl.sh ; fi'
+      - # Need to refresh helm repository if it's on Azure, because it times out after a while
+      - 'if [[ "$DEPLOY_PLATFORM" = "AZURE" ]] then ./ci/helm/add_repos.sh ; fi'
+      - 'if [[ "$SHOULD_RELEASE ]]"; then travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
     - # For release branch, update git with the new tag and update version
       if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
       stage: Versioning
