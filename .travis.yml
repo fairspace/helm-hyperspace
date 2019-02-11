@@ -46,6 +46,7 @@ jobs:
       name: Helm chart
       script:
       - 'if [[ "$SHOULD_RELEASE" ]] ; then ./ci/login-provider.sh ; fi'
+      - ./ci/helm/install_helm.sh
       - ./ci/helm/tag.sh
       - ./ci/helm/add_repos.sh
       - ./ci/helm/build.sh
