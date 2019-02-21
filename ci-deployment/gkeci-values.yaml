@@ -18,9 +18,3 @@ keycloak:
   postgresql:
     postgresPassword: "9FGwLKpEu$4w/knG"
 
-rabbitmq:
-  rbacEnabled: true
-  rabbitmq:
-    password: "X6SXtXV3Jzg4gyVR"
-    erlangCookie: "x6w5BVsp8HaQ3uXMvpt5YE46tSBARTNv"
-    diskFreeLimit: '"1GiB"'
