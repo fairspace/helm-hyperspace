@@ -45,11 +45,3 @@ keycloak:
         persistence:
             enabled: true
 
-# RabbitMQ configuration
-rabbitmq:
-    ingress:
-        enabled: false
-    persistence:
-        enabled: true
-    rabbitmq:
-        username: rabbitmq
