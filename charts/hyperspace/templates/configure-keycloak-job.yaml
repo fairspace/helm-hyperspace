@@ -1,3 +1,4 @@
+{{ if .Values.keycloak.enabled -}}
 {{- $scripts := .Values.hyperspace.configurationScripts -}}
 apiVersion: batch/v1
 kind: Job
@@ -40,3 +41,4 @@ spec:
         - "http://{{ template "keycloak.prefix" . }}-headless:8080/auth"
         - "{{.Values.keycloak.keycloak.username}}"
         - "{{.Values.hyperspace.keycloak.realm}}"
+{{ end -}}

@@ -5,7 +5,10 @@ hyperspace:
     domain: hyperspace.ci.fairway.app
     tls:
       certificate:
-        dns01Provider: azuredns-ci
+        dns01Provider: gke
+  configurationScripts:
+    dockerRepository: eu.gcr.io/fairspace-207108
+    image: keycloak-configuration
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
@@ -14,9 +17,3 @@ keycloak:
   postgresql:
     postgresPassword: "9FGwLKpEu$4w/knG"
 
-rabbitmq:
-  rbacEnabled: false
-  rabbitmq:
-    password: "X6SXtXV3Jzg4gyVR"
-    erlangCookie: "x6w5BVsp8HaQ3uXMvpt5YE46tSBARTNv"
-    diskFreeLimit: '"1GiB"'

@@ -2,10 +2,13 @@ hyperspace:
   keycloak:
     realm: demo
   ingress:
-    domain: hyperspace.demo.fairspace.app
+    domain: hyperspace.demo.fairway.app
     tls:
       certificate:
-        dns01Provider: azuredns-demo
+        dns01Provider: gke
+  configurationScripts:
+    dockerRepository: eu.gcr.io/fairspace-207108
+    image: keycloak-configuration
 
 # Set password to prevent having a new password at every upgrade
 keycloak:
@@ -14,9 +17,3 @@ keycloak:
   postgresql:
     postgresPassword: "mf5-Y5Q5E5_P33eB"
 
-rabbitmq:
-  rbacEnabled: false
-  rabbitmq:
-    password: "gtzb28355LFqxbar"
-    erlangCookie: "fLbZs6ncGzp9Q2R35V3zv9uQyDEjgyDy"
-    diskFreeLimit: '"1GiB"'

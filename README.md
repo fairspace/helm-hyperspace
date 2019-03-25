@@ -1,5 +1,5 @@
 # A Helm chart for VRE hyperspace
-This helm chart will install and setup a VRE hyperspace, including keycloak. 
+This helm chart will install and setup a VRE hyperspace, including keycloak.
 
 See `hyperspace/README.md` for more information
 
@@ -7,7 +7,7 @@ See `hyperspace/README.md` for more information
 Deployment scripts can be found in the `ci` directory. They are
 run by travis-ci, as setup in the `travis.yml` file.
 
-Please note that the `kube-config.yml` file is encrypted as described
-in the [travis documentation](https://docs.travis-ci.com/user/encrypting-files/). The
-file contains configuration for `kubectl` that points to the azure cluster. The context 
-is set to 'azure-context', whose cluster points to `https://fairspacecluster-4493cdc7.hcp.westeurope.azmk8s.io:443`  
+Please note that the `kube-config.yml.enc` file is encrypted. This file contains
+credentials for our AKS clusters. See the `Updating Travis Kubernetes config`
+section of https://wiki.thehyve.nl/display/VRE/Deploying+Fairspace+on+Azure for
+information about how to change it.
