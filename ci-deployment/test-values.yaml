@@ -13,6 +13,6 @@ hyperspace:
 # Set password to prevent having a new password at every upgrade
 keycloak:
   keycloak:
-    password: keycloak-demo-123
+    password: yJH7qVjAQ469MVNBR9L5
   postgresql:
     postgresPassword: "mf5-Y5Q5E5_P33eB"
