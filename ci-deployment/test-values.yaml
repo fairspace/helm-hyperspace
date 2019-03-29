@@ -1,16 +1,18 @@
 hyperspace:
   keycloak:
-    realm: cbio
+    realm: test
   ingress:
-    domain: hyperspace.test.fairway.app
+    domain: hyperspace.test.fairspace.app
     tls:
       certificate:
-        dns01Provider: azuredns-test
+        dns01Provider: gke
+  configurationScripts:
+    dockerRepository: eu.gcr.io/fairspace-207108
+    image: keycloak-configuration
 
-# Set passwords to prevent having a new password at every upgrade
+# Set password to prevent having a new password at every upgrade
 keycloak:
   keycloak:
-      password: keycloak-ci-123
+    password: keycloak-demo-123
   postgresql:
-    postgresPassword: "bco4B4B4B4Bcb7TG"
-
+    postgresPassword: "mf5-Y5Q5E5_P33eB"
