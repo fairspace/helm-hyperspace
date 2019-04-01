@@ -20,14 +20,14 @@ hyperspace:
                 issuerRef:
                     name: letsencrypt-prod
                     kind: ClusterIssuer
-                dns01Provider: clouddns
+                dns01Provider: gke
         controller:
             required: false
 
     # Scripts for setting up keycloak for hyperspace
     configurationScripts:
-        dockerRepository: fairspace.azurecr.io
-        image: fairspace/keycloak-configuration
+        dockerRepository: eu.gcr.io
+        image: fairspace-207108/keycloak-configuration
         configurationScriptsTag: 0.1.0
         pullPolicy: IfNotPresent
 
