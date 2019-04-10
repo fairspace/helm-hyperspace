@@ -50,16 +50,16 @@ keycloak:
             enabled: false
         resources:
             requests:
-                cpu: "50m"
-                memory: "1300Mi"
+                cpu: "10m"
+                memory: "600Mi"
             limits:
                 cpu: "500m"
-                memory: "3612Mi"
+                memory: "2048Mi"
     postgresql:
         persistence:
             enabled: true
         resources:
             # Request values are set by default in postgresql chart
             limits:
-                cpu: "200m"
-                memory: "1024Mi"
+                cpu: "500m"
+                memory: "512Mi"
