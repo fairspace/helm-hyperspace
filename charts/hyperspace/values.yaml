@@ -30,6 +30,13 @@ hyperspace:
         image: fairspace-207108/keycloak-configuration
         configurationScriptsTag: 0.1.0
         pullPolicy: IfNotPresent
+        resources:
+            requests:
+                cpu: "50m"
+                memory: "512Mi"
+            limits:
+                cpu: "500m"
+                memory: "2048Mi"
 
 # Keycloak configuration
 keycloak:
@@ -41,7 +48,18 @@ keycloak:
             port: 80
         ingress:
             enabled: false
+        resources:
+            requests:
+                cpu: "10m"
+                memory: "600Mi"
+            limits:
+                cpu: "500m"
+                memory: "2048Mi"
     postgresql:
         persistence:
             enabled: true
-
+        resources:
+            # Request values are set by default in postgresql chart
+            limits:
+                cpu: "500m"
+                memory: "512Mi"

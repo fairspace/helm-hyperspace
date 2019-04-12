@@ -30,6 +30,8 @@ spec:
       - name: configure-keycloak-job
         image: "{{ $scripts.dockerRepository }}/{{ $scripts.image }}:{{ $scripts.configurationScriptsTag }}"
         imagePullPolicy: {{ $scripts.pullPolicy }}
+        resources:
+{{ toYaml $scripts.resources | indent 10 }}
         env:
           - name: KEYCLOAK_PASSWORD
             valueFrom:
