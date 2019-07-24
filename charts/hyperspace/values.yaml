@@ -21,8 +21,6 @@ hyperspace:
                     name: letsencrypt-prod
                     kind: ClusterIssuer
                 dns01Provider: gke
-        controller:
-            required: false
 
     # Scripts for setting up keycloak for hyperspace
     configurationScripts:
