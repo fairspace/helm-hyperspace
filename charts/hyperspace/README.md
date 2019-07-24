@@ -7,8 +7,7 @@ Contains:
 
 ## Prerequisites
 This chart relies on the following prerequisites:
-- If ingress is enabled, an active ingress controller should be present in the cluster. If this has not been setup, you can 
-  let this chart handle the installation by setting `hyperspace.ingress.controller.required` to true.
+- If ingress is enabled, an active nginx ingress controller should be present in the cluster. 
 - If a TLS certificate is to be obtained automatically, an installation of `cert-manager` should be present in the cluster. See
   https://cert-manager.readthedocs.io/en/latest/getting-started/2-installing.html#with-helm for the easiest way to set it up. Please
   note that the certificate that is being created, relies on a dns01 challenge provider being configured properly, as well as on a 
@@ -50,7 +49,6 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 | `ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for hyperspace  | true  |
 | `ingress.tls.secretNameOverride`  | If set, this secret name is used for loading certificates for TLS. | `tls-<release name>` |
 | `ingress.tls.certificate.obtain`  | If set, a `Certificate` object will be created, such that [cert-manager](https://cert-manager.readthedocs.io/en/latest/) will request a certificate automatically. | true |
-| `ingress.controller.required`  | If set to true, an nginx-ingress controller will be installed along with the application. | false |
 
 To retrieve the initial user password run:
 
