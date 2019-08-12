@@ -35,6 +35,9 @@ hyperspace:
             limits:
                 cpu: "500m"
                 memory: "2048Mi"
+    organisationadmin:
+        username:
+        password: fairspace123
 
 # Keycloak configuration
 keycloak:
