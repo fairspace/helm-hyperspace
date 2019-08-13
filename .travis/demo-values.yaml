@@ -1,5 +1,5 @@
 hyperspace:
-  name: "Fairspace Demo"
+  name: "Fairspace-Demo"
   keycloak:
     realm: demo
   ingress:
