@@ -3,6 +3,9 @@ hyperspace:
     realm: ci
   ingress:
     domain: hyperspace.ci.fairway.app
+  configurationScripts:
+    configurationScriptsTag: 0.1.4-SNAPSHOT
+    pullPolicy: Always
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
