@@ -5,6 +5,7 @@ fairspaceImagePullSecret:
 
 # Setup ingress for hyperspace components
 hyperspace:
+    name: Fairspace
     keycloak:
         realm:
     ingress:

@@ -42,6 +42,7 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 
 | Parameter  | Description  | Default |
 |---|---|---|
+| `hyperspace.name`  | Name of the hyperspace | Fairspace |
 | `hyperspace.keycloak.realm`  | Realm to be used within keycloak |  |
 | `keycloak.keycloak.service.type`  | [Servicetype](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for the Keycloak service. |  ClusterIP |
 | `hyperspace.organisationadmin.username` | Username for the organisation admin that will be created for this hyperspace | `organisation-admin-<realm>` |
