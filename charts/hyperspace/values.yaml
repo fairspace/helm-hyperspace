@@ -5,6 +5,7 @@ fairspaceImagePullSecret:
 
 # Setup ingress for hyperspace components
 hyperspace:
+    name: Fairspace
     keycloak:
         realm:
     ingress:
@@ -35,6 +36,9 @@ hyperspace:
             limits:
                 cpu: "500m"
                 memory: "2048Mi"
+    organisationadmin:
+        username:
+        password: fairspace123
 
 # Keycloak configuration
 keycloak:
