@@ -15,6 +15,10 @@ compileJava {
     targetCompatibility = 11
 }
 
+application {
+    mainClassName = "io.fairspace.portal.App"
+}
+
 repositories {
     mavenCentral()
 }
