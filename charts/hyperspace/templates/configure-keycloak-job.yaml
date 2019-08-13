@@ -38,6 +38,16 @@ spec:
               secretKeyRef:
                 name: "{{ template "keycloak.prefix" . }}-http"
                 key: password
+          - name: ORGANISATION_ADMIN_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: "{{.Values.hyperspace.keycloak.realm}}-organisationadmin"
+                key: username
+          - name: ORGANISATION_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{.Values.hyperspace.keycloak.realm}}-organisationadmin"
+                key: password
         command:
         - "/opt/jboss/scripts/setup-keycloak-hyperspace.sh"
         - "http://{{ template "keycloak.prefix" . }}-headless:8080/auth"

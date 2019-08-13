@@ -1,4 +1,5 @@
 hyperspace:
+  name: "Fairspace-CI"
   keycloak:
     realm: ci
   ingress:
