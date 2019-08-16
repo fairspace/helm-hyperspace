@@ -33,8 +33,4 @@ data:
         socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}
 
       routes:
-        # Please note that the order of the routes is relevant
-        # The elasticsearch route must be defined before
-        # saturn, which must be defined before ui, because of the
-        # paths they listen to        ui:
           url: {{ .Values.pluto.backends.portal | default (printf "http://%s-portal.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
