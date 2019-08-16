@@ -71,15 +71,8 @@ Create the keycloak baseUrl, either by using the override value or constructing 
 {{- end -}}
 {{- end -}}
 
-{{/* Pluto external hostname */}}
-{{- define "pluto.hostname" -}}
-{{- .Values.hyperspace.ingress.domain -}}
-{{- end -}}
 {{- define "pluto.fullname" -}}
 {{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
-{{- end -}}
-{{- define "hyperspace.url" -}}
-https://{{ template "pluto.hostname" . }}
 {{- end -}}
 
 {{/* Organisation portal external hostname */}}
