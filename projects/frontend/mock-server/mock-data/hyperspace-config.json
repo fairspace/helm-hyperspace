@@ -1,0 +1,7 @@
+{
+  "roles": {
+    "user": "user-workspace",
+    "organisationAdmin": "organisation-admin",
+    "workspaceCoordinator": "workspace-coordinator"
+  }
+}
