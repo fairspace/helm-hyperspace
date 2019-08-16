@@ -74,8 +74,7 @@ tracing:
 
 #####################################################################
 # Specific settings for Pluto subchart
-# Default configuration points to mercury and saturn
-# in the same workspace
+# Default configuration points to organisation portal
 #####################################################################
 pluto:
     replicaCount: 1
