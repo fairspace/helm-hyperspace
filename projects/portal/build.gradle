@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        oidcAuthVersion = '0.1.0-SNAPSHOT'
+        oidcAuthVersion = '0.7.0-SNAPSHOT'
     }
 }
 
@@ -26,8 +26,10 @@ application {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
+
+    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
+    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-snapshots/" }
 }
 
 dependencies {
