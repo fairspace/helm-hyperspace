@@ -92,3 +92,7 @@ https://{{ template "pluto.hostname" . }}
 {{- define "hyperspace.url" -}}
 https://{{ template "portal.hostname" . }}
 {{- end -}}
+
+{{- define "frontend.fullname" -}}
+{{- .Values.frontend.nameOverride | default (printf "%s-frontend" .Release.Name) -}}
+{{- end -}}

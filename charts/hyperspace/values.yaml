@@ -174,3 +174,35 @@ portal:
     # Zuul timeouts when connecting to upstream services
     socketTimeoutMillis: 15000
     connectTimeoutMillis: 2000
+
+#####################################################################
+# Specific settings for Frontend subchart
+#####################################################################
+frontend:
+    replicaCount: 1
+    image:
+        image: eu.gcr.io/fairspace-207108/frontend
+        tag: RELEASEVERSION
+        pullPolicy: IfNotPresent
+    service:
+        type: ClusterIP
+        externalPort: 80
+        internalPort: 80
+    resources:
+        limits:
+            cpu: 200m
+            memory: 128Mi
+        requests:
+            cpu: 100m
+            memory: 64Mi
+    probePath: /
+    livenessProbe:
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+    readinessProbe:
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+    terminationGracePeriodSeconds: 10
