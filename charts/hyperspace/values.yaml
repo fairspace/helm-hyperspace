@@ -125,8 +125,7 @@ pluto:
     connectTimeoutMillis: 2000
 
 # Specific settings for Pluto subchart
-# Default configuration points to mercury and saturn
-# in the same workspace
+# Default configuration points to organisation portal
 #####################################################################
 portal:
     replicaCount: 1
