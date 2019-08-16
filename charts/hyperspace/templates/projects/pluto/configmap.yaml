@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "pluto.fullname" . }}
+  labels:
+    app: pluto
+    chart: {{ template "hyperspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    app:
+      domains:
+        - {{ template "hyperspace.url" . }}
+      oauth2:
+        base-url: {{ template "keycloak.baseUrl" . }}
+        realm: {{ .Values.hyperspace.keycloak.realm }}
+
+    security:
+      oidc:
+        redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "hyperspace.url" .) }}
+        required-authority: {{ .Values.hyperspace.organisationadmin.username | default (printf "orgnisation-admin-%s" (include "hyperspace.name" .)) }}
+
+    spring:
+      zipkin:
+        enabled: {{ .Values.tracing.enabled }}
+        base-url: {{ .Values.tracing.baseUrl }}
+
+    zuul:
+      retryable: false
+      host:
+        connect-timeout-millis: {{ .Values.pluto.connectTimeoutMillis }}
+        socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}
+
+      routes:
+        # Please note that the order of the routes is relevant
+        # The elasticsearch route must be defined before
+        # saturn, which must be defined before ui, because of the
+        # paths they listen to        ui:
+          url: {{ .Values.pluto.backends.portal | default (printf "http://%s-portal.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}

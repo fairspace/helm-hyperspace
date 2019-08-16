@@ -51,3 +51,44 @@ Create a name for the tls secret for hyperspace
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create the keycloak baseUrl, either by using the override value or constructing it ourselves
+*/}}
+{{- define "keycloak.baseUrl" -}}
+
+{{- if .Values.hyperspace.locationOverrides.keycloak -}}
+{{- .Values.hyperspace.locationOverrides.keycloak -}}
+{{- else -}}
+
+{{- if .Values.hyperspace.tls -}}
+{{- $scheme := "https" -}}
+{{- printf "%s://keycloak.%s" $scheme .Values.hyperspace.ingress.domain -}}
+{{- else -}}
+{{- $scheme := "http" -}}
+{{- printf "%s://keycloak.%s" $scheme .Values.hyperspace.ingress.domain -}}
+{{- end -}}
+
+{{- end -}}
+{{- end -}}
+
+{{/* Pluto external hostname */}}
+{{- define "pluto.hostname" -}}
+{{- .Values.hyperspace.ingress.domain -}}
+{{- end -}}
+{{- define "pluto.fullname" -}}
+{{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
+{{- end -}}
+{{- define "hyperspace.url" -}}
+https://{{ template "pluto.hostname" . }}
+{{- end -}}
+
+{{/* Organisation portal external hostname */}}
+{{- define "portal.hostname" -}}
+{{- .Values.hyperspace.ingress.domain -}}
+{{- end -}}
+{{- define "portal.fullname" -}}
+{{- .Values.portal.nameOverride | default (printf "%s-portal" .Release.Name) -}}
+{{- end -}}
+{{- define "hyperspace.url" -}}
+https://{{ template "portal.hostname" . }}
+{{- end -}}

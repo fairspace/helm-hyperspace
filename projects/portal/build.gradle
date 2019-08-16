@@ -1,9 +1,15 @@
+buildscript {
+    ext {
+        oidcAuthVersion = '0.1.0-SNAPSHOT'
+    }
+}
+
 plugins {
     id 'java'
     id 'io.franzbecker.gradle-lombok' version '2.0'
     id 'application'
     id 'jacoco'
-    id  'com.github.spotbugs' version '1.6.10'
+//    id  'com.github.spotbugs' version '1.6.10'
     id "org.owasp.dependencycheck" version "5.0.0-M3.1"
 }
 
@@ -20,6 +26,7 @@ application {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -27,6 +34,8 @@ dependencies {
     implementation "com.sparkjava:spark-core:2.9.0"
     implementation "com.fasterxml.jackson.core:jackson-core:2.9.9"
     implementation "com.fasterxml.jackson.core:jackson-databind:2.9.9"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.9"
+    implementation "io.fairspace:oidc-auth-base:${oidcAuthVersion}"
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
