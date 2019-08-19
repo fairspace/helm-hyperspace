@@ -9,7 +9,7 @@ import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import LoadingInlay from "../LoadingInlay";
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../constants";
 import Routes from "../Routes";
-import HyperspaceContext from "../HyperspaceContext";
+import VersionContext from "../VersionContext";
 import UserContext from "../UserContext";
 
 const Layout = ({classes}) => {
@@ -17,7 +17,7 @@ const Layout = ({classes}) => {
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const {currentUserLoading} = useContext(UserContext);
-    const {name: hyperspaceName, version, loading: hyperspaceInfoLoading, redirecting} = useContext(HyperspaceContext);
+    const {name: hyperspaceName, version, loading: hyperspaceInfoLoading, redirecting} = useContext(VersionContext);
 
     if (redirecting || hyperspaceInfoLoading || currentUserLoading) {
         return <LoadingInlay />;

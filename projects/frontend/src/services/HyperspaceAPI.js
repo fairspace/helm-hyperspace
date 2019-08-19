@@ -8,9 +8,9 @@ const requestOptions = {
 };
 
 class HyperspaceAPI {
-    getHyperspace() {
-        return axios.get(Config.get().urls.hyperspace, requestOptions)
-            .catch(handleHttpError('Error while loading workspace details'))
+    getVersion() {
+        return axios.get(Config.get().urls.version, requestOptions)
+            .catch(handleHttpError('Error while loading version details'))
             .then(extractJsonData);
     }
 }

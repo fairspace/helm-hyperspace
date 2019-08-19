@@ -7,16 +7,16 @@ const initialState = {
     version: ''
 };
 
-const HyperspaceContext = React.createContext(initialState);
+const VersionContext = React.createContext(initialState);
 
-export const HyperspaceProvider = ({children}) => {
+export const VersionProvider = ({children}) => {
     const [info, setInfo] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [redirecting, setRedirecting] = useState(false);
 
     useEffect(() => {
         setLoading(true);
-        HyperspaceAPI.getHyperspace()
+        HyperspaceAPI.getVersion()
             .then(i => {
                 setInfo(i);
                 setLoading(false);
@@ -27,7 +27,7 @@ export const HyperspaceProvider = ({children}) => {
     }, []);
 
     return (
-        <HyperspaceContext.Provider
+        <VersionContext.Provider
             value={{
                 ...info,
                 loading,
@@ -35,8 +35,8 @@ export const HyperspaceProvider = ({children}) => {
             }}
         >
             {children}
-        </HyperspaceContext.Provider>
+        </VersionContext.Provider>
     );
 };
 
-export default HyperspaceContext;
+export default VersionContext;

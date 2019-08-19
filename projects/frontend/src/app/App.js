@@ -8,7 +8,7 @@ import Layout from "./Layout/Layout";
 import LoadingInlay from './LoadingInlay';
 import {UserProvider} from './UserContext';
 import useIsMounted from "./useIsMounted";
-import {HyperspaceProvider} from "./HyperspaceContext";
+import {VersionProvider} from "./VersionContext";
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -24,7 +24,7 @@ const App = () => {
     }
 
     return (
-        <HyperspaceProvider>
+        <VersionProvider>
             <UserProvider>
                 <MuiThemeProvider theme={theme}>
                     <Router>
@@ -32,7 +32,7 @@ const App = () => {
                     </Router>
                 </MuiThemeProvider>
             </UserProvider>
-        </HyperspaceProvider>
+        </VersionProvider>
     );
 };
 

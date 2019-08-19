@@ -2,7 +2,7 @@
   "urls": {
     "logout": "/logout",
     "userInfo": "/api/v1/account",
-    "hyperspace": "/config/version.json",
+    "version": "/config/version.json",
     "workspaces": "/api/v1/workspaces/"
   },
   "externalConfigurationFiles": [

@@ -1,10 +1,10 @@
 import {useContext, useEffect} from 'react';
-import HyperspaceContext from "./HyperspaceContext";
+import VersionContext from "./VersionContext";
 
 const separator = '-';
 
 const UsePageTitleUpdater = (segments) => {
-    const {name: hyperspaceName} = useContext(HyperspaceContext);
+    const {name: hyperspaceName} = useContext(VersionContext);
 
     useEffect(() => {
         const labels = segments ? segments.map(({label}) => label).join('/') : '';
