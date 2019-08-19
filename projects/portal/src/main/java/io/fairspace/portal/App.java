@@ -1,8 +1,8 @@
 package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
+import io.fairspace.portal.services.TillerLocalPortForward;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
@@ -21,10 +21,8 @@ public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
 
     public static void main(String[] args) throws IOException {
-        var client = new DefaultKubernetesClient(CONFIG.kubernetes);
-        var tiller = new Tiller(client);
+        var tiller = new Tiller(new TillerLocalPortForward());
         var releaseManager = new ReleaseManager(tiller);
-
         var workspaceService = new WorkspaceService(releaseManager);
         initSpark(workspaceService);
     }
@@ -33,7 +31,7 @@ public class App {
         port(8080);
 
         if (CONFIG.auth.enabled) {
-            before("/*", (request, response) -> {
+            before((request, response) -> {
                 if (request.uri().equals("/api/v1/health")) {
                     return;
                 }

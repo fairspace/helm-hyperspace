@@ -5,8 +5,3 @@ auth:
   jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
   # JWK encryption algorithm. Defaults to "RS256"
   jwtAlgorithm: "RS256"
-kubernetes:
-  masterUrl:
-  caCertData:
-  username:
-  password:

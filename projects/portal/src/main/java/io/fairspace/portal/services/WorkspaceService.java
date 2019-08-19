@@ -8,7 +8,6 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-//@Slf4j
 public class WorkspaceService {
     private static final String WORKSPACE_CHART_NAME = "workspace";
     private static final String WORKSPACE_NAME_PREFIX = "workspace-";
@@ -26,13 +25,13 @@ public class WorkspaceService {
                     .getReleasesList()
                     .stream()
                     .filter(release -> release.getChart().getMetadata().getName().equals(WORKSPACE_CHART_NAME))
-                    .map(release -> new Workspace(stripName(release.getName())))
+                    .map(release -> new Workspace(stripNamePrefix(release.getName())))
                     .collect(toList());
         }
         return List.of();
     }
 
-    private static String stripName(String name) {
+    private static String stripNamePrefix(String name) {
         return name.startsWith(WORKSPACE_NAME_PREFIX) ? name.substring(WORKSPACE_NAME_PREFIX.length()) : name;
     }
 }
