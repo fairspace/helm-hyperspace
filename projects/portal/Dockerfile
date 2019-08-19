@@ -4,4 +4,4 @@ ADD build/distributions/*.tar /opt/
 EXPOSE 8080
 
 WORKDIR "/opt/config"
-CMD ["/bin/sh", "-c", "/opt/organisation-portal-*/bin//organisation-portal"]
+CMD ["/bin/sh", "-c", "/opt/portal-*/bin//portal"]
