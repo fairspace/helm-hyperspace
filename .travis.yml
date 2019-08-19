@@ -56,9 +56,7 @@ jobs:
         - ci/gcp/install.sh
         - ci/gcp/login.sh
       script:
-        - echo Nothing to build yet
-        # - .travis/build.sh projects/saturn
-        # - .travis/build.sh projects/mercury
+        - .travis/build.sh projects/portal
     - stage: build
       cache: false
       name: Build helm charts

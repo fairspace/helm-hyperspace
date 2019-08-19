@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "portal.fullname" . }}
+  labels:
+    app: portal
+    chart: {{ template "hyperspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    auth:
+      enabled: true
+      jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
+      jwtAlgorithm: "RS256"
