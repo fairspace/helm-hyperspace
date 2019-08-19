@@ -74,8 +74,7 @@ tracing:
 
 #####################################################################
 # Specific settings for Pluto subchart
-# Default configuration points to mercury and saturn
-# in the same workspace
+# Default configuration points to organisation portal
 #####################################################################
 pluto:
     replicaCount: 1
@@ -84,7 +83,7 @@ pluto:
         maxSurge: 25%
     image:
         image: eu.gcr.io/fairspace-207108/pluto
-        tag: "0.6.7-SNAPSHOT"
+        tag: 0.6.6
         pullPolicy: IfNotPresent
     service:
         type: ClusterIP
@@ -125,8 +124,7 @@ pluto:
     connectTimeoutMillis: 2000
 
 # Specific settings for Pluto subchart
-# Default configuration points to mercury and saturn
-# in the same workspace
+# Default configuration points to organisation portal
 #####################################################################
 portal:
     replicaCount: 1
@@ -135,7 +133,7 @@ portal:
         maxSurge: 25%
     image:
         image: eu.gcr.io/fairspace-207108/portal
-        tag: "0.6.7-SNAPSHOT"
+        tag: RELEASEVERSION
         pullPolicy: IfNotPresent
     service:
         type: ClusterIP
