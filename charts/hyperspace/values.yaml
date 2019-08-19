@@ -39,6 +39,7 @@ hyperspace:
     organisationadmin:
         username:
         password: fairspace123
+    locationOverrides: {}
 
 # Keycloak configuration
 keycloak:
@@ -172,3 +173,5 @@ portal:
     # Zuul timeouts when connecting to upstream services
     socketTimeoutMillis: 15000
     connectTimeoutMillis: 2000
+
+podAnnotations: {}
