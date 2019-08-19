@@ -55,7 +55,6 @@ Create a name for the tls secret for hyperspace
 Create the keycloak baseUrl, either by using the override value or constructing it ourselves
 */}}
 {{- define "keycloak.baseUrl" -}}
-
 {{- if .Values.hyperspace.locationOverrides.keycloak -}}
 {{- .Values.hyperspace.locationOverrides.keycloak -}}
 {{- else -}}
