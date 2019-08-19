@@ -15,4 +15,8 @@ data:
         "workspaceCoordinator": "workspace-coordinator"
       }
     }
-
+  version.json: |-
+    {
+      "name": "{{ .Release.Name }}",
+      "version": "{{ .Release.Version }}"
+    }
