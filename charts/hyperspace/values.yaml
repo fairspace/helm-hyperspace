@@ -39,6 +39,7 @@ hyperspace:
     organisationadmin:
         username:
         password: fairspace123
+    locationOverrides: {}
 
 # Keycloak configuration
 keycloak:
@@ -204,3 +205,5 @@ frontend:
         successThreshold: 1
         timeoutSeconds: 1
     terminationGracePeriodSeconds: 10
+
+podAnnotations: {}
