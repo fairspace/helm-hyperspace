@@ -1,5 +1,5 @@
 import {createMuiTheme} from "@material-ui/core";
-import {grey, blue, blueGrey} from "@material-ui/core/colors";
+import {blue, blueGrey} from "@material-ui/core/colors";
 
 export default createMuiTheme({
     typography: {

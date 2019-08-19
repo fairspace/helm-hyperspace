@@ -1,8 +1,8 @@
 import React from 'react';
 import {Route} from "react-router-dom";
 
-import Home from "./Home";
-import logout from "../services/logout";
+import Home from "./home/Home";
+import logout from "./common/services/logout";
 
 const routes = () => (
     <>

@@ -2,13 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 
-import Config from "../services/Config/Config";
+import Config from "./common/services/Config/Config";
 import theme from './App.theme';
-import Layout from "./Layout/Layout";
-import LoadingInlay from './LoadingInlay';
-import {UserProvider} from './UserContext';
-import useIsMounted from "./useIsMounted";
-import {VersionProvider} from "./VersionContext";
+import Layout from "./common/components/Layout/Layout";
+import LoadingInlay from './common/components/LoadingInlay';
+import {UserProvider} from './common/contexts/UserContext';
+import useIsMounted from "./common/hooks/useIsMounted";
+import {VersionProvider} from "./common/contexts/VersionContext";
 
 const App = () => {
     const isMounted = useIsMounted();

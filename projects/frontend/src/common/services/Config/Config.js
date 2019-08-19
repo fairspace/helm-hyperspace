@@ -1,7 +1,7 @@
 import merge from 'deepmerge';
 import axios from 'axios';
 
-import internalConfig from "../../config";
+import internalConfig from "../../../config";
 
 class Config {
     static instance;

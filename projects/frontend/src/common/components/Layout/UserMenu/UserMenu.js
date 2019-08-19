@@ -4,7 +4,7 @@ import {
     Paper, Popper, ClickAwayListener, MenuList
 } from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
-import UserContext from "../../UserContext";
+import UserContext from "../../../contexts/UserContext";
 import MessageDisplay from "../../MessageDisplay";
 
 const styles = {

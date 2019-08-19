@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import {Link as RouterLink} from 'react-router-dom';
 import {Breadcrumbs, Icon, Link} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
-import BreadcrumbsContext from "./BreadcrumbsContext";
-import usePageTitleUpdater from '../UsePageTitleUpdater';
+import BreadcrumbsContext from "../contexts/BreadcrumbsContext";
+import usePageTitleUpdater from '../hooks/UsePageTitleUpdater';
 
 /**
  * Renders a list of breadcrumbs

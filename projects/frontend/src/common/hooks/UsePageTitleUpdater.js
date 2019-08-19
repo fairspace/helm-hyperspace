@@ -1,5 +1,5 @@
 import {useContext, useEffect} from 'react';
-import VersionContext from "./VersionContext";
+import VersionContext from "../contexts/VersionContext";
 
 const separator = '-';
 

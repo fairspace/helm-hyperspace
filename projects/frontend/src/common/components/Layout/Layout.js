@@ -7,10 +7,10 @@ import Footer from './Footer/Footer';
 import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
 import LoadingInlay from "../LoadingInlay";
-import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../constants";
-import Routes from "../Routes";
-import VersionContext from "../VersionContext";
-import UserContext from "../UserContext";
+import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
+import Routes from "../../../Routes";
+import VersionContext from "../../contexts/VersionContext";
+import UserContext from "../../contexts/UserContext";
 
 const Layout = ({classes}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');

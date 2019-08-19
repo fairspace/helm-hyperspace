@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
 import LoadingInlay from './LoadingInlay';
-import UserContext from "./UserContext";
+import UserContext from "../contexts/UserContext";
 
 /**
  * This component performs an authorization check for the current user
