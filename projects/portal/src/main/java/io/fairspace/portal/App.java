@@ -20,8 +20,13 @@ public class App {
         port(8080);
 
         if (CONFIG.auth.enabled) {
-            before((request, response) -> {
+            before("/*", (request, response) -> {
+                if (request.uri().equals("/api/v1/health")) {
+                    return;
+                }
+
                 var token = getUserInfo(request, tokenValidator);
+
                 if (token == null) {
                     halt(401);
                 }
