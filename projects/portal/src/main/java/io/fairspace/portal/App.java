@@ -10,7 +10,7 @@ import static spark.Spark.*;
 
 public class App {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);;
+    private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
 
     public static void main(String[] args) {
         initSpark();
@@ -35,6 +35,8 @@ public class App {
                     return CONFIG.workspaces;
                 }, mapper::writeValueAsString);
             });
+
+            get("/health", (request, response) -> "OK");
         });
     }
 }
