@@ -12,7 +12,7 @@ import java.util.*;
 public class Config {
     public final Auth auth = new Auth();
 
-    public List<Workspace> workspaces = new ArrayList<>();
+    public final io.fabric8.kubernetes.client.Config kubernetes = io.fabric8.kubernetes.client.Config.autoConfigure(null);
 
     public static class Auth {
         public boolean enabled = false;

@@ -1,39 +1,38 @@
 package io.fairspace.portal.services;
 
-import hapi.services.tiller.Tiller;
+import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
 import org.microbean.helm.ReleaseManager;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class WorkspaceService implements Closeable {
+//@Slf4j
+public class WorkspaceService {
+    private static final String WORKSPACE_CHART_NAME = "workspace";
+    private static final String WORKSPACE_NAME_PREFIX = "workspace-";
+
     private final ReleaseManager releaseManager;
 
     public WorkspaceService(ReleaseManager releaseManager) {
         this.releaseManager = releaseManager;
     }
 
-    @Override
-    public void close() throws IOException {
-        releaseManager.close();
-    }
-
-
     public List<Workspace> listWorkspaces() {
-        var request = Tiller.ListReleasesRequest.newBuilder().build();
-        var response = releaseManager.list(request);
+        var response = releaseManager.list(ListReleasesRequest.getDefaultInstance());
         if (response.hasNext()) {
             return response.next()
                     .getReleasesList()
                     .stream()
-                    .filter(release -> release.getChart().getMetadata().getName().equals("workspace"))
-                    .map(release -> new Workspace(release.getName()))
+                    .filter(release -> release.getChart().getMetadata().getName().equals(WORKSPACE_CHART_NAME))
+                    .map(release -> new Workspace(stripName(release.getName())))
                     .collect(toList());
         }
         return List.of();
+    }
+
+    private static String stripName(String name) {
+        return name.startsWith(WORKSPACE_NAME_PREFIX) ? name.substring(WORKSPACE_NAME_PREFIX.length()) : name;
     }
 }
