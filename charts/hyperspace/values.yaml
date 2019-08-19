@@ -118,7 +118,8 @@ pluto:
 
     # Where to find the backends for this proxy
     backends:
-        portal:
+      portal:
+      frontend:
 
     # Zuul timeouts when connecting to upstream services
     socketTimeoutMillis: 15000
