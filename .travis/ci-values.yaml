@@ -1,6 +1,7 @@
 hyperspace:
   name: "Fairspace-CI"
   keycloak:
+    clientSecret: 73808b94-7410-4a69-a4a5-6d1884683602
     realm: ci
   ingress:
     domain: hyperspace.ci.fairway.app
@@ -15,3 +16,6 @@ keycloak:
   postgresql:
     postgresPassword: "9FGwLKpEu$4w/knG"
 
+pluto:
+  keycloak:
+    redirectAfterLogoutUrl:

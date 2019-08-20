@@ -1,6 +1,7 @@
 hyperspace:
   name: "Fairspace-Demo"
   keycloak:
+    clientSecret: b91575e7-a61d-489d-8302-e25a29d794ed
     realm: demo
   ingress:
     domain: hyperspace.demo.fairway.app
