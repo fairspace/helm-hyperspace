@@ -2,7 +2,7 @@ package io.fairspace.portal.services;
 
 import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
-import hapi.services.tiller.Tiller;
+import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
 import org.microbean.helm.ReleaseManager;
@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class WorkspaceService {
     private final ReleaseManager releaseManager;
@@ -40,12 +39,12 @@ public class WorkspaceService {
         return result;
     }
 
-    public Workspace installWorkspace(Workspace workspace) throws IOException, ExecutionException, InterruptedException {
-        var requestBuilder = Tiller.InstallReleaseRequest.newBuilder()
-                .setName(addNamePrefix(workspace.getName()))
-                .setWait(true);
-        var release = releaseManager.install(requestBuilder, chart).get().getRelease();
-        return releaseToWorkspace(release);
+    public void installWorkspace(Workspace workspace) throws IOException {
+        var prefixedName = addNamePrefix(workspace.getName());
+        var requestBuilder = InstallReleaseRequest.newBuilder()
+                .setName(prefixedName)
+                .setNamespace(prefixedName);
+        releaseManager.install(requestBuilder, chart);
     }
 
     private Workspace releaseToWorkspace(ReleaseOuterClass.Release release) {

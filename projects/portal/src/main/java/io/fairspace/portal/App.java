@@ -57,8 +57,8 @@ public class App {
                 }, mapper::writeValueAsString);
 
                 put("", (request, response) -> {
-                    response.type(APPLICATION_JSON.asString());
-                    return workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));
+                    workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));
+                    return "";
                 }, mapper::writeValueAsString);
             });
 
