@@ -2,15 +2,17 @@ package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.JwtTokenValidator;
-import io.fairspace.portal.services.TillerLocalPortForward;
+import io.fairspace.portal.services.StaticLocalPortForward;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.Tiller;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import static io.fairspace.portal.Authentication.getUserInfo;
+import static io.fairspace.portal.Config.WORKSPACE_CHART;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
@@ -21,9 +23,11 @@ public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
 
     public static void main(String[] args) throws IOException {
-        var tiller = new Tiller(new TillerLocalPortForward());
+        var localPortForward = new StaticLocalPortForward(InetAddress.getByName(CONFIG.tiller.namespace + "." + CONFIG.tiller.service), CONFIG.tiller.port);
+        var tiller = new Tiller(localPortForward);
         var releaseManager = new ReleaseManager(tiller);
-        var workspaceService = new WorkspaceService(releaseManager);
+        var workspaceService = new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));
+
         initSpark(workspaceService);
     }
 

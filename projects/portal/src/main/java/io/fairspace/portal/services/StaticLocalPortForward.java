@@ -4,16 +4,14 @@ import io.fabric8.kubernetes.client.LocalPortForward;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
-public class TillerLocalPortForward implements LocalPortForward {
-    private static final String TILLER_SERVICE = "tiller-deploy.kube-system";
-    private static final int TILLER_PORT = 44134;
-
+public class StaticLocalPortForward implements LocalPortForward {
     private final InetAddress address;
+    private final int port;
 
-    public TillerLocalPortForward() throws UnknownHostException {
-        address = InetAddress.getByName(TILLER_SERVICE);
+    public StaticLocalPortForward(InetAddress address, int port) {
+        this.address = address;
+        this.port = port;
     }
 
     @Override
@@ -23,7 +21,7 @@ public class TillerLocalPortForward implements LocalPortForward {
 
     @Override
     public int getLocalPort() {
-        return TILLER_PORT;
+        return port;
     }
 
     @Override

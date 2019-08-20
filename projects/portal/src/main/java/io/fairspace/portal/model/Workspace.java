@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Workspace {
     private String name;
+    private String version;
 }
