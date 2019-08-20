@@ -23,7 +23,7 @@ public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
 
     public static void main(String[] args) throws IOException {
-        var localPortForward = new StaticLocalPortForward(InetAddress.getByName(CONFIG.tiller.namespace + "." + CONFIG.tiller.service), CONFIG.tiller.port);
+        var localPortForward = new StaticLocalPortForward(InetAddress.getByName(CONFIG.tiller.service), CONFIG.tiller.port);
         var tiller = new Tiller(localPortForward);
         var releaseManager = new ReleaseManager(tiller);
         var workspaceService = new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));

@@ -25,8 +25,7 @@ public class Config {
     }
 
     public static class Tiller {
-        public String namespace = "kube-system";
-        public String service = "tiller-deploy";
+        public String service = "tiller-deploy.kube-system";
         public int port = 44134;
     }
 

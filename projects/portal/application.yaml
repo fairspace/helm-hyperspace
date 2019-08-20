@@ -6,8 +6,7 @@ auth:
   # JWK encryption algorithm. Defaults to "RS256"
   jwtAlgorithm: RS256
 tiller:
-  namespace: kube-system
-  service: tiller-deploy
+  service: tiller-deploy.kube-system
   port: 44134
 charts:
   workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7-SNAPSHOT.tgz
