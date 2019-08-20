@@ -136,7 +136,7 @@ portal:
     image:
         image: eu.gcr.io/fairspace-207108/portal
         tag: RELEASEVERSION
-        pullPolicy: Always
+        pullPolicy: IfNotPresent
     service:
         type: ClusterIP
         externalPort: 80
