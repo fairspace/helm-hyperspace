@@ -1,7 +1,7 @@
 hyperspace:
   name: "Fairspace-CI"
   keycloak:
-    clientSecret: 73808b94-7410-4a69-a4a5-6d1884683602
+    clientSecret: e38026bd-c9d2-4430-8171-d3c58e8cec53
     realm: ci
   ingress:
     domain: hyperspace.ci.fairway.app
