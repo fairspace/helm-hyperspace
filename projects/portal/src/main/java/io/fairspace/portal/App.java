@@ -2,6 +2,7 @@ package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.JwtTokenValidator;
+import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.services.StaticLocalPortForward;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,11 @@ public class App {
                 get("", (request, response) -> {
                     response.type(APPLICATION_JSON.asString());
                     return workspaceService.listWorkspaces();
+                }, mapper::writeValueAsString);
+
+                put("", (request, response) -> {
+                    response.type(APPLICATION_JSON.asString());
+                    return workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));
                 }, mapper::writeValueAsString);
             });
 
