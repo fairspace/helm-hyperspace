@@ -7,6 +7,8 @@ fairspaceImagePullSecret:
 hyperspace:
     name: Fairspace
     keycloak:
+        clientId: hyperspace
+        clientSecret:
         realm:
     ingress:
         enabled: true
@@ -109,10 +111,8 @@ pluto:
     terminationGracePeriodSeconds: 10
 
     # Keycloak configuration for authentication
+    # See also hyperspace.keycloak.clientId and hyperspace.keycloak.clientSecret
     keycloak:
-        client:
-            id:
-            secret:
         redirectAfterLogoutUrl:
 
     # Where to find the backends for this proxy
@@ -124,7 +124,7 @@ pluto:
     socketTimeoutMillis: 15000
     connectTimeoutMillis: 2000
 
-# Specific settings for Pluto subchart
+#####################################################################
 # Default configuration points to organisation portal
 #####################################################################
 portal:
@@ -158,21 +158,6 @@ portal:
         successThreshold: 1
         timeoutSeconds: 1
     terminationGracePeriodSeconds: 10
-
-    # Keycloak configuration for authentication
-    keycloak:
-        client:
-            id:
-            secret:
-        redirectAfterLogoutUrl:
-
-    # Where to find the backends for this proxy
-    backends:
-        portal:
-
-    # Zuul timeouts when connecting to upstream services
-    socketTimeoutMillis: 15000
-    connectTimeoutMillis: 2000
 
 #####################################################################
 # Specific settings for Frontend subchart
