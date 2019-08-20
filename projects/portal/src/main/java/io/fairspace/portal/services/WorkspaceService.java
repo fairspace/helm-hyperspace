@@ -13,7 +13,7 @@ import java.util.List;
 
 public class WorkspaceService {
     private final ReleaseManager releaseManager;
-    private final ChartOuterClass.Chart.Builder chart;
+    private final ChartOuterClass.ChartOrBuilder chart;
 
     public WorkspaceService(ReleaseManager releaseManager, URL chartUrl) throws IOException {
         this.releaseManager = releaseManager;
