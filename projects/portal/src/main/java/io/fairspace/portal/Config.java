@@ -4,15 +4,17 @@ package io.fairspace.portal;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.fairspace.portal.model.Workspace;
 
-import java.io.File;
-import java.util.*;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Config {
-    public final Auth auth = new Auth();
+    public static final String WORKSPACE_CHART = "workspace";
 
-    public List<Workspace> workspaces = new ArrayList<>();
+    public final Auth auth = new Auth();
+    public final Tiller tiller = new Tiller();
+    public final Map<String, URL> charts = new HashMap<>();
 
     public static class Auth {
         public boolean enabled = false;
@@ -20,6 +22,11 @@ public class Config {
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
         public String jwtAlgorithm = "RS256";
+    }
+
+    public static class Tiller {
+        public String service = "tiller-deploy.kube-system";
+        public int port = 44134;
     }
 
     @Override

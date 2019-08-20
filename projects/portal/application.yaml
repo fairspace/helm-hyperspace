@@ -4,8 +4,9 @@ auth:
   # JWKS URL
   jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
   # JWK encryption algorithm. Defaults to "RS256"
-  jwtAlgorithm: "RS256"
-workspaces:
-  - name: "Workspace 1"
-  - name: "Workspace 2"
-  - name: "Workspace 3"
+  jwtAlgorithm: RS256
+tiller:
+  service: tiller-deploy.kube-system
+  port: 44134
+charts:
+  workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7-SNAPSHOT.tgz
