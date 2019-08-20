@@ -39,3 +39,6 @@ data:
           path: /api/${app.apiVersion.portal}/**
           url: {{ .Values.pluto.backends.portal | default (printf "http://%s-portal.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
           strip-prefix: false
+        frontend:
+          path: /**
+          url: {{ .Values.pluto.backends.frontend | default (printf "http://%s-frontend.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}

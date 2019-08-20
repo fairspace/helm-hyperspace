@@ -84,3 +84,7 @@ Create the keycloak baseUrl, either by using the override value or constructing 
 {{- define "hyperspace.url" -}}
 https://{{ template "portal.hostname" . }}
 {{- end -}}
+
+{{- define "frontend.fullname" -}}
+{{- .Values.frontend.nameOverride | default (printf "%s-frontend" .Release.Name) -}}
+{{- end -}}

@@ -57,6 +57,7 @@ jobs:
         - ci/gcp/login.sh
       script:
         - .travis/build.sh projects/portal
+        - .travis/build.sh projects/frontend
     - stage: build
       cache: false
       name: Build helm charts
