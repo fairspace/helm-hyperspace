@@ -31,7 +31,7 @@ public class WorkspaceService {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
                 if(release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
-                    result.add(new Workspace(stripNamePrefix(release.getName()), release.getChart().getMetadata().getVersion()));
+                    result.add(new Workspace(stripNamePrefix(release.getName()), release.getChart().getMetadata().getVersion(), release.getInfo().getStatus().getCode()));
                 }
             });
         }

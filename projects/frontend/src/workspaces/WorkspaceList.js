@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel
 } from "@material-ui/core";
@@ -9,7 +9,7 @@ import usePagination from "../common/hooks/UsePagination";
 import MessageDisplay from "../common/components/MessageDisplay";
 import WorkspaceAPI from "./WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
-import useAsync from "../common/hooks/UseAsync";
+import {useInterval} from "../common/utils/genericUtils";
 
 const columns = {
     name: {
@@ -19,20 +19,42 @@ const columns = {
     version: {
         valueExtractor: 'version',
         label: 'Version'
+    },
+    status: {
+        valueExtractor: 'status',
+        label: 'Status'
     }
 };
 
 const WorkspaceList = () => {
-    const [workspaces = [], loading, error] = useAsync(WorkspaceAPI.getWorkspaces);
+    const [workspaces, setWorkspaces] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, serError] = useState(null);
+
+    const refreshWorkspaces = () => WorkspaceAPI.getWorkspaces()
+        .then((workspaces) => {
+            setLoading(false);
+            serError(null);
+            setWorkspaces(workspaces);
+        })
+        .catch((error) => {
+            setLoading(false);
+            serError(error);
+            setWorkspaces([]);
+        });
+
+    // refresh every 5 seconds
+    useInterval(refreshWorkspaces, 5000);
+
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (loading) {
-        return <LoadingInlay />;
+        return <LoadingInlay/>;
     }
 
     if (error) {
-        return <MessageDisplay message="An error occurred while loading workspaces" />;
+        return <MessageDisplay message="An error occurred while loading workspaces"/>;
     }
 
     return (
@@ -40,7 +62,7 @@ const WorkspaceList = () => {
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell />
+                        <TableCell/>
                         <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'name'}
@@ -59,6 +81,15 @@ const WorkspaceList = () => {
                                 Version
                             </TableSortLabel>
                         </TableCell>
+                        <TableCell>
+                            <TableSortLabel
+                                active={orderBy === 'status'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('status')}
+                            >
+                                Status
+                            </TableSortLabel>
+                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -69,13 +100,16 @@ const WorkspaceList = () => {
                                 key={workspace.name}
                             >
                                 <TableCell align="left">
-                                    <FolderOpen />
+                                    <FolderOpen/>
                                 </TableCell>
                                 <TableCell>
                                     {workspace.name}
                                 </TableCell>
                                 <TableCell>
                                     {workspace.version}
+                                </TableCell>
+                                <TableCell>
+                                    {workspace.status}
                                 </TableCell>
                             </TableRow>
                         );
