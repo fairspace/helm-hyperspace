@@ -17,5 +17,15 @@ keycloak:
     postgresPassword: "9FGwLKpEu$4w/knG"
 
 pluto:
+  image:
+    pullPolicy: Always
   keycloak:
     redirectAfterLogoutUrl:
+
+portal:
+  image:
+    pullPolicy: Always
+
+frontend:
+  image:
+    pullPolicy: Always
