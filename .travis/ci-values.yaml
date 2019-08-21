@@ -17,5 +17,7 @@ keycloak:
     postgresPassword: "9FGwLKpEu$4w/knG"
 
 pluto:
+  image:
+    tag: 0.6.7-SNAPSHOT
   keycloak:
     redirectAfterLogoutUrl:
