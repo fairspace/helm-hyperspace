@@ -1,6 +1,7 @@
 package io.fairspace.portal.services;
 
 import hapi.chart.ChartOuterClass;
+import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
 import org.microbean.helm.ReleaseManager;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class WorkspaceService {
     private final ReleaseManager releaseManager;
-    private final ChartOuterClass.ChartOrBuilder chart;
+    private final ChartOuterClass.Chart.Builder chart;
 
     public WorkspaceService(ReleaseManager releaseManager, URL chartUrl) throws IOException {
         this.releaseManager = releaseManager;
@@ -35,6 +36,18 @@ public class WorkspaceService {
             });
         }
         return result;
+    }
+
+    public void installWorkspace(Workspace workspace) throws IOException {
+        var prefixedName = addNamePrefix(workspace.getName());
+        var requestBuilder = InstallReleaseRequest.newBuilder()
+                .setName(prefixedName)
+                .setNamespace(prefixedName);
+        releaseManager.install(requestBuilder, chart);
+    }
+
+    private String addNamePrefix(String name) {
+        return chart.getMetadata().getName() + "-" + name;
     }
 
     private String stripNamePrefix(String name) {
