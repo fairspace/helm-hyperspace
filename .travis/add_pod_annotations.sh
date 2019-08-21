@@ -14,6 +14,8 @@ PROJECTS=(portal frontend)
 # If we have no changes at all in any of the projects, we can skip
 # pod annotations
 if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/; then
+    echo "Adding pod annotations"
+
     # Remove empty pod annotations
     sed -i -e "s/podAnnotations: {}//" charts/hyperspace/values.yaml
 
@@ -24,6 +26,7 @@ if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/; then
     for project in ${PROJECTS[*]}
     do
         if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/$project; then
+            echo "Adding pod annotation for $project"
             echo -e "  ${project}:\n    commit : \"$COMMIT_ID\"\n" >> charts/hyperspace/values.yaml
         fi
     done
