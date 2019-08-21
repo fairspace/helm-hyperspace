@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography";
 const MessageDisplay = ({
     message, isError = true, withIcon = true,
     small = false, noMessage = false, variant = "body2",
-    color = 'inherit', messageColor = 'default', noWrap = true
+    color = 'inherit', messageColor = 'textPrimary', noWrap = true
 }) => (
     <div style={{textAlign: 'center', padding: 10}}>
         {withIcon && (

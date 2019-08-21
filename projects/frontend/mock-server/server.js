@@ -18,7 +18,7 @@ app.get('/api/v1/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.
 app.get('/config/config.json', (req, res) => res.sendFile(`${mockDataDir}/hyperspace-config.json`));
 app.get('/config/version.json', (req, res) => res.sendFile(`${mockDataDir}/version.json`));
 
-// Account API
 app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
+app.get('/api/v1/workspaces', (req, res) => res.sendFile(`${mockDataDir}/workspaces.json`));
 
 app.listen(port);
