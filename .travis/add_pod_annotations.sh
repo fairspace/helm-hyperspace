@@ -19,12 +19,12 @@ if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/; then
 
     # Add a pod annotation in the values.yaml file
     echo -e "\npodAnnotations:" >> charts/workspace/values.yaml
-    echo -e "  workspace:\n    commit: \"$COMMIT_ID\"\n" >> charts/workspace/values.yaml
+    echo -e "  hyperspace:\n    commit: \"$COMMIT_ID\"\n" >> charts/hyperspace/values.yaml
 
     for project in ${PROJECTS[*]}
     do
         if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/$project; then
-            echo -e "  ${project}:\n    commit: \"$COMMIT_ID\"\n" >> charts/workspace/values.yaml
+            echo -e "  ${project}:\n    commit: \"$COMMIT_ID\"\n" >> charts/hyperspace/values.yaml
         fi
     done
 fi
