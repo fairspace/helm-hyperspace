@@ -1,7 +1,6 @@
 package io.fairspace.portal.services;
 
 import hapi.chart.ChartOuterClass;
-import hapi.release.ReleaseOuterClass;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
@@ -32,7 +31,7 @@ public class WorkspaceService {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
                 if(release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
-                    result.add(releaseToWorkspace(release));
+                    result.add(new Workspace(stripNamePrefix(release.getName()), release.getChart().getMetadata().getVersion()));
                 }
             });
         }
@@ -45,10 +44,6 @@ public class WorkspaceService {
                 .setName(prefixedName)
                 .setNamespace(prefixedName);
         releaseManager.install(requestBuilder, chart);
-    }
-
-    private Workspace releaseToWorkspace(ReleaseOuterClass.Release release) {
-        return new Workspace(stripNamePrefix(release.getName()), release.getChart().getMetadata().getVersion());
     }
 
     private String addNamePrefix(String name) {
