@@ -7,7 +7,6 @@
 #
 # Usage: build-condition.sh <commitrange> <path>
 #
-
 if [[ -z $1 ]]; then
     echo "Commit range cannot be empty"
     echo "Usage: build-condition.sh <commitrange> <path>"
