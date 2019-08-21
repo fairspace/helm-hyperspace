@@ -22,21 +22,15 @@ data:
     security:
       oidc:
         redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "hyperspace.url" .) }}
-        required-authority: {{ .Values.hyperspace.organisationadmin.username | default (printf "orgnisation-admin-%s" (include "hyperspace.name" .)) }}
       urls:
         # Please note that by default pluto is configured to allow certain urls anonymously
         # (e.g. login or health), and is configured to require specific authorization for anything else
-        # This configuration will make sure that all frontend resources can be accessed for anyone
-        # that has logged in, even if the user does not have the required authority. This enables the
-        # frontend to show a nice error message
+        # This configuration will make sure that anyone with a valid token will be able to access the
+        # organisation portal. This means that specific authorizations will have to be checked in the
+        # applications themselves
         needsAuthentication:
-        - /
-        - /static/*
-        - /public/*
-        - /config/*
-        - /workspaces/*
-        - "*.js"
-        - /api/${app.apiVersion.pluto}/account/*
+        - /*
+        needsAuthorization: []
     spring:
       zipkin:
         enabled: {{ .Values.tracing.enabled }}
