@@ -1,18 +1,20 @@
 import {useEffect, useState} from "react";
 
 /**
- * Custom hook to perform pagination
- * @param items     Sorted items
- * @param initialRowsPerPage
- * @returns {{pagedItems: *, page: number, setRowsPerPage: function, rowsPerPage: number, setPage: function<Number>>}}
+ * Custom hook to perform an async call and keeps track of the result.
+ *
+ * This hook will execute the callback function once, and keep track of the loading or error
+ * state.
+ *
+ * @param callback that will return a promise
+ * @returns {any[]}
  */
 const useAsync = (callback) => {
     const [data, setData] = useState();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
 
     useEffect(() => {
-        setLoading(true);
         callback()
             .then(setData)
             .catch(() => setError(true))
