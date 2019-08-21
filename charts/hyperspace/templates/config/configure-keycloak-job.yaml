@@ -48,9 +48,27 @@ spec:
               secretKeyRef:
                 name: "{{.Values.hyperspace.keycloak.realm}}-organisationadmin"
                 key: password
+          - name: CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-oauth-client"
+                key: clientId
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Release.Name }}-oauth-client"
+                key: clientSecret
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/config
         command:
         - "/opt/jboss/scripts/setup-keycloak-hyperspace.sh"
         - "http://{{ template "keycloak.prefix" . }}-headless:8080/auth"
         - "{{.Values.keycloak.keycloak.username}}"
         - "{{.Values.hyperspace.keycloak.realm}}"
+        - "/opt/config/redirect.urls"
+        volumes:
+        - name: config-volume
+          configMap:
+            name: "{{.Release.Name}}-keycloak-config-map"
 {{ end -}}
