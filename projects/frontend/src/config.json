@@ -3,7 +3,7 @@
     "logout": "/logout",
     "userInfo": "/api/v1/account",
     "version": "/config/version.json",
-    "workspaces": "/api/v1/workspaces/"
+    "workspaces": "/api/v1/workspaces"
   },
   "externalConfigurationFiles": [
     "/config/config.json"
