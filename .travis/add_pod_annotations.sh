@@ -15,7 +15,7 @@ PROJECTS=(portal frontend)
 # pod annotations
 if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/; then
     # Remove empty pod annotations
-    sed -i -e "s/podAnnotations: {}//" charts/workspace/values.yaml
+    sed -i -e "s/podAnnotations: {}//" charts/hyperspace/values.yaml
 
     # Add a pod annotation in the values.yaml file
     echo -e "\npodAnnotations:" >> charts/workspace/values.yaml
