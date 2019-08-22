@@ -8,6 +8,9 @@ hyperspace:
   configurationScripts:
     configurationScriptsTag: 0.1.4-SNAPSHOT
     pullPolicy: Always
+  testuser:
+    generate: true
+    password: fairspace123
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
