@@ -14,7 +14,7 @@ export default ({onClose}) => (
         maxWidth="md"
     >
         <DialogTitle disableTypography id="form-dialog-title">
-            <Typography variant="h5">Add a new Workspace</Typography>
+            <Typography variant="h5">Adding a new Workspace</Typography>
             <Typography variant="subtitle1">Your new workspace is being created. That might take some time.</Typography>
         </DialogTitle>
         <DialogActions>
