@@ -32,7 +32,7 @@ export default () => {
                 variant="contained"
                 aria-label="Add"
                 title="Create a new workspace"
-
+                disabled={addingWorkspace}
                 onClick={() => setAddingWorkspace(true)}
             >
                 New
