@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
     Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel
 } from "@material-ui/core";
@@ -30,18 +30,28 @@ const WorkspaceList = () => {
     const [workspaces, setWorkspaces] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, serError] = useState(null);
+    const refreshing = useRef(false);
 
-    const refreshWorkspaces = () => WorkspaceAPI.getWorkspaces()
+    const refreshWorkspaces = () => {
+        if (refreshing.current) {
+            return;
+        }
+        refreshing.current = true;
+        WorkspaceAPI.getWorkspaces()
         .then((workspaces) => {
+            refreshing.current = false;
             setLoading(false);
             serError(null);
             setWorkspaces(workspaces);
         })
         .catch((error) => {
+            refreshing.current = false;
             setLoading(false);
             serError(error);
             setWorkspaces([]);
         });
+    };
+
 
     // refresh every 5 seconds
     useInterval(refreshWorkspaces, 5000);
