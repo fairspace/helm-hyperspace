@@ -18,7 +18,7 @@ export default ({onCreate, onClose}) => {
         maxWidth="md"
     >
         <DialogTitle disableTypography id="form-dialog-title">
-            <Typography variant="h5">{"Add a new Workspace"}</Typography>
+            <Typography variant="h5">Add a new Workspace</Typography>
             <Typography variant="subtitle1">{"Add a new Workspace"}</Typography>
         </DialogTitle>
         <DialogContent style={{overflowX: 'hidden'}}>
