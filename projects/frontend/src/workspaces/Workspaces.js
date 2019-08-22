@@ -5,13 +5,16 @@ import WorkspaceList from "./WorkspaceList";
 import Button from "@material-ui/core/Button";
 import NewWorkspaceDialog from "./NewWorkspaceDialog";
 import WorkspaceAPI from "./WorkspaceAPI";
+import AddingWorkspaceDialog from "./AddingWorkspaceDialog";
 
 export default () => {
+    const [showNewWorkspaceDialog, setShowNewWorkspaceDialog] = useState(false);
     const [addingWorkspace, setAddingWorkspace] = useState(false);
 
     const createWorkspace = (workspace) => {
-        setAddingWorkspace(false);
-        WorkspaceAPI.createWorkspace(workspace);
+        setShowNewWorkspaceDialog(false);
+        setAddingWorkspace(true);
+        return WorkspaceAPI.createWorkspace(workspace);
     };
 
     return (
@@ -32,13 +35,16 @@ export default () => {
                 variant="contained"
                 aria-label="Add"
                 title="Create a new workspace"
-                disabled={addingWorkspace}
-                onClick={() => setAddingWorkspace(true)}
+                disabled={showNewWorkspaceDialog}
+                onClick={() => setShowNewWorkspaceDialog(true)}
             >
                 New
             </Button>
-            {addingWorkspace && <NewWorkspaceDialog
+            {showNewWorkspaceDialog && <NewWorkspaceDialog
                 onCreate={createWorkspace}
+                onClose={() => setShowNewWorkspaceDialog(false)}
+            />}
+            {addingWorkspace && <AddingWorkspaceDialog
                 onClose={() => setAddingWorkspace(false)}
             />}
         </BreadcrumbsContext.Provider>
