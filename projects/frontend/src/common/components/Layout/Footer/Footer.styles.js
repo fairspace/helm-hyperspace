@@ -1,7 +1,7 @@
 const styles = theme => ({
     root: {
         backgroundColor: theme.palette.primary.main,
-        padding: theme.spacing(),
+        padding: theme.spacing.unit,
         width: '100%',
         textAlign: 'center',
         position: 'fixed',

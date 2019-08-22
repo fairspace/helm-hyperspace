@@ -4,7 +4,7 @@ import {withStyles} from '@material-ui/core/styles';
 
 const styles = theme => ({
     inlayProgress: {
-        margin: theme.spacing(2),
+        margin: theme.spacing.unit * 2,
         textAlign: 'center',
         backgroundColor: 'transparent'
     }
