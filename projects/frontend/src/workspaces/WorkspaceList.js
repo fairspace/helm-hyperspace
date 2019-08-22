@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React from 'react';
 import {
     Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel
 } from "@material-ui/core";
@@ -10,6 +10,7 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import WorkspaceAPI from "./WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
 import useInterval from "../common/hooks/UseInterval";
+import useAsync from "../common/hooks/UseAsync";
 
 const columns = {
     name: {
@@ -27,34 +28,10 @@ const columns = {
 };
 
 const WorkspaceList = () => {
-    const [workspaces, setWorkspaces] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, serError] = useState(null);
-    const refreshing = useRef(false);
-
-    const refreshWorkspaces = () => {
-        if (refreshing.current) {
-            return;
-        }
-        refreshing.current = true;
-        WorkspaceAPI.getWorkspaces()
-        .then((workspaces) => {
-            refreshing.current = false;
-            setLoading(false);
-            serError(null);
-            setWorkspaces(workspaces);
-        })
-        .catch((error) => {
-            refreshing.current = false;
-            setLoading(false);
-            serError(error);
-            setWorkspaces([]);
-        });
-    };
-
+    const [workspaces = [], loading, error, update] = useAsync(WorkspaceAPI.getWorkspaces);
 
     // refresh every 5 seconds
-    useInterval(refreshWorkspaces, 5000);
+    useInterval(update, 5000);
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);

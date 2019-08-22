@@ -14,14 +14,19 @@ const useAsync = (callback) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
 
-    useEffect(() => {
+    const update = () => {
         callback()
-            .then(setData)
-            .catch(() => setError(true))
+            .then(data => {
+                setData(data);
+                setError(undefined);
+            })
+            .catch((e) => setError(e || true))
             .finally(() => setLoading(false));
-    }, [callback]);
+    };
 
-    return [data, loading, error];
+    useEffect(update, [callback]);
+
+    return [data, loading, error, update];
 };
 
 export default useAsync;
