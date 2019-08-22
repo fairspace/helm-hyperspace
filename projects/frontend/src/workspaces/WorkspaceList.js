@@ -9,7 +9,7 @@ import usePagination from "../common/hooks/UsePagination";
 import MessageDisplay from "../common/components/MessageDisplay";
 import WorkspaceAPI from "./WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
-import {useInterval} from "../common/utils/genericUtils";
+import {useInterval} from "../common/utils/hookUtils";
 
 const columns = {
     name: {
