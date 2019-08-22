@@ -14,7 +14,7 @@ const useAsync = (callback) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
 
-    const update = () => {
+    const refresh = () =>
         callback()
             .then(data => {
                 setData(data);
@@ -22,11 +22,11 @@ const useAsync = (callback) => {
             })
             .catch((e) => setError(e || true))
             .finally(() => setLoading(false));
-    };
 
-    useEffect(update, [callback]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => { refresh(); }, [callback]);
 
-    return [data, loading, error, update];
+    return [data, loading, error, refresh];
 };
 
 export default useAsync;

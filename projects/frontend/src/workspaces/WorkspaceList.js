@@ -9,7 +9,7 @@ import usePagination from "../common/hooks/UsePagination";
 import MessageDisplay from "../common/components/MessageDisplay";
 import WorkspaceAPI from "./WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
-import useInterval from "../common/hooks/UseInterval";
+import useRepeat from "../common/hooks/UseRepeat";
 import useAsync from "../common/hooks/UseAsync";
 
 const columns = {
@@ -28,10 +28,10 @@ const columns = {
 };
 
 const WorkspaceList = () => {
-    const [workspaces = [], loading, error, update] = useAsync(WorkspaceAPI.getWorkspaces);
+    const [workspaces = [], loading, error, refresh] = useAsync(WorkspaceAPI.getWorkspaces);
 
     // refresh every 5 seconds
-    useInterval(update, 5000);
+    useRepeat(refresh, 5000);
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
