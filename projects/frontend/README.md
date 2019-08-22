@@ -4,8 +4,8 @@ This application contains a portal UI for within a hyperspace. The UI is based o
 ### Running the app in development mode
 The app needs a backend to communicate with. For convenience, there are a few scripts to use for local development:
 
-- `yarn server:mock` starts a mock backend server at port 5000. It can be configured in the file `mock-server/server.js`
-- `yarn start` starts the frontend and exposes it at port 3000
+- `yarn server:mock` starts a mock backend server at port 5001. It can be configured in the file `mock-server/server.js`
+- `yarn start` starts the frontend and exposes it at port 3001
 
 An additional command is available to start all components needed for local development at once: 
 

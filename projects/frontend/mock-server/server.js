@@ -4,8 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const mockDataDir = path.join(__dirname, '/mock-data');
-const port = process.env.PORT || 5000;
-// Start a generic server on port 5000 that serves default API
+const port = process.env.PORT || 5001;
 const app = express();
 
 // Add a delay to make the loading visible
