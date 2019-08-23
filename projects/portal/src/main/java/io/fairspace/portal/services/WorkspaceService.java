@@ -1,6 +1,7 @@
 package io.fairspace.portal.services;
 
 import hapi.chart.ChartOuterClass;
+import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
@@ -13,6 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WorkspaceService {
+    private static final ListReleasesRequest LIST_ALL_RELEASES = ListReleasesRequest.newBuilder()
+            .addAllStatusCodes(List.of(StatusOuterClass.Status.Code.values()))
+            .build();
+
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
 
@@ -26,7 +31,7 @@ public class WorkspaceService {
 
     public List<Workspace> listWorkspaces() {
         var result = new ArrayList<Workspace>();
-        var responseIterator = releaseManager.list(ListReleasesRequest.getDefaultInstance());
+        var responseIterator = releaseManager.list(LIST_ALL_RELEASES);
         while (responseIterator.hasNext()) {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
