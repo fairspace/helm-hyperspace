@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import WorkspaceList from "./WorkspaceList";
@@ -6,6 +6,8 @@ import Button from "@material-ui/core/Button";
 import NewWorkspaceDialog from "./NewWorkspaceDialog";
 import WorkspaceAPI from "./WorkspaceAPI";
 import AddingWorkspaceDialog from "./AddingWorkspaceDialog";
+import UserContext from "../common/contexts/UserContext";
+import Config from "../common/services/Config/Config";
 
 export default () => {
     const [showNewWorkspaceDialog, setShowNewWorkspaceDialog] = useState(false);
@@ -16,6 +18,9 @@ export default () => {
         setAddingWorkspace(true);
         return WorkspaceAPI.createWorkspace(workspace);
     };
+
+    const userContext = useContext(UserContext);
+    const isAdmin = userContext && userContext.currentUser && userContext.currentUser.authorizations.includes(Config.get().roles.organisationAdmin);
 
     return (
     <>
@@ -35,7 +40,7 @@ export default () => {
                 variant="contained"
                 aria-label="Add"
                 title="Create a new workspace"
-                disabled={showNewWorkspaceDialog}
+                disabled={showNewWorkspaceDialog || !userContext || !isAdmin}
                 onClick={() => setShowNewWorkspaceDialog(true)}
             >
                 New
