@@ -10,9 +10,9 @@ metadata:
 data:
   application.yaml: |-
     auth:
-      enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: RS256
+      organisationAdminRole: organisation-admin-{{ .Values.hyperspace.name }}
     tiller:
       service: tiller-deploy.kube-system
       port: 44134
