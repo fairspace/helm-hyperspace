@@ -1,10 +1,12 @@
 const express = require('express');
+require('dotenv').config();
+
 // eslint-disable-next-line import/no-extraneous-dependencies
 const bodyParser = require('body-parser');
 const path = require('path');
 
 const mockDataDir = path.join(__dirname, '/mock-data');
-const port = process.env.PORT || 5001;
+const port = process.env.MOCK_SERVER_PORT || 5001;
 const app = express();
 
 // Add a delay to make the loading visible
