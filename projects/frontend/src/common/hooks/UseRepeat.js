@@ -1,7 +1,7 @@
 import {useEffect, useRef} from "react";
 
 /**
- * Perform a promise-returning action periodically with a fixed delay between executions.
+ * Performs a promise-returning action periodically with a fixed delay between executions.
  * Waits for each promise to finish before scheduling a new one.
  * @param callback
  * @param delay
