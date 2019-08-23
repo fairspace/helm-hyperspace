@@ -48,6 +48,11 @@ spec:
               secretKeyRef:
                 name: "{{.Values.hyperspace.keycloak.realm}}-organisationadmin"
                 key: password
+          - name: TESTUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{.Values.hyperspace.keycloak.realm}}-testuser"
+                key: password
           - name: CLIENT_ID
             valueFrom:
               secretKeyRef:
@@ -67,6 +72,7 @@ spec:
         - "{{.Values.keycloak.keycloak.username}}"
         - "{{.Values.hyperspace.keycloak.realm}}"
         - "/opt/config/redirect.urls"
+        - "{{.Values.hyperspace.testuser.generate}}"
         volumes:
         - name: config-volume
           configMap:

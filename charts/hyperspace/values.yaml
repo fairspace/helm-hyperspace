@@ -28,7 +28,7 @@ hyperspace:
     configurationScripts:
         dockerRepository: eu.gcr.io
         image: fairspace-207108/keycloak-configuration
-        configurationScriptsTag: 0.1.0
+        configurationScriptsTag: 0.1.3
         pullPolicy: IfNotPresent
         resources:
             requests:
@@ -40,6 +40,9 @@ hyperspace:
     organisationadmin:
         username:
         password: fairspace123
+    testuser:
+        generate: false
+        password:
     locationOverrides: {}
 
 # Keycloak configuration

@@ -10,6 +10,10 @@ class WorkspaceAPI {
             .then(extractJsonData);
     }
 
+    createWorkspace(workspace) {
+        return axios.put(Config.get().urls.workspaces, workspace, {headers: {'Content-type': 'application/json'}})
+            .catch(handleHttpError("Failure when creating a workspace"));
+    }
 }
 
 export default new WorkspaceAPI();

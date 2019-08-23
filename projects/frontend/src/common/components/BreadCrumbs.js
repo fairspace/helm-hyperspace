@@ -1,10 +1,11 @@
 import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import {Link as RouterLink} from 'react-router-dom';
-import {Breadcrumbs, Icon, Link} from '@material-ui/core';
+import {Icon, Link} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
 import BreadcrumbsContext from "../contexts/BreadcrumbsContext";
 import usePageTitleUpdater from '../hooks/UsePageTitleUpdater';
+import Breadcrumbs from "@material-ui/lab/Breadcrumbs";
 
 /**
  * Renders a list of breadcrumbs
@@ -51,14 +52,14 @@ BreadCrumbs.propTypes = {
 
 const styles = theme => ({
     root: {
-        padding: `${theme.spacing()}px ${theme.spacing(2)}px`,
+        padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
         display: 'flex'
     },
     link: {
         display: 'flex',
     },
     icon: {
-        marginRight: theme.spacing(),
+        marginRight: theme.spacing.unit,
         width: 24,
         height: 24,
     }
