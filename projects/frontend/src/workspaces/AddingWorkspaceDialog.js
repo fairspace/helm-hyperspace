@@ -19,7 +19,6 @@ export default ({onClose}) => (
         </DialogTitle>
         <DialogActions>
             <Button
-                type="submit"
                 onClick={onClose}
                 color="primary"
                 variant="contained"

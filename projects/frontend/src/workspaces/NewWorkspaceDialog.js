@@ -42,7 +42,6 @@ export default ({onCreate, onClose}) => {
                 Cancel
             </Button>
             <Button
-                type="submit"
                 onClick={() => onCreate({name})}
                 color="primary"
                 variant="contained"
