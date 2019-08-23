@@ -1,18 +1,22 @@
 [
   {
     "name": "Example workspace",
-    "version": "0.6.1"
+    "version": "0.6.1",
+    "status": "DEPLOYED"
   },
   {
     "name": "Melanoma",
-    "version": "0.6.4"
+    "version": "0.6.4",
+    "status": "DEPLOYED"
   },
   {
     "name": "Curie",
-    "version": "0.0.1"
+    "version": "0.0.1",
+    "status": "PENDING_INSTALL"
   },
   {
     "name": "Sales team",
-    "version": "0.5.1-SNAPSHOT"
+    "version": "0.5.1-SNAPSHOT",
+    "status": "PENDING_INSTALL"
   }
 ]

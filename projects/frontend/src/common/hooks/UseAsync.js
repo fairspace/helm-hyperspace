@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 
 /**
  * Custom hook to perform an async call and keeps track of the result.
@@ -14,14 +14,17 @@ const useAsync = (callback) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
 
-    useEffect(() => {
-        callback()
-            .then(setData)
-            .catch(() => setError(true))
-            .finally(() => setLoading(false));
-    }, [callback]);
+    const refresh = useCallback(() => callback()
+        .then(d => {
+            setData(d);
+            setError(undefined);
+        })
+        .catch((e) => setError(e || true))
+        .finally(() => setLoading(false)), [callback]);
 
-    return [data, loading, error];
+    useEffect(() => { refresh(); }, [refresh]);
+
+    return [data, loading, error, refresh];
 };
 
 export default useAsync;

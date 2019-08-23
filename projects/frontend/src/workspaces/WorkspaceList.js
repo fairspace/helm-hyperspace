@@ -9,6 +9,7 @@ import usePagination from "../common/hooks/UsePagination";
 import MessageDisplay from "../common/components/MessageDisplay";
 import WorkspaceAPI from "./WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
+import useRepeat from "../common/hooks/UseRepeat";
 import useAsync from "../common/hooks/UseAsync";
 
 const columns = {
@@ -19,20 +20,28 @@ const columns = {
     version: {
         valueExtractor: 'version',
         label: 'Version'
+    },
+    status: {
+        valueExtractor: 'status',
+        label: 'Status'
     }
 };
 
 const WorkspaceList = () => {
-    const [workspaces = [], loading, error] = useAsync(WorkspaceAPI.getWorkspaces);
+    const [workspaces = [], loading, error, refresh] = useAsync(WorkspaceAPI.getWorkspaces);
+
+    // refresh every 5 seconds
+    useRepeat(refresh, 5000);
+
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (loading) {
-        return <LoadingInlay />;
+        return <LoadingInlay/>;
     }
 
     if (error) {
-        return <MessageDisplay message="An error occurred while loading workspaces" />;
+        return <MessageDisplay message="An error occurred while loading workspaces"/>;
     }
 
     return (
@@ -40,7 +49,7 @@ const WorkspaceList = () => {
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell />
+                        <TableCell/>
                         <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'name'}
@@ -59,6 +68,15 @@ const WorkspaceList = () => {
                                 Version
                             </TableSortLabel>
                         </TableCell>
+                        <TableCell>
+                            <TableSortLabel
+                                active={orderBy === 'status'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('status')}
+                            >
+                                Status
+                            </TableSortLabel>
+                        </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -69,13 +87,16 @@ const WorkspaceList = () => {
                                 key={workspace.name}
                             >
                                 <TableCell align="left">
-                                    <FolderOpen />
+                                    <FolderOpen/>
                                 </TableCell>
                                 <TableCell>
                                     {workspace.name}
                                 </TableCell>
                                 <TableCell>
                                     {workspace.version}
+                                </TableCell>
+                                <TableCell>
+                                    {workspace.status}
                                 </TableCell>
                             </TableRow>
                         );
