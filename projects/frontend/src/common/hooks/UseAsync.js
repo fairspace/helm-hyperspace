@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 
 /**
  * Custom hook to perform an async call and keeps track of the result.
@@ -14,17 +14,15 @@ const useAsync = (callback) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState();
 
-    const refresh = () =>
-        callback()
-            .then(data => {
-                setData(data);
-                setError(undefined);
-            })
-            .catch((e) => setError(e || true))
-            .finally(() => setLoading(false));
+    const refresh = useCallback(() => callback()
+        .then(d => {
+            setData(d);
+            setError(undefined);
+        })
+        .catch((e) => setError(e || true))
+        .finally(() => setLoading(false)), [callback]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { refresh(); }, [callback]);
+    useEffect(() => { refresh(); }, [refresh]);
 
     return [data, loading, error, refresh];
 };
