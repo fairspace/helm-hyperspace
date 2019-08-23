@@ -3,9 +3,8 @@
   "version": "0.0.0-RELEASEVERSION",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"yarn server:mock\" \"yarn start\" \"yarn test\" \"yarn server\"",
+    "dev": "concurrently \"yarn server:mock\" \"yarn start\" \"yarn test\"",
     "server:mock": "node mock-server/server.js",
-    "server": "cd ../portal/ && ./gradlew run",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
