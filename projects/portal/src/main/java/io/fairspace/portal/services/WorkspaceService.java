@@ -1,7 +1,6 @@
 package io.fairspace.portal.services;
 
 import hapi.chart.ChartOuterClass;
-import hapi.chart.ConfigOuterClass;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
@@ -42,9 +41,8 @@ public class WorkspaceService {
     public void installWorkspace(Workspace workspace) throws IOException {
         var requestBuilder = InstallReleaseRequest.newBuilder()
                 .setName(workspace.getName())
-                .setNamespace(workspace.getName())
-                .setValues(ConfigOuterClass.Config.parseFrom(workspace.getValues().getBytes()));
+                .setNamespace(workspace.getName());
+        requestBuilder.getValuesBuilder().setRaw(workspace.getValues());
         releaseManager.install(requestBuilder, chart);
     }
-
 }
