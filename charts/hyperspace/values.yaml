@@ -6,6 +6,8 @@ fairspaceImagePullSecret:
 # Setup ingress for hyperspace components
 hyperspace:
     name: Fairspace
+    rbac:
+        enabled: true
     keycloak:
         clientId: hyperspace
         clientSecret:

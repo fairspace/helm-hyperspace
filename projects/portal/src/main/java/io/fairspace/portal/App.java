@@ -1,22 +1,27 @@
 package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.portal.model.Workspace;
-import io.fairspace.portal.services.StaticLocalPortForward;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.Tiller;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import static io.fairspace.portal.Authentication.getUserInfo;
 import static io.fairspace.portal.Config.WORKSPACE_CHART;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
-import static spark.Spark.*;
+import static spark.Spark.before;
+import static spark.Spark.exception;
+import static spark.Spark.get;
+import static spark.Spark.halt;
+import static spark.Spark.path;
+import static spark.Spark.port;
+import static spark.Spark.put;
 
 @Slf4j
 public class App {
@@ -24,8 +29,8 @@ public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
 
     public static void main(String[] args) throws IOException {
-        var localPortForward = new StaticLocalPortForward(InetAddress.getByName(CONFIG.tiller.service), CONFIG.tiller.port);
-        var tiller = new Tiller(localPortForward);
+        var client = new DefaultKubernetesClient();
+        var tiller = new Tiller(client);
         var releaseManager = new ReleaseManager(tiller);
         var workspaceService = new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));
 
