@@ -15,6 +15,17 @@ import java.util.EnumSet;
 import java.util.List;
 
 public class WorkspaceService {
+    private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
+            StatusOuterClass.Status.Code.UNKNOWN,
+            StatusOuterClass.Status.Code.DEPLOYED,
+            StatusOuterClass.Status.Code.FAILED,
+            StatusOuterClass.Status.Code.DELETING,
+            StatusOuterClass.Status.Code.PENDING_INSTALL,
+            StatusOuterClass.Status.Code.PENDING_UPGRADE,
+            StatusOuterClass.Status.Code.PENDING_ROLLBACK);
+
+    private static final long MAX_RELEASES_TO_RETURN = 100L;
+
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
 
@@ -29,7 +40,8 @@ public class WorkspaceService {
     public List<Workspace> listWorkspaces() {
         var result = new ArrayList<Workspace>();
         var request = ListReleasesRequest.newBuilder()
-                .addAllStatusCodes(EnumSet.complementOf(EnumSet.of(StatusOuterClass.Status.Code.UNRECOGNIZED)))
+                .addAllStatusCodes(RELEVANT_STATUSES)
+                .setLimit(MAX_RELEASES_TO_RETURN)
                 .build();
         var responseIterator = releaseManager.list(request);
         while (responseIterator.hasNext()) {
