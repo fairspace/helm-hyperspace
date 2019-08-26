@@ -49,8 +49,8 @@ public class WorkspaceService {
                 workspaces = fetchWorkspaces();
                 lastUpdateTime = currentTimeMillis();
             }
+            return workspaces;
         }
-        return workspaces;
     }
 
     private List<Workspace> fetchWorkspaces() {
