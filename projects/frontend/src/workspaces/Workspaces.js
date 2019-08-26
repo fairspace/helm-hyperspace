@@ -7,7 +7,7 @@ import NewWorkspaceDialog from "./NewWorkspaceDialog";
 import WorkspaceAPI from "./WorkspaceAPI";
 import AddingWorkspaceDialog from "./AddingWorkspaceDialog";
 import UserContext from "../common/contexts/UserContext";
-import Config from "../common/services/Config/Config";
+import {isOrganisationAdmin} from "../common/utils/userUtils";
 
 export default () => {
     const [showNewWorkspaceDialog, setShowNewWorkspaceDialog] = useState(false);
@@ -19,8 +19,7 @@ export default () => {
         return WorkspaceAPI.createWorkspace(workspace);
     };
 
-    const userContext = useContext(UserContext);
-    const isAdmin = userContext && userContext.currentUser && userContext.currentUser.authorizations.includes(Config.get().roles.organisationAdmin);
+    const {currentUser: {authorizations}} = useContext(UserContext);
 
     return (
     <>
@@ -40,7 +39,7 @@ export default () => {
                 variant="contained"
                 aria-label="Add"
                 title="Create a new workspace"
-                disabled={showNewWorkspaceDialog || !userContext || !isAdmin}
+                disabled={showNewWorkspaceDialog || !isOrganisationAdmin(authorizations)}
                 onClick={() => setShowNewWorkspaceDialog(true)}
             >
                 New

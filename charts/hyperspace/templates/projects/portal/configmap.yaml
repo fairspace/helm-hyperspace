@@ -12,7 +12,7 @@ data:
     auth:
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: RS256
-      organisationAdminRole: organisation-admin-{{ .Values.hyperspace.name }}
+      organisationAdminRole: {{ template "hyperspace.roles.organisation-admin" . }}
     tiller:
       service: tiller-deploy.kube-system
       port: 44134
