@@ -13,13 +13,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static java.lang.System.currentTimeMillis;
 
 public class WorkspaceService {
-    private static final long REFRESH_INTERVAL = 1;
+    private static final long EXPIRATION_INTERVAL_MS = 1000;
     private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
             StatusOuterClass.Status.Code.UNKNOWN,
             StatusOuterClass.Status.Code.DEPLOYED,
@@ -33,8 +31,9 @@ public class WorkspaceService {
 
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
-    private volatile List<Workspace> workspaces = List.of();
-    private final ScheduledExecutorService worker = newSingleThreadScheduledExecutor();
+    private final Object lock = new Object();
+    private long lastUpdateTime;
+    private List<Workspace> workspaces;
 
     public WorkspaceService(ReleaseManager releaseManager, URL chartUrl) throws IOException {
         this.releaseManager = releaseManager;
@@ -42,15 +41,19 @@ public class WorkspaceService {
         try (var chartLoader = new URLChartLoader()) {
             chart = chartLoader.load(chartUrl);
         }
-
-        worker.scheduleWithFixedDelay(this::fetchWorkspaces, 0L, REFRESH_INTERVAL, TimeUnit.SECONDS);
     }
 
     public List<Workspace> listWorkspaces() {
+        synchronized (lock) {
+            if (currentTimeMillis() - lastUpdateTime > EXPIRATION_INTERVAL_MS) {
+                workspaces = fetchWorkspaces();
+                lastUpdateTime = currentTimeMillis();
+            }
+        }
         return workspaces;
     }
 
-    private void fetchWorkspaces() {
+    private List<Workspace> fetchWorkspaces() {
         var result = new ArrayList<Workspace>();
         var request = ListReleasesRequest.newBuilder()
                 .addAllStatusCodes(RELEVANT_STATUSES)
@@ -65,7 +68,7 @@ public class WorkspaceService {
                 }
             });
         }
-        workspaces = result;
+        return result;
     }
 
     public void installWorkspace(Workspace workspace) throws IOException {
