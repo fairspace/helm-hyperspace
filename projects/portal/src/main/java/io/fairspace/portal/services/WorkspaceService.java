@@ -13,8 +13,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 public class WorkspaceService {
+    private static final long REFRESH_INTERVAL = 1;
     private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
             StatusOuterClass.Status.Code.UNKNOWN,
             StatusOuterClass.Status.Code.DEPLOYED,
@@ -28,6 +33,8 @@ public class WorkspaceService {
 
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
+    private volatile List<Workspace> workspaces = List.of();
+    private final ScheduledExecutorService worker = newSingleThreadScheduledExecutor();
 
     public WorkspaceService(ReleaseManager releaseManager, URL chartUrl) throws IOException {
         this.releaseManager = releaseManager;
@@ -35,9 +42,15 @@ public class WorkspaceService {
         try (var chartLoader = new URLChartLoader()) {
             chart = chartLoader.load(chartUrl);
         }
+
+        worker.scheduleWithFixedDelay(this::fetchWorkspaces, 0L, REFRESH_INTERVAL, TimeUnit.SECONDS);
     }
 
     public List<Workspace> listWorkspaces() {
+        return workspaces;
+    }
+
+    private void fetchWorkspaces() {
         var result = new ArrayList<Workspace>();
         var request = ListReleasesRequest.newBuilder()
                 .addAllStatusCodes(RELEVANT_STATUSES)
@@ -52,7 +65,7 @@ public class WorkspaceService {
                 }
             });
         }
-        return result;
+        workspaces = result;
     }
 
     public void installWorkspace(Workspace workspace) throws IOException {
