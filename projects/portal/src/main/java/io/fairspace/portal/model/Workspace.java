@@ -12,4 +12,5 @@ public class Workspace {
     private String name;
     private String version;
     private StatusOuterClass.Status.Code status;
+    private String values;
 }
