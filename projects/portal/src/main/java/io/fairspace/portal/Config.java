@@ -12,7 +12,6 @@ public class Config {
     public static final String WORKSPACE_CHART = "workspace";
 
     public final Auth auth = new Auth();
-    public final Tiller tiller = new Tiller();
     public final Map<String, URL> charts = new HashMap<>();
 
     public static class Auth {
@@ -21,11 +20,6 @@ public class Config {
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
         public String jwtAlgorithm = "RS256";
-    }
-
-    public static class Tiller {
-        public String service = "tiller-deploy.kube-system";
-        public int port = 44134;
     }
 
     @Override
