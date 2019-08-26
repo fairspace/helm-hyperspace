@@ -1,6 +1,7 @@
 package io.fairspace.portal.services;
 
 import hapi.chart.ChartOuterClass;
+import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
@@ -10,6 +11,7 @@ import org.microbean.helm.chart.URLChartLoader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 public class WorkspaceService {
@@ -26,7 +28,10 @@ public class WorkspaceService {
 
     public List<Workspace> listWorkspaces() {
         var result = new ArrayList<Workspace>();
-        var responseIterator = releaseManager.list(ListReleasesRequest.getDefaultInstance());
+        var request = ListReleasesRequest.newBuilder()
+                .addAllStatusCodes(EnumSet.complementOf(EnumSet.of(StatusOuterClass.Status.Code.UNRECOGNIZED)))
+                .build();
+        var responseIterator = releaseManager.list(request);
         while (responseIterator.hasNext()) {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
