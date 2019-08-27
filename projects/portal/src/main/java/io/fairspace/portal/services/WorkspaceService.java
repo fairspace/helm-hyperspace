@@ -1,10 +1,15 @@
 package io.fairspace.portal.services;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
+import hapi.chart.ConfigOuterClass;
+import hapi.release.ReleaseOuterClass;
 import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
+import hapi.services.tiller.Tiller.InstallReleaseResponse;
 import io.fairspace.portal.model.Workspace;
+import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.chart.URLChartLoader;
 
@@ -13,11 +18,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
+@Slf4j
 public class WorkspaceService {
-    private static final long EXPIRATION_INTERVAL_MS = 1000;
+    private static final long EXPIRATION_INTERVAL_MS = 300_000;
+    private static final long INSTALLATION_TIMEOUT_SEC = 900;
+
     private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
             StatusOuterClass.Status.Code.UNKNOWN,
             StatusOuterClass.Status.Code.DEPLOYED,
@@ -31,9 +41,9 @@ public class WorkspaceService {
 
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
-    private final Object lock = new Object();
+    private final List<Workspace> workspaces = new ArrayList<>();
     private long lastUpdateTime;
-    private List<Workspace> workspaces;
+    private final Executor worker = newSingleThreadExecutor();
 
     public WorkspaceService(ReleaseManager releaseManager, URL chartUrl) throws IOException {
         this.releaseManager = releaseManager;
@@ -44,9 +54,11 @@ public class WorkspaceService {
     }
 
     public List<Workspace> listWorkspaces() {
-        synchronized (lock) {
+        synchronized (workspaces) {
             if (currentTimeMillis() - lastUpdateTime > EXPIRATION_INTERVAL_MS) {
-                workspaces = fetchWorkspaces();
+                var newWorkspaces = fetchWorkspaces();
+                workspaces.clear();
+                workspaces.addAll(newWorkspaces);
                 lastUpdateTime = currentTimeMillis();
             }
             return workspaces;
@@ -64,7 +76,7 @@ public class WorkspaceService {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
                 if(release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
-                    result.add(new Workspace(release.getName(), release.getChart().getMetadata().getVersion(), release.getInfo().getStatus().getCode(), release.getConfig().getRaw()));
+                    result.add(asWorkspace(release));
                 }
             });
         }
@@ -74,8 +86,26 @@ public class WorkspaceService {
     public void installWorkspace(Workspace workspace) throws IOException {
         var requestBuilder = InstallReleaseRequest.newBuilder()
                 .setName(workspace.getName())
-                .setNamespace(workspace.getName());
-        requestBuilder.getValuesBuilder().setRaw(workspace.getValues());
-        releaseManager.install(requestBuilder, chart);
+                .setNamespace(workspace.getName())
+                .setValues(ConfigOuterClass.Config.newBuilder().setRaw(workspace.getValues()))
+                .setTimeout(INSTALLATION_TIMEOUT_SEC)
+                .setWait(true);
+        var future = (ListenableFuture<InstallReleaseResponse>) releaseManager.install(requestBuilder, chart);
+        future.addListener(() -> {
+            try {
+                var ws = asWorkspace(future.get().getRelease());
+                synchronized (workspaces) {
+                    workspaces.removeIf(w -> w.getName().equals(ws.getName()));
+                    workspaces.add(ws);
+                    lastUpdateTime = currentTimeMillis();
+                }
+            } catch (Exception e) {
+                log.error("Error installing a workspace", e);
+            }
+        }, worker);
+    }
+
+    private static Workspace asWorkspace(ReleaseOuterClass.Release release) {
+        return new Workspace(release.getName(), release.getChart().getMetadata().getVersion(), release.getInfo().getStatus().getCode(), release.getConfig().getRaw());
     }
 }
