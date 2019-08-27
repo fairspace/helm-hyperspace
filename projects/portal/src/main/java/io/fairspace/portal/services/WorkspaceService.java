@@ -75,7 +75,7 @@ public class WorkspaceService {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
                 if(release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
-                    result.add(asWorkspace(release));
+                    result.add(new Workspace(release.getName(), release.getChart().getMetadata().getVersion(), release.getInfo().getStatus().getCode(), release.getConfig().getRaw()));
                 }
             });
         }
@@ -95,9 +95,5 @@ public class WorkspaceService {
                 lastUpdateTime = 0;
             }
         }, worker);
-    }
-
-    private static Workspace asWorkspace(ReleaseOuterClass.Release release) {
-        return new Workspace(release.getName(), release.getChart().getMetadata().getVersion(), release.getInfo().getStatus().getCode(), release.getConfig().getRaw());
     }
 }
