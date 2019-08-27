@@ -87,8 +87,3 @@ https://{{ template "portal.hostname" . }}
 {{- define "frontend.fullname" -}}
 {{- .Values.frontend.nameOverride | default (printf "%s-frontend" .Release.Name) -}}
 {{- end -}}
-
-{{- define "hyperspace.roles.organisation-admin" -}}
-organisation-admin-{{ .Values.hyperspace.name }}
-{{- printf "organisation-admin-%s" .Values.hyperspace.name -}}
-{{- end -}}
