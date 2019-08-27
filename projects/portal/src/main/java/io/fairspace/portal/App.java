@@ -1,8 +1,10 @@
 package io.fairspace.portal;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
+import io.fairspace.portal.errors.ErrorHelper;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.NonNull;
@@ -15,11 +17,17 @@ import java.io.IOException;
 import static io.fairspace.portal.Authentication.getUserInfo;
 import static io.fairspace.portal.Config.WORKSPACE_CHART;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
+import static io.fairspace.portal.errors.ErrorHelper.errorBody;
+import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.before;
 import static spark.Spark.exception;
 import static spark.Spark.get;
 import static spark.Spark.halt;
+import static spark.Spark.notFound;
 import static spark.Spark.path;
 import static spark.Spark.port;
 import static spark.Spark.put;
@@ -81,9 +89,9 @@ public class App {
             get("/health", (request, response) -> "OK");
         });
 
-        exception(Exception.class, (exception, request, response) -> {
-            log.error("Error handling request {} {}", request.requestMethod(), request.uri(), exception);
-            response.status(500);
-        });
+        notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
+        exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
+        exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
+        exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
 }
