@@ -73,8 +73,8 @@ spec:
         - "{{.Values.hyperspace.keycloak.realm}}"
         - "/opt/config/redirect.urls"
         - "{{.Values.hyperspace.testuser.generate}}"
-        volumes:
-        - name: config-volume
-          configMap:
-            name: "{{.Release.Name}}-keycloak-config-map"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: "{{.Release.Name}}-keycloak-config-map"
 {{ end -}}
