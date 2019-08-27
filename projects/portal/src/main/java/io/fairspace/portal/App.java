@@ -14,6 +14,8 @@ import java.io.IOException;
 import static io.fairspace.portal.Authentication.getUserInfo;
 import static io.fairspace.portal.Config.WORKSPACE_CHART;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
+import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
+import static org.eclipse.jetty.http.HttpStatus.UNAUTHORIZED_401;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.before;
 import static spark.Spark.exception;
@@ -40,19 +42,17 @@ public class App {
     private static void initSpark(WorkspaceService workspaceService) {
         port(8080);
 
-        if (CONFIG.auth.enabled) {
-            before((request, response) -> {
-                if (request.uri().equals("/api/v1/health")) {
-                    return;
-                }
+        before((request, response) -> {
+            if (request.uri().equals("/api/v1/health")) {
+                return;
+            }
 
-                var token = getUserInfo(request, tokenValidator);
+            var token = getUserInfo(request, tokenValidator);
 
-                if (token == null) {
-                    halt(401);
-                }
-            });
-        }
+            if (token == null) {
+                halt(UNAUTHORIZED_401);
+            }
+        });
 
         path("/api/v1", () -> {
             path("/workspaces", () -> {
@@ -62,6 +62,10 @@ public class App {
                 }, mapper::writeValueAsString);
 
                 put("", (request, response) -> {
+                    var token = getUserInfo(request, tokenValidator);
+                    if (!token.getAuthorities().contains(CONFIG.auth.organisationAdminRole)) {
+                        halt(FORBIDDEN_403);
+                    }
                     workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));
                     return "";
                 }, mapper::writeValueAsString);
