@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.services.WorkspaceService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.Tiller;
@@ -29,15 +30,25 @@ public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
 
     public static void main(String[] args) throws IOException {
-        var client = new DefaultKubernetesClient();
-        var tiller = new Tiller(client);
-        var releaseManager = new ReleaseManager(tiller);
-        var workspaceService = new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));
-
-        initSpark(workspaceService);
+        initSpark(initWorkspaceService());
     }
 
-    private static void initSpark(WorkspaceService workspaceService) {
+    private static WorkspaceService initWorkspaceService() throws IOException {
+        ReleaseManager releaseManager;
+
+        try {
+            var client = new DefaultKubernetesClient();
+            var tiller = new Tiller(client);
+            releaseManager = new ReleaseManager(tiller);
+        } catch(Exception e) {
+            log.error("Error while initializing release manager for tiller.", e);
+            throw e;
+        }
+
+        return new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));
+    }
+
+    private static void initSpark(@NonNull WorkspaceService workspaceService) {
         port(8080);
 
         if (CONFIG.auth.enabled) {

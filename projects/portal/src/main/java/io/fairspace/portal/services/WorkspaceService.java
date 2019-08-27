@@ -8,6 +8,7 @@ import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.InstallReleaseResponse;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.chart.URLChartLoader;
@@ -45,7 +46,7 @@ public class WorkspaceService {
     private long lastUpdateTime;
     private final Executor worker = newSingleThreadExecutor();
 
-    public WorkspaceService(ReleaseManager releaseManager, URL chartUrl) throws IOException {
+    public WorkspaceService(ReleaseManager releaseManager, @NonNull URL chartUrl) throws IOException {
         this.releaseManager = releaseManager;
 
         try (var chartLoader = new URLChartLoader()) {
