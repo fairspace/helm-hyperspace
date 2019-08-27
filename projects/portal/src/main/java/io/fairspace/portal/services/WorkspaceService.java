@@ -41,7 +41,8 @@ public class WorkspaceService {
 
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
-    private final List<Workspace> workspaces = new ArrayList<>();
+    private final Object lock = new Object();
+    private List<Workspace> workspaces = new ArrayList<>();
     private long lastUpdateTime;
     private final Executor worker = newSingleThreadExecutor();
 
@@ -54,11 +55,9 @@ public class WorkspaceService {
     }
 
     public List<Workspace> listWorkspaces() {
-        synchronized (workspaces) {
+        synchronized (lock) {
             if (currentTimeMillis() - lastUpdateTime > EXPIRATION_INTERVAL_MS) {
-                var newWorkspaces = fetchWorkspaces();
-                workspaces.clear();
-                workspaces.addAll(newWorkspaces);
+                workspaces = fetchWorkspaces();
                 lastUpdateTime = currentTimeMillis();
             }
             return workspaces;
@@ -92,15 +91,8 @@ public class WorkspaceService {
                 .setWait(true);
         var future = (ListenableFuture<InstallReleaseResponse>) releaseManager.install(requestBuilder, chart);
         future.addListener(() -> {
-            try {
-                var ws = asWorkspace(future.get().getRelease());
-                synchronized (workspaces) {
-                    workspaces.removeIf(w -> w.getName().equals(ws.getName()));
-                    workspaces.add(ws);
-                    lastUpdateTime = currentTimeMillis();
-                }
-            } catch (Exception e) {
-                log.error("Error installing a workspace", e);
+            synchronized (lock) {
+                lastUpdateTime = 0;
             }
         }, worker);
     }
