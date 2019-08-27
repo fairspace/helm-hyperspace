@@ -32,7 +32,7 @@ public class App {
         var client = new DefaultKubernetesClient();
         var tiller = new Tiller(client);
         var releaseManager = new ReleaseManager(tiller);
-        var workspaceService = new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));
+        var workspaceService = new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART), CONFIG.workspace.domainTemplate, CONFIG.workspace.workspaceValues);
 
         initSpark(workspaceService);
     }

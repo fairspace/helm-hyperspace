@@ -13,6 +13,7 @@ public class Config {
 
     public final Auth auth = new Auth();
     public final Map<String, URL> charts = new HashMap<>();
+    public final WorkspaceConfig workspace = new WorkspaceConfig();
 
     public static class Auth {
         public boolean enabled = false;
@@ -20,6 +21,11 @@ public class Config {
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
         public String jwtAlgorithm = "RS256";
+    }
+
+    public static class WorkspaceConfig {
+        public String domainTemplate;
+        public final Map<String, Object> workspaceValues = new HashMap<>();
     }
 
     @Override
