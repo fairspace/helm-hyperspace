@@ -30,8 +30,8 @@ const columns = {
 const WorkspaceList = () => {
     const [workspaces = [], loading, error, refresh] = useAsync(WorkspaceAPI.getWorkspaces);
 
-    // refresh every 5 seconds
-    useRepeat(refresh, 5000);
+    // refresh every 30 seconds
+    useRepeat(refresh, 30000);
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
