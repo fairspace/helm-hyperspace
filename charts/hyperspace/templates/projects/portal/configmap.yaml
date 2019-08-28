@@ -23,6 +23,11 @@ data:
           password: {{ .Values.keycloak.keycloak.password .}}
           realm: {{ .Values.hyperspace.keycloak.realm .}}
           clientSecret: {{ .Values.hyperspace.keycloak.clientSecret .}}
+        elasticsearch:
+          transport:
+            host: {{ .Release.Name }}-elasticsearch-discovery.{{ .Release.Namespace }}.svc.cluster.local
+          rest:
+            host: {{ .Release.Name }}-elasticsearch-client.{{ .Release.Namespace }}.svc.cluster.local
       saturn:
         mail:
 {{ toYaml .Values.portal.mail | indent 6 }}
