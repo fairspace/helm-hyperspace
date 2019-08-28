@@ -84,7 +84,7 @@ public class App {
                     }
                     workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));
                     return "";
-                }, mapper::writeValueAsString);
+                });
             });
 
             get("/health", (request, response) -> "OK");
