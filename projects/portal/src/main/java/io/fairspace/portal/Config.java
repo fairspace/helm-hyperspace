@@ -16,11 +16,11 @@ public class Config {
     public final WorkspaceConfig workspace = new WorkspaceConfig();
 
     public static class Auth {
-        public boolean enabled = false;
-
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
         public String jwtAlgorithm = "RS256";
+
+        public String organisationAdminRole = "organisation-admin";
     }
 
     public static class WorkspaceConfig {
