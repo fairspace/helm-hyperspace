@@ -10,7 +10,6 @@ plugins {
     id 'io.franzbecker.gradle-lombok' version '2.0'
     id 'application'
     id 'jacoco'
-//    id  'com.github.spotbugs' version '1.6.10'
     id "org.owasp.dependencycheck" version "5.0.0-M3.1"
 }
 
@@ -44,5 +43,6 @@ dependencies {
     implementation "org.slf4j:slf4j-simple:1.7.28"
 
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation "junit:junit:4.12"
+    testImplementation "org.mockito:mockito-core:2.23.0"
 }

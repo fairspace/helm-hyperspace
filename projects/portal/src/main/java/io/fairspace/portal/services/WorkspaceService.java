@@ -56,7 +56,7 @@ public class WorkspaceService {
     private long lastUpdateTime;
     private final Executor worker = newSingleThreadExecutor();
 
-    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NotNull ChartOuterClass.Chart.Builder chart, @NonNull String domain, @NonNull Map<String, Object> workspaceValues) throws IOException {
+    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NotNull ChartOuterClass.Chart.Builder chart, @NonNull String domain, @NonNull Map<String, Object> workspaceValues) {
         this.releaseManager = releaseManager;
         this.chart = chart;
         this.domain = domain;
