@@ -3,3 +3,7 @@ dependencies:
   version: "2.0.0"
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: keycloak.enabled
+- name: elasticsearch
+  version: "1.31.0"
+  repository: https://kubernetes-charts.storage.googleapis.com
+  condition: elasticsearch.enabled
