@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {withRouter} from "react-router-dom";
 import {
-    Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel
+    Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel, IconButton, Menu, MenuItem
 } from "@material-ui/core";
-import FolderOpen from "@material-ui/icons/FolderOpen";
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
@@ -27,8 +28,9 @@ const columns = {
     }
 };
 
-const WorkspaceList = () => {
+const WorkspaceList = ({history}) => {
     const [workspaces = [], loading, error, refresh] = useAsync(WorkspaceAPI.getWorkspaces);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     // refresh every 30 seconds
     useRepeat(refresh, 30000);
@@ -36,12 +38,25 @@ const WorkspaceList = () => {
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
+
+    const handleMenuClick = event => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const openWorkspaceRoles = (workspace) => {
+        history.push(`/roles?workspace=${workspace}`);
+    };
+
     if (loading) {
-        return <LoadingInlay/>;
+        return <LoadingInlay />;
     }
 
     if (error) {
-        return <MessageDisplay message="An error occurred while loading workspaces"/>;
+        return <MessageDisplay message="An error occurred while loading workspaces" />;
     }
 
     return (
@@ -49,7 +64,6 @@ const WorkspaceList = () => {
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell/>
                         <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'name'}
@@ -77,26 +91,49 @@ const WorkspaceList = () => {
                                 Status
                             </TableSortLabel>
                         </TableCell>
+                        <TableCell />
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map((workspace) => {
+                    {pagedItems.map(({name, version, status}) => {
+                        const actionsButtonId = name + 'ActionsBtn';
+
                         return (
                             <TableRow
                                 hover
-                                key={workspace.name}
+                                key={name}
                             >
-                                <TableCell align="left">
-                                    <FolderOpen/>
+                                <TableCell>
+                                    {name}
                                 </TableCell>
                                 <TableCell>
-                                    {workspace.name}
+                                    {version}
                                 </TableCell>
                                 <TableCell>
-                                    {workspace.version}
+                                    {status}
                                 </TableCell>
                                 <TableCell>
-                                    {workspace.status}
+                                    <>
+                                        <IconButton
+                                            id={actionsButtonId}
+                                            aria-label="Roles"
+                                            aria-owns={anchorEl ? 'actions-menu' : undefined}
+                                            aria-haspopup="true"
+                                            onClick={handleMenuClick}
+                                        >
+                                            <MoreVertIcon />
+                                        </IconButton>
+                                        <Menu
+                                            id="actions-menu"
+                                            anchorEl={anchorEl}
+                                            open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
+                                            onClose={handleMenuClose}
+                                        >
+                                            <MenuItem onClick={() => openWorkspaceRoles(name)}>
+                                                Manage Roles
+                                            </MenuItem>
+                                        </Menu>
+                                    </>
                                 </TableCell>
                             </TableRow>
                         );
@@ -116,4 +153,4 @@ const WorkspaceList = () => {
     );
 };
 
-export default WorkspaceList;
+export default withRouter(WorkspaceList);

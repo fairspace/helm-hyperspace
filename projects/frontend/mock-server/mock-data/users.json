@@ -6,9 +6,9 @@
     "lastName": "Snow",
     "roles": [
       "organisation-admin",
-      "user-workspace-ci",
-      "datasteward-workspace-ci",
-      "coordinator-workspace-ci"
+      "user-Example workspace",
+      "datasteward-Example workspace",
+      "coordinator-Example workspace"
     ]
   },
   {
@@ -16,7 +16,7 @@
     "firstName": "Ygritte",
     "lastName": "Lopez",
     "roles": [
-      "datasteward-workspace-ci"
+      "datasteward-Example workspace"
     ]
   },
   {
@@ -24,7 +24,7 @@
     "firstName": "Daenarys",
     "lastName": "Targaryen",
     "roles": [
-      "coordinator-workspace-ci"
+      "coordinator-Example workspace"
     ]
   },
   {
@@ -32,7 +32,7 @@
     "firstName": "Gregor",
     "lastName": "Clegane",
     "roles": [
-      "user-workspace-ci"
+      "user-Example workspace"
     ]
   },
   {
@@ -40,8 +40,8 @@
     "firstName": "Cersei",
     "lastName": "Lannister",
     "roles": [
-      "user-workspace-ci",
-      "sparql-workspace-ci"
+      "user-Example workspace",
+      "sparql-Example workspace"
     ]
   }
 ]
