@@ -13,10 +13,9 @@ import io.fairspace.portal.model.Workspace;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
-import org.microbean.helm.chart.URLChartLoader;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -58,14 +57,11 @@ public class WorkspaceService {
     private long lastUpdateTime;
     private final Executor worker = newSingleThreadExecutor();
 
-    public WorkspaceService(ReleaseManager releaseManager, @NonNull URL chartUrl, @NonNull String domainTemplate, @NonNull Map<String, Object> workspaceValues) throws IOException {
+    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NotNull ChartOuterClass.Chart.Builder chart, @NonNull String domainTemplate, @NonNull Map<String, Object> workspaceValues) throws IOException {
         this.releaseManager = releaseManager;
+        this.chart = chart;
         this.domainTemplate = domainTemplate;
         this.workspaceValues = workspaceValues;
-
-        try (var chartLoader = new URLChartLoader()) {
-            chart = chartLoader.load(chartUrl);
-        }
     }
 
     public List<Workspace> listWorkspaces() {
