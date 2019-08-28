@@ -18,13 +18,9 @@ const App = () => {
     useEffect(() => {
         Config.init()
             .then(() => isMounted() && setConfigLoaded(true));
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [isMounted]);
 
     if (!configLoaded) {
-        console.log({Config});
-        
         return <LoadingInlay />;
     }
 

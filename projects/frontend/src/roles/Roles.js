@@ -1,12 +1,13 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {
     withStyles, TableSortLabel, TablePagination, Table, TableBody,
     TableCell, TableHead, TableRow, Paper, FormGroup, FormControlLabel,
-    Checkbox, Grid, Typography,
+    Checkbox, Grid, Typography, Button,
 } from '@material-ui/core';
 import queryString from 'query-string';
 
+import Config from "../common/services/Config/Config";
 import UsersContext from '../common/contexts/UsersContext';
 import {
     isWorkspaceUser, isWorkspaceCoordinator, isWorkspaceDatasteward,
@@ -33,22 +34,27 @@ const styles = theme => ({
 });
 
 const columns = {
-    name: {
-        valueExtractor: 'name',
+    firstName: {
+        valueExtractor: 'firstName',
         label: 'Name'
     }
 };
 
-// TODO: for testing
-const Roles = ({classes, location: {search}}) => {
-    const {workspace} = queryString.parse(search);
+const idToRoles = (accumulator, {id, roles}) => ({
+    ...accumulator,
+    [id]: new Set(roles)
+});
+
+const Roles = ({
+    classes, location: {search}, workspace = queryString.parse(search).workspace
+}) => {
     const {users, usersError, usersLoading} = useContext(UsersContext);
-    const usersWithNames = users.map(u => ({
-        ...u,
-        name: `${u.firstName} ${u.lastName}`
-    }));
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(usersWithNames, columns, 'name');
+    const [usersRolesMapping, setUsersRolesMapping] = useState(users.reduce(idToRoles, {}));
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+    const [fromDirty, setFromDirty] = useState(false);
+
+    // TODO: there should be 2 checks here, the workspace exists and the current user is coordinator or admin
 
     if (!workspace || workspace.trim().length === 0) {
         return <MessageDisplay message="No workspace is provided." />;
@@ -62,10 +68,45 @@ const Roles = ({classes, location: {search}}) => {
         return <MessageDisplay message="Unable to retrieve the list of users." />;
     }
 
+    const handleChange = (id) => (event) => {
+        setFromDirty(true);
+        const roles = usersRolesMapping[id];
+
+        if (event.target.checked) {
+            roles.add(event.target.value);
+        } else {
+            roles.delete(event.target.value);
+        }
+
+        setUsersRolesMapping(prev => ({
+            ...prev,
+            [id]: roles
+        }));
+    };
+
+    const {roles, rolesPrefixes} = Config.get();
+
+    const RoleCheckbox = ({userId, label, roleChecker, value, disabled}) => (
+        <Grid item xs={4}>
+            <FormControlLabel
+                control={(
+                    <Checkbox
+                        className={classes.roleCheckbox}
+                        checked={roleChecker(Array.from(usersRolesMapping[userId]), workspace)}
+                        onChange={handleChange(userId)}
+                        value={value}
+                        disabled={disabled}
+                    />
+                )}
+                label={label}
+            />
+        </Grid>
+    );
+
     return (
         <>
             <Typography variant="h5" className={classes.header}>
-                Managing {workspace}
+                {workspace}
             </Typography>
             <Paper className={classes.tableRoot}>
                 <Table style={{tableLayout: 'fixed'}}>
@@ -73,9 +114,9 @@ const Roles = ({classes, location: {search}}) => {
                         <TableRow>
                             <TableCell>
                                 <TableSortLabel
-                                    active={orderBy === 'name'}
+                                    active={orderBy === 'firstName'}
                                     direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('name')}
+                                    onClick={() => toggleSort('firstName')}
                                 >
                                     User
                                 </TableSortLabel>
@@ -87,76 +128,46 @@ const Roles = ({classes, location: {search}}) => {
                     </TableHead>
                     <TableBody>
                         {
-                            pagedItems.map(({id, name, roles}) => (
+                            pagedItems.map(({id, firstName, lastName}) => (
                                 <TableRow key={id}>
                                     <TableCell component="th" scope="row">
-                                        {name}
+                                        {`${firstName} ${lastName}`}
                                     </TableCell>
                                     <TableCell>
                                         <FormGroup>
                                             <Grid container>
-                                                <Grid item xs={6}>
-                                                    <FormControlLabel
-                                                        control={(
-                                                            <Checkbox
-                                                                className={classes.roleCheckbox}
-                                                                checked={isOrganisationAdmin(roles, workspace)}
-                                                                value="Admin"
-                                                                disabled
-                                                            />
-                                                        )}
-                                                        label="Admin"
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <FormControlLabel
-                                                        control={(
-                                                            <Checkbox
-                                                                className={classes.roleCheckbox}
-                                                                checked={isWorkspaceCoordinator(roles, workspace)}
-                                                                value="Coordinator"
-                                                                disabled
-                                                            />
-                                                        )}
-                                                        label="Coordinator"
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <FormControlLabel
-                                                        control={(
-                                                            <Checkbox
-                                                                className={classes.roleCheckbox}
-                                                                checked={isWorkspaceUser(roles, workspace)}
-                                                                value="User"
-                                                            />
-                                                        )}
-                                                        label="User"
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <FormControlLabel
-                                                        control={(
-                                                            <Checkbox
-                                                                className={classes.roleCheckbox}
-                                                                checked={isWorkspaceDatasteward(roles, workspace)}
-                                                                value="DataSteward"
-                                                            />
-                                                        )}
-                                                        label="DataSteward"
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={6}>
-                                                    <FormControlLabel
-                                                        control={(
-                                                            <Checkbox
-                                                                className={classes.roleCheckbox}
-                                                                checked={isWorkspaceSparql(roles, workspace)}
-                                                                value="SAPRQL"
-                                                            />
-                                                        )}
-                                                        label="SAPRQL"
-                                                    />
-                                                </Grid>
+                                                <RoleCheckbox
+                                                    userId={id}
+                                                    label="Admin"
+                                                    roleChecker={isOrganisationAdmin}
+                                                    value={roles.organisationAdmin}
+                                                    disabled
+                                                />
+                                                <RoleCheckbox
+                                                    userId={id}
+                                                    label="Coordinator"
+                                                    roleChecker={isWorkspaceCoordinator}
+                                                    value={rolesPrefixes.coordinator + workspace}
+                                                    disabled
+                                                />
+                                                <RoleCheckbox
+                                                    userId={id}
+                                                    label="User"
+                                                    roleChecker={isWorkspaceUser}
+                                                    value={rolesPrefixes.user + workspace}
+                                                />
+                                                <RoleCheckbox
+                                                    userId={id}
+                                                    label="DataSteward"
+                                                    roleChecker={isWorkspaceDatasteward}
+                                                    value={rolesPrefixes.datasteward + workspace}
+                                                />
+                                                <RoleCheckbox
+                                                    userId={id}
+                                                    label="SAPRQL"
+                                                    roleChecker={isWorkspaceSparql}
+                                                    value={rolesPrefixes.sparql + workspace}
+                                                />
                                             </Grid>
                                         </FormGroup>
                                     </TableCell>
@@ -175,6 +186,14 @@ const Roles = ({classes, location: {search}}) => {
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                 />
             </Paper>
+            <Button
+                style={{marginTop: 8}}
+                variant="contained"
+                color="primary"
+                disabled={!fromDirty}
+            >
+                Save Roles Changes
+            </Button>
         </>
     );
 };
