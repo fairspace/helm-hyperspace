@@ -1,3 +1,5 @@
+import Config from "../services/Config/Config";
+
 export const getDisplayName = (user) => (user && user.name) || '';
 
 export const Roles = {
@@ -8,17 +10,21 @@ export const Roles = {
     SPARQL: 'Sparql'
 };
 
-export const isOrganisationAdmin = (userRoles, workspace, {roles}) => userRoles && userRoles.includes(roles.organisationAdmin);
+// export const isOrganisationAdmin = (userRoles, workspace, {roles}) => userRoles && userRoles.includes(roles.organisationAdmin);
+export const isOrganisationAdmin = (userRoles) => userRoles && userRoles.includes(Config.get().roles.organisationAdmin);
 
-export const isWorkspaceUser = (userRoles, workspace, {rolesPrefixes}) => userRoles && workspace && !!userRoles.find(r => r === rolesPrefixes.user + workspace);
+export const isWorkspaceUser = (userRoles, workspace) => userRoles && workspace && !!userRoles.find(r => r === Config.get().rolesPrefixes.user + workspace);
 
-export const isWorkspaceCoordinator = (userRoles, workspace, {rolesPrefixes}) => userRoles && workspace && !!userRoles.find(r => r === rolesPrefixes.coordinator + workspace);
+// export const isWorkspaceCoordinator = (authorizations) => authorizations && authorizations.includes(Config.get().roles.workspaceCoordinator);
+export const isWorkspaceCoordinator = (userRoles, workspace) => userRoles && workspace && !!userRoles.find(r => r === Config.get().rolesPrefixes.coordinator + workspace);
 
-export const isWorkspaceDatasteward = (userRoles, workspace, {rolesPrefixes}) => userRoles && workspace && !!userRoles.find(r => r === rolesPrefixes.datasteward + workspace);
+export const isWorkspaceDatasteward = (userRoles, workspace) => userRoles && workspace && !!userRoles.find(r => r === Config.get().rolesPrefixes.datasteward + workspace);
 
-export const isWorkspaceSparql = (userRoles, workspace, {rolesPrefixes}) => userRoles && workspace && !!userRoles.find(r => r === rolesPrefixes.sparql + workspace);
+export const isWorkspaceSparql = (userRoles, workspace) => userRoles && workspace && !!userRoles.find(r => r === Config.get().rolesPrefixes.sparql + workspace);
 
-export const userHasRole = (role, userRoles, workspace, config) => {
+export const userHasRole = (role, userRoles, workspace) => {
+    const config = Config.get();
+
     switch (role) {
         case Roles.ADMIN:
             return isOrganisationAdmin(userRoles, workspace, config);

@@ -1,20 +1,24 @@
 package io.fairspace.portal;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.portal.model.Workspace;
-import io.fairspace.portal.services.StaticLocalPortForward;
 import io.fairspace.portal.services.WorkspaceService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.Tiller;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import static io.fairspace.portal.Authentication.getUserInfo;
 import static io.fairspace.portal.Config.WORKSPACE_CHART;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
+import static io.fairspace.portal.errors.ErrorHelper.errorBody;
+import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
@@ -24,30 +28,38 @@ public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
 
     public static void main(String[] args) throws IOException {
-        var localPortForward = new StaticLocalPortForward(InetAddress.getByName(CONFIG.tiller.service), CONFIG.tiller.port);
-        var tiller = new Tiller(localPortForward);
-        var releaseManager = new ReleaseManager(tiller);
-        var workspaceService = new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));
-
-        initSpark(workspaceService);
+        initSpark(initWorkspaceService());
     }
 
-    private static void initSpark(WorkspaceService workspaceService) {
+    private static WorkspaceService initWorkspaceService() throws IOException {
+        ReleaseManager releaseManager;
+
+        try {
+            var client = new DefaultKubernetesClient();
+            var tiller = new Tiller(client);
+            releaseManager = new ReleaseManager(tiller);
+        } catch(Exception e) {
+            log.error("Error while initializing release manager for tiller.", e);
+            throw e;
+        }
+
+        return new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));
+    }
+
+    private static void initSpark(@NonNull WorkspaceService workspaceService) {
         port(8080);
 
-        if (CONFIG.auth.enabled) {
-            before((request, response) -> {
-                if (request.uri().equals("/api/v1/health")) {
-                    return;
-                }
+        before((request, response) -> {
+            if (request.uri().equals("/api/v1/health")) {
+                return;
+            }
 
-                var token = getUserInfo(request, tokenValidator);
+            var token = getUserInfo(request, tokenValidator);
 
-                if (token == null) {
-                    halt(401);
-                }
-            });
-        }
+            if (token == null) {
+                halt(SC_UNAUTHORIZED);
+            }
+        });
 
         path("/api/v1", () -> {
             path("/workspaces", () -> {
@@ -57,6 +69,10 @@ public class App {
                 }, mapper::writeValueAsString);
 
                 put("", (request, response) -> {
+                    var token = getUserInfo(request, tokenValidator);
+                    if (!token.getAuthorities().contains(CONFIG.auth.organisationAdminRole)) {
+                        halt(SC_FORBIDDEN);
+                    }
                     workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));
                     return "";
                 }, mapper::writeValueAsString);
@@ -65,9 +81,9 @@ public class App {
             get("/health", (request, response) -> "OK");
         });
 
-        exception(Exception.class, (exception, request, response) -> {
-            log.error("Error handling request {} {}", request.requestMethod(), request.uri(), exception);
-            response.status(500);
-        });
+        notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
+        exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
+        exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
+        exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
 }

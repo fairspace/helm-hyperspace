@@ -29,6 +29,9 @@ spec:
 {{ toYaml .Values.podAnnotations.portal | indent 8 }}
 {{- end }}
     spec:
+      {{- if .Values.hyperspace.rbac.enabled }}
+      serviceAccountName: {{ .Release.Name }}-portal
+      {{- end }}
       containers:
       - name: {{ template "portal.fullname" . }}
         image: "{{ .Values.portal.image.image }}:{{ .Values.portal.image.tag }}"
