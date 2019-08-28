@@ -14,7 +14,7 @@ hyperspace:
         realm:
     ingress:
         enabled: true
-        domain: hyperspace.ci.test.fairdev.app
+        domain: ci.test.fairdev.app
         annotations:
             kubernetes.io/ingress.class: nginx
         tls:
@@ -163,6 +163,15 @@ portal:
         successThreshold: 1
         timeoutSeconds: 1
     terminationGracePeriodSeconds: 10
+    mail:
+        mail.from: info@fairspace.io
+        mail.user: user
+        mail.password: password
+        mail.transport.protocol: smtp
+        mail.smtp.auth: true
+        mail.smtp.host: host
+        mail.smtp.port: 587
+        mail.smtp.starttls.enable: true
 
 #####################################################################
 # Specific settings for Frontend subchart

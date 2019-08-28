@@ -10,10 +10,10 @@ import java.util.Map;
 
 public class Config {
     public static final String WORKSPACE_CHART = "workspace";
-
+    public String domain = "ci.fairway.app";
     public final Auth auth = new Auth();
     public final Map<String, URL> charts = new HashMap<>();
-    public final WorkspaceConfig workspace = new WorkspaceConfig();
+    public final Map<String, Object> workspace = new HashMap<>();
 
     public static class Auth {
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
@@ -21,11 +21,6 @@ public class Config {
         public String jwtAlgorithm = "RS256";
 
         public String organisationAdminRole = "organisation-admin";
-    }
-
-    public static class WorkspaceConfig {
-        public String domainTemplate;
-        public final Map<String, Object> workspaceValues = new HashMap<>();
     }
 
     @Override

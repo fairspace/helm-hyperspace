@@ -50,7 +50,7 @@ public class App {
             throw e;
         }
 
-        return new WorkspaceService(releaseManager, chart, CONFIG.workspace.domainTemplate, CONFIG.workspace.workspaceValues);
+        return new WorkspaceService(releaseManager, chart, CONFIG.domain, CONFIG.workspace);
     }
 
     private static void initSpark(@NonNull WorkspaceService workspaceService) {

@@ -9,6 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
+    domain: {{ .Values.hyperspace.ingress.domain .}}
     auth:
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: RS256
@@ -16,12 +17,12 @@ data:
     charts:
       workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7-SNAPSHOT.tgz
     workspace:
-      domainTemplate: workspace.%s.fairway.app
-      config:
-        hyperspace:
-          domain: {{ .Values.hyperspace.ingress.domain .}}
-          keycloak:
-            username: {{ .Values.keycloak.keycloak.username .}}
-            password: {{ .Values.keycloak.keycloak.password .}}
-            realm: {{ .Values.hyperspace.keycloak.realm .}}
-            clientSecret: {{ .Values.hyperspace.keycloak.clientSecret .}}
+      hyperspace:
+        keycloak:
+          username: {{ .Values.keycloak.keycloak.username .}}
+          password: {{ .Values.keycloak.keycloak.password .}}
+          realm: {{ .Values.hyperspace.keycloak.realm .}}
+          clientSecret: {{ .Values.hyperspace.keycloak.clientSecret .}}
+      saturn:
+        mail:
+{{ toYaml .Values.portal.mail | indent 6 }}

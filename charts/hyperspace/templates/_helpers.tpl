@@ -72,10 +72,10 @@ Create the keycloak baseUrl, either by using the override value or constructing 
 {{- define "pluto.fullname" -}}
 {{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
 {{- end -}}
-
+p
 {{/* Organisation portal external hostname */}}
 {{- define "portal.hostname" -}}
-{{- .Values.hyperspace.ingress.domain -}}
+{{- printf "hyperspace.%s" .Values.hyperspace.ingress.domain -}}
 {{- end -}}
 {{- define "portal.fullname" -}}
 {{- .Values.portal.nameOverride | default (printf "%s-portal" .Release.Name) -}}

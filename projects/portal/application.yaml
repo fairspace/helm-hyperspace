@@ -1,3 +1,4 @@
+domain: ci.fairway.app
 auth:
   # JWKS URL
   jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
@@ -8,12 +9,19 @@ auth:
 charts:
   workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7-SNAPSHOT.tgz
 workspace:
-  domainTemplate: workspace.%s.fairway.app
-  config:
-    hyperspace:
-      domain: hyperspace.ci.fairway.app
-      keycloak:
-        username: keycloak
-        password: keycloak-ci-123
-        realm: ci
-        clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+  hyperspace:
+    keycloak:
+      username: keycloak
+      password: keycloak-ci-123
+      realm: ci
+      clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+  saturn:
+    mail:
+      mail.from: info@fairspace.io
+      mail.user: user
+      mail.password: password
+      mail.transport.protocol: smtp
+      mail.smtp.auth: true
+      mail.smtp.host: host
+      mail.smtp.port: 587
+      mail.smtp.starttls.enable: true
