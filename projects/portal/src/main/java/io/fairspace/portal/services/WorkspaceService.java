@@ -16,14 +16,12 @@ import org.microbean.helm.ReleaseManager;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @Slf4j
@@ -83,13 +81,13 @@ public class WorkspaceService {
         while (responseIterator.hasNext()) {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
-                if(release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
+                if (release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
                     result.add(Workspace.builder()
                             .name(release.getName())
                             .version(release.getChart().getMetadata().getVersion())
                             .status(release.getInfo().getStatus().getCode())
-                            .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(FILE_STORAGE_SIZE_YAML_PATH).getValue()))
-                            .databaseVolumeSize(getSize(release.getConfig().getValuesMap().get(DATABASE_STORAGE_SIZE_YAML_PATH).getValue()))
+                            .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(FILE_STORAGE_SIZE_YAML_PATH)))
+                            .databaseVolumeSize(getSize(release.getConfig().getValuesMap().get(DATABASE_STORAGE_SIZE_YAML_PATH)))
                             .build());
                 }
             });
@@ -119,7 +117,10 @@ public class WorkspaceService {
         }, worker);
     }
 
-    private static int getSize(String value) {
-        return parseInt(value.substring(0, value.length() - GIGABYTE_SUFFIX.length()));
+    private static int getSize(ConfigOuterClass.Value value) {
+        return ofNullable(value)
+                .map(ConfigOuterClass.Value::getValue)
+                .map(str -> parseInt(str.substring(0, str.length() - GIGABYTE_SUFFIX.length())))
+                .orElse(-1);
     }
 }
