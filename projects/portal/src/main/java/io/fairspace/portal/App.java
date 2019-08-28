@@ -35,18 +35,20 @@ public class App {
 
     private static WorkspaceService initWorkspaceService() throws IOException {
         ReleaseManager releaseManager;
-        ChartOuterClass.Chart.Builder chart;
-
         try {
             var client = new DefaultKubernetesClient();
             var tiller = new Tiller(client);
             releaseManager = new ReleaseManager(tiller);
-
-            try (var chartLoader = new URLChartLoader()) {
-                chart = chartLoader.load(CONFIG.charts.get(WORKSPACE_CHART));
-            }
         } catch(Exception e) {
             log.error("Error while initializing release manager for tiller.", e);
+            throw e;
+        }
+
+        ChartOuterClass.Chart.Builder chart;
+        try (var chartLoader = new URLChartLoader()) {
+            chart = chartLoader.load(CONFIG.charts.get(WORKSPACE_CHART));
+        } catch (Exception e) {
+            log.error("Error downloading the workspace chart.", e);
             throw e;
         }
 
