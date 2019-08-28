@@ -47,7 +47,7 @@ data:
           path: /api/${app.apiVersion.portal}/**
           url: {{ .Values.pluto.backends.portal | default (printf "http://%s-portal.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
           strip-prefix: false
-        portal:
+        keycloak:
           path: /api/keycloak/**
           url: {{ .Values.pluto.backends.keycloak | default (printf "http://%s-headless.%s.svc.cluster.local:8080/auth/admin/realms/%s" (template "keycloak.prefix" .) .Release.Namespace .Values.hyperspace.keycloak.realm)}}
           strip-prefix: true
