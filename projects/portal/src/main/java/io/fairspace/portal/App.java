@@ -2,6 +2,7 @@ package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hapi.chart.ChartOuterClass;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.portal.model.Workspace;
@@ -10,6 +11,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.Tiller;
+import org.microbean.helm.chart.URLChartLoader;
 
 import java.io.IOException;
 
@@ -33,17 +35,22 @@ public class App {
 
     private static WorkspaceService initWorkspaceService() throws IOException {
         ReleaseManager releaseManager;
+        ChartOuterClass.Chart.Builder chart;
 
         try {
             var client = new DefaultKubernetesClient();
             var tiller = new Tiller(client);
             releaseManager = new ReleaseManager(tiller);
+
+            try (var chartLoader = new URLChartLoader()) {
+                chart = chartLoader.load(CONFIG.charts.get(WORKSPACE_CHART));
+            }
         } catch(Exception e) {
             log.error("Error while initializing release manager for tiller.", e);
             throw e;
         }
 
-        return new WorkspaceService(releaseManager, CONFIG.charts.get(WORKSPACE_CHART));
+        return new WorkspaceService(releaseManager, chart, CONFIG.domain, CONFIG.workspace);
     }
 
     private static void initSpark(@NonNull WorkspaceService workspaceService) {

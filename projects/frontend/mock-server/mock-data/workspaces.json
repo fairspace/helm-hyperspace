@@ -3,24 +3,27 @@
     "name": "Example workspace",
     "version": "0.6.1",
     "status": "DEPLOYED",
-    "values": ""
+    "logAndFilesVolumeSize": 1024,
+    "databaseVolumeSize": 1024
   },
   {
     "name": "Melanoma",
     "version": "0.6.4",
-    "status": "DEPLOYED",
-    "values": ""
+    "logAndFilesVolumeSize": 1024,
+    "databaseVolumeSize": 1024
   },
   {
     "name": "Curie",
     "version": "0.0.1",
     "status": "PENDING_INSTALL",
-    "values": ""
+    "logAndFilesVolumeSize": 1024,
+    "databaseVolumeSize": 1024
   },
   {
     "name": "Sales team",
     "version": "0.5.1-SNAPSHOT",
     "status": "PENDING_INSTALL",
-    "values": ""
+    "logAndFilesVolumeSize": 1024,
+    "databaseVolumeSize": 1024
   }
 ]

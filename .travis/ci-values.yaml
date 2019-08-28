@@ -4,7 +4,7 @@ hyperspace:
     clientSecret: e38026bd-c9d2-4430-8171-d3c58e8cec53
     realm: ci
   ingress:
-    domain: hyperspace.ci.fairway.app
+    domain: ci.fairway.app
   configurationScripts:
     configurationScriptsTag: 0.1.4-SNAPSHOT
     pullPolicy: Always
@@ -28,6 +28,15 @@ pluto:
 portal:
   image:
     pullPolicy: Always
+  mail:
+    mail.from: pavel@thehyve.nl
+    mail.user: AKIAISXHGXUIMMU75YVA
+    mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
+    mail.transport.protocol: smtp
+    mail.smtp.auth: true
+    mail.smtp.host: email-smtp.us-east-1.amazonaws.com
+    mail.smtp.port: 587
+    mail.smtp.starttls.enable: true
 
 frontend:
   image:

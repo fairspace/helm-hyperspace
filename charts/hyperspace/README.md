@@ -48,7 +48,7 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 | `hyperspace.organisationadmin.username` | Username for the organisation admin that will be created for this hyperspace | `organisation-admin-<realm>` |
 | `hyperspace.organisationadmin.password` | Password for the organisation admin that will be created for this hyperspace | `fairspace123` |
 | `ingress.enabled`  | Whether or not an ingress is setup for the hyperspace components. Should be set to false when running locally.  | true  |
-| `ingress.domain`   | Domain that is used for setting up the hyperspace. Is used as postfix for the hostname for the specific components. For example setting `fairspace.app` as domain will setup keycloak at `keycloak.fairspace.app`  | hyperspace.ci.test.fairdev.app  |
+| `ingress.domain`   | Domain that is used for setting up the hyperspace. Is used as postfix for the hostname for the specific components. For example setting `fairspace.app` as domain will setup keycloak at `keycloak.fairspace.app`  | ci.test.fairdev.app  |
 | `ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for hyperspace  | true  |
 | `ingress.tls.secretNameOverride`  | If set, this secret name is used for loading certificates for TLS. | `tls-<release name>` |
 | `ingress.tls.certificate.obtain`  | If set, a `Certificate` object will be created, such that [cert-manager](https://cert-manager.readthedocs.io/en/latest/) will request a certificate automatically. | true |

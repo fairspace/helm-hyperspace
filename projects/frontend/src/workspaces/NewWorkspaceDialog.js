@@ -7,62 +7,13 @@ import Button from "@material-ui/core/Button";
 import DialogContent from "@material-ui/core/DialogContent";
 import TextField from "@material-ui/core/TextField";
 
-const defaultValues = `
-# Hyperspace that this workspace is connected to
-hyperspace:
-  domain: 
-  keycloak:
-    username: keycloak
-    password: 
-    realm: ci
-    clientSecret: 
-
-# Settings for the workspace
-workspace:
-  ingress:
-    domain: 
-  enableExperimentalFeatures: true
-  configurationScripts:
-    keycloak:
-      enabled: true
-      pullPolicy: IfNotPresent
-
-services:
-  jupyterhub: 
-
-pluto:
-  image:
-    pullPolicy: Always
-    
-# Specific settings for Saturn subchart
-saturn:
-  image:
-    pullPolicy: Always
-  mail:
-    mail.from: 
-    mail.user: 
-    mail.password: 
-    mail.transport.protocol: smtp
-    mail.smtp.auth: true
-    mail.smtp.host: email-smtp.us-east-1.amazonaws.com
-    mail.smtp.port: 587
-    mail.smtp.starttls.enable: true
-
-
-# Specific settings for Mercury subchart
-mercury:
-  image:
-    pullPolicy: Always
-
-# Specific settings for Mercury subchart
-docs:
-  image:
-    pullPolicy: Always
-`;
+const defaultLogAndFilesVolumeSize = 1024;
+const defaultDatabaseVolumeSize = 1024;
 
 export default ({onCreate, onClose}) => {
     const [name, setName] = useState("");
-    const [values, setValues] = useState(defaultValues);
+    const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
+    const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
 
     return (<Dialog
         open
@@ -88,13 +39,24 @@ export default ({onCreate, onClose}) => {
                 required
             />
             <TextField
-                multiline
                 margin="dense"
-                id="values"
-                label="Values"
-                value={values}
-                name="values"
-                onChange={(event) => setValues(event.target.value)}
+                id="logAndFilesVolumeSize"
+                label="Log and files volume size, Gb"
+                value={logAndFilesVolumeSize}
+                name="logAndFilesVolumeSize"
+                type="number"
+                onChange={(event) => setLogAndFilesVolumeSize(event.target.value)}
+                fullWidth
+                required
+            />
+            <TextField
+                margin="dense"
+                id="databaseVolumeSize"
+                label="Log and files volume size, Gb"
+                value={databaseVolumeSize}
+                name="databaseVolumeSize"
+                type="number"
+                onChange={(event) => setDatabaseVolumeSize(event.target.value)}
                 fullWidth
                 required
             />
@@ -107,7 +69,7 @@ export default ({onCreate, onClose}) => {
                 Cancel
             </Button>
             <Button
-                onClick={() => onCreate({name, values})}
+                onClick={() => onCreate({name, logAndFilesVolumeSize, databaseVolumeSize})}
                 color="primary"
                 variant="contained"
             >
