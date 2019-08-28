@@ -36,6 +36,7 @@ public class WorkspaceService {
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.database.size";
     private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "workspace.ingress.domain";
     private static final String HYPERSPACE_DOMAIN_YAML_PATH = "hyperspace.domain";
+    private static final String ELASTICSEARCH_INDEX_YAML_PATH = "hyperspace.elasticsearch.indexName";
     private static final String HYPERSPACE_PREFIX = "hyperspace.";
     private static final String GIGABYTE_SUFFIX = "Gi";
     private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
@@ -100,10 +101,11 @@ public class WorkspaceService {
     public void installWorkspace(Workspace workspace) throws IOException {
         var config = ConfigOuterClass.Config.newBuilder()
                 .setRaw(objectMapper.writeValueAsString(workspaceValues))
-                .putValues(WORKSPACE_INGRESS_DOMAIN_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(workspace.getName() + "." + domain).build())
-                .putValues(HYPERSPACE_DOMAIN_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(HYPERSPACE_PREFIX + domain).build())
-                .putValues(FILE_STORAGE_SIZE_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX).build())
-                .putValues(DATABASE_STORAGE_SIZE_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX).build())
+                .putValues(WORKSPACE_INGRESS_DOMAIN_YAML_PATH, stringValue(workspace.getName() + "." + domain))
+                .putValues(HYPERSPACE_DOMAIN_YAML_PATH, stringValue(HYPERSPACE_PREFIX + domain))
+                .putValues(FILE_STORAGE_SIZE_YAML_PATH, stringValue(workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX))
+                .putValues(DATABASE_STORAGE_SIZE_YAML_PATH, stringValue(workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX))
+                .putValues(ELASTICSEARCH_INDEX_YAML_PATH, stringValue(workspace.getName()))
                 .build();
         var requestBuilder = InstallReleaseRequest.newBuilder()
                 .setName(workspace.getName())
@@ -121,5 +123,9 @@ public class WorkspaceService {
 
     private static int getSize(String value) {
         return parseInt(value.substring(0, value.length() - GIGABYTE_SUFFIX.length()));
+    }
+
+    private static ConfigOuterClass.Value stringValue(String value) {
+        return ConfigOuterClass.Value.newBuilder().setValue(value).build();
     }
 }
