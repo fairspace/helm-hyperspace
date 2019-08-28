@@ -7,11 +7,13 @@ import Button from "@material-ui/core/Button";
 import DialogContent from "@material-ui/core/DialogContent";
 import TextField from "@material-ui/core/TextField";
 
+const defaultLogAndFilesVolumeSize = 1024;
+const defaultDatabaseVolumeSize = 1024;
 
 export default ({onCreate, onClose}) => {
     const [name, setName] = useState("");
-    const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(1024);
-    const [databaseVolumeSize, setDatabaseVolumeSize] = useState(1024);
+    const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
+    const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
 
     return (<Dialog
         open
@@ -37,7 +39,6 @@ export default ({onCreate, onClose}) => {
                 required
             />
             <TextField
-                multiline
                 margin="dense"
                 id="logAndFilesVolumeSize"
                 label="Log and files volume size, Gb"
@@ -49,7 +50,6 @@ export default ({onCreate, onClose}) => {
                 required
             />
             <TextField
-                multiline
                 margin="dense"
                 id="databaseVolumeSize"
                 label="Log and files volume size, Gb"
