@@ -9,7 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   application.yaml: |-
-    domain: {{ .Values.hyperspace.ingress.domain .}}
+    domain: {{ .Values.hyperspace.ingress.domain }}
     auth:
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: RS256
@@ -19,10 +19,10 @@ data:
     workspace:
       hyperspace:
         keycloak:
-          username: {{ .Values.keycloak.keycloak.username .}}
-          password: {{ .Values.keycloak.keycloak.password .}}
-          realm: {{ .Values.hyperspace.keycloak.realm .}}
-          clientSecret: {{ .Values.hyperspace.keycloak.clientSecret .}}
+          username: {{ .Values.keycloak.keycloak.username }}
+          password: {{ .Values.keycloak.keycloak.password }}
+          realm: {{ .Values.hyperspace.keycloak.realm }}
+          clientSecret: {{ .Values.hyperspace.keycloak.clientSecret }}
         elasticsearch:
           transport:
             host: {{ .Release.Name }}-elasticsearch-discovery.{{ .Release.Namespace }}.svc.cluster.local
