@@ -45,8 +45,9 @@ public class WorkspaceService {
             StatusOuterClass.Status.Code.PENDING_ROLLBACK);
 
     private static final long MAX_RELEASES_TO_RETURN = 100L;
-    public static final String SATURN_PERSISTENCE_FILES_SIZE = "saturn.persistence.files.size";
-    public static final String SATURN_PERSISTENCE_DATABASE_SIZE = "saturn.persistence.database.size";
+    private static final String FILE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.files.size";
+    private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.database.size";
+    private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "workspace.ingress.domain";
 
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
@@ -92,8 +93,8 @@ public class WorkspaceService {
                             .name(release.getName())
                             .version(release.getChart().getMetadata().getVersion())
                             .status(release.getInfo().getStatus().getCode())
-                            .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(SATURN_PERSISTENCE_FILES_SIZE).getValue()))
-                            .databaseVolumeSize(getSize(release.getConfig().getValuesMap().get(SATURN_PERSISTENCE_DATABASE_SIZE).getValue()))
+                            .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(FILE_STORAGE_SIZE_YAML_PATH).getValue()))
+                            .databaseVolumeSize(getSize(release.getConfig().getValuesMap().get(DATABASE_STORAGE_SIZE_YAML_PATH).getValue()))
                             .build());
                 }
             });
@@ -104,9 +105,9 @@ public class WorkspaceService {
     public void installWorkspace(Workspace workspace) throws IOException {
         var config = ConfigOuterClass.Config.newBuilder()
                 .setRaw(objectMapper.writeValueAsString(workspaceValues))
-                .putValues("workspace.ingress.domain", ConfigOuterClass.Value.newBuilder().setValue(format(domainTemplate, workspace.getName())).build())
-                .putValues(SATURN_PERSISTENCE_FILES_SIZE, ConfigOuterClass.Value.newBuilder().setValue(workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX).build())
-                .putValues(SATURN_PERSISTENCE_DATABASE_SIZE, ConfigOuterClass.Value.newBuilder().setValue(workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX).build())
+                .putValues(WORKSPACE_INGRESS_DOMAIN_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(format(domainTemplate, workspace.getName())).build())
+                .putValues(FILE_STORAGE_SIZE_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX).build())
+                .putValues(DATABASE_STORAGE_SIZE_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX).build())
                 .build();
         var requestBuilder = InstallReleaseRequest.newBuilder()
                 .setName(workspace.getName())
