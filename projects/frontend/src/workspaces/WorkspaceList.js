@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {
     Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel
 } from "@material-ui/core";
@@ -11,6 +11,7 @@ import WorkspaceAPI from "./WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
 import useRepeat from "../common/hooks/UseRepeat";
 import useAsync from "../common/hooks/UseAsync";
+import UserContext from "../common/contexts/UserContext";
 
 const columns = {
     name: {
@@ -35,6 +36,12 @@ const WorkspaceList = () => {
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+    const {currentUser: {authorizations}} = useContext(UserContext);
+    const gotoWorkspace = (workspace) => {
+        if (authorizations.includes(`user-${workspace.name}`)) {
+            window.location.href = workspace.url
+        }
+    };
 
     if (loading) {
         return <LoadingInlay/>;
@@ -89,7 +96,7 @@ const WorkspaceList = () => {
                                 <TableCell align="left">
                                     <FolderOpen/>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell onClick={() => gotoWorkspace(workspace) }>
                                     {workspace.name}
                                 </TableCell>
                                 <TableCell>
