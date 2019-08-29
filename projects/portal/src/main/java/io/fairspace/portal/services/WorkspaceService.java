@@ -102,6 +102,8 @@ public class WorkspaceService {
                        "    domain: %s.%s\n" +
                        "hyperspace:\n" +
                        "  domain: hyperspace.%s\n" +
+                       "  elasticsearch:\n" +
+                       "    indexName: %s\n" +
                        "saturn:\n" +
                        "  persistence:\n" +
                        "    files:\n" +
@@ -111,6 +113,7 @@ public class WorkspaceService {
                        workspace.getName(),
                        domain,
                        domain,
+                       workspace.getName(),
                        workspace.getLogAndFilesVolumeSize(),
                        workspace.getDatabaseVolumeSize());
 
