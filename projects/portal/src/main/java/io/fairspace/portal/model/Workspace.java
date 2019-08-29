@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class Workspace {
     private String name;
     private String version;
+    private String url;
     private StatusOuterClass.Status.Code status;
     private int logAndFilesVolumeSize;
     private int databaseVolumeSize;

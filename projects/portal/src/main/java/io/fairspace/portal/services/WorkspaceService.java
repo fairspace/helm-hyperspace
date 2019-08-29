@@ -31,6 +31,7 @@ public class WorkspaceService {
     private static final long EXPIRATION_INTERVAL_MS = 300_000;
     private static final long INSTALLATION_TIMEOUT_SEC = 900;
     private static final long MAX_RELEASES_TO_RETURN = 100L;
+    private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "workspace.ingress.domain";
     private static final String FILE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.files.size";
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.database.size";
     private static final String GIGABYTE_SUFFIX = "Gi";
@@ -82,6 +83,7 @@ public class WorkspaceService {
                 if (release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
                     result.add(Workspace.builder()
                             .name(release.getName())
+                            .url(release.getConfig().getValuesMap().get("https://" + WORKSPACE_INGRESS_DOMAIN_YAML_PATH).getValue())
                             .version(release.getChart().getMetadata().getVersion())
                             .status(release.getInfo().getStatus().getCode())
                             .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(FILE_STORAGE_SIZE_YAML_PATH)))
