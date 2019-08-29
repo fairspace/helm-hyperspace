@@ -92,11 +92,12 @@ const WorkspaceList = () => {
                             <TableRow
                                 hover
                                 key={workspace.name}
+                                onDoubleClick={() => gotoWorkspace(workspace) }
                             >
                                 <TableCell align="left">
                                     <FolderOpen/>
                                 </TableCell>
-                                <TableCell onClick={() => gotoWorkspace(workspace) }>
+                                <TableCell>
                                     {workspace.name}
                                 </TableCell>
                                 <TableCell>
