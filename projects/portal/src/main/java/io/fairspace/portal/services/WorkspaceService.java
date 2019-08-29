@@ -95,10 +95,17 @@ public class WorkspaceService {
 
     public void installWorkspace(Workspace workspace) throws IOException {
         var yaml = objectMapper.writeValueAsString(workspaceValues) +
-                format("workspace.ingress.domain: %s%s\n" +
-                       "hyperspace.domain: hyperspace.%s\n" +
-                       "saturn.persistence.files.size: %sGi\n" +
-                       "saturn.persistence.database.size: %sGi\n",
+                format("workspace:\n" +
+                       "  ingress:\n" +
+                       "    domain: %s.%s\n" +
+                       "hyperspace:\n" +
+                       "  domain: hyperspace.%s\n" +
+                       "saturn:\n" +
+                       "  persistence:\n" +
+                       "    files:\n" +
+                       "      size: %sGi\n" +
+                       "    database:\n" +
+                       "      size: %sGi\n",
                        workspace.getName(),
                        domain,
                        domain,
