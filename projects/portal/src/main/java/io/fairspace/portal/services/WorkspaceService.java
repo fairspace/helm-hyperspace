@@ -83,7 +83,7 @@ public class WorkspaceService {
                 if (release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
                     result.add(Workspace.builder()
                             .name(release.getName())
-                            .url(release.getConfig().getValuesMap().get("https://" + WORKSPACE_INGRESS_DOMAIN_YAML_PATH).getValue())
+                            .url("https://" + release.getConfig().getValuesMap().get(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).getValue())
                             .version(release.getChart().getMetadata().getVersion())
                             .status(release.getInfo().getStatus().getCode())
                             .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(FILE_STORAGE_SIZE_YAML_PATH)))
