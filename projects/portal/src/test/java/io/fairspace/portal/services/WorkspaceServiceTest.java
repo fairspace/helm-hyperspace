@@ -89,6 +89,8 @@ public class WorkspaceServiceTest {
                         "    domain: test.example.com\n" +
                         "hyperspace:\n" +
                         "  domain: hyperspace.example.com\n" +
+                        "  elasticsearch:\n" +
+                        "    indexName: test\n" +
                         "saturn:\n" +
                         "  persistence:\n" +
                         "    files:\n" +
