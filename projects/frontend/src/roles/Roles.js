@@ -11,12 +11,13 @@ import Config from "../common/services/Config/Config";
 import UsersContext from '../common/contexts/UsersContext';
 import {
     isWorkspaceUser, isWorkspaceCoordinator, isWorkspaceDatasteward,
-    isWorkspaceSparql, isOrganisationAdmin
+    isWorkspaceSparql, isOrganisationAdmin, isUserTheGivenWorkspace, idToRoles
 } from '../common/utils/userUtils';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
 import LoadingInlay from '../common/components/LoadingInlay';
 import MessageDisplay from '../common/components/MessageDisplay';
+import UserContext from '../common/contexts/UserContext';
 
 const styles = theme => ({
     header: {
@@ -40,17 +41,19 @@ const columns = {
     }
 };
 
-const idToRoles = (accumulator, {id, roles}) => ({
-    ...accumulator,
-    [id]: new Set(roles)
-});
 
 const Roles = ({
     classes, location: {search}, workspace = queryString.parse(search).workspace
 }) => {
+    const {currentUser: {authorizations: userAuthorizations}} = useContext(UserContext);
     const {users, usersError, usersLoading} = useContext(UsersContext);
-    const [usersRolesMapping, setUsersRolesMapping] = useState(users.reduce(idToRoles, {}));
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
+
+    const isCurrentUserAdmin = isOrganisationAdmin(userAuthorizations);
+    const allWorkspaceUsers = users.filter(({authorizations}) => isUserTheGivenWorkspace(authorizations, workspace));
+    const usersToHandle = isCurrentUserAdmin ? allWorkspaceUsers : allWorkspaceUsers.filter(({authorizations}) => !isWorkspaceCoordinator(authorizations, workspace));
+
+    const [usersRolesMapping, setUsersRolesMapping] = useState(usersToHandle.reduce(idToRoles, {}));
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(usersToHandle, columns, 'firstName');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [fromDirty, setFromDirty] = useState(false);
 
@@ -92,7 +95,7 @@ const Roles = ({
                 control={(
                     <Checkbox
                         className={classes.roleCheckbox}
-                        checked={roleChecker(Array.from(usersRolesMapping[userId]), workspace)}
+                        checked={roleChecker(Array.from(usersRolesMapping[userId] || {}), workspace)}
                         onChange={handleChange(userId)}
                         value={value}
                         disabled={disabled}
@@ -102,6 +105,10 @@ const Roles = ({
             />
         </Grid>
     );
+
+    if (pagedItems && pagedItems.length === 0) {
+        return <MessageDisplay message={`No users for ${workspace}`} />;
+    }
 
     return (
         <>
@@ -148,7 +155,7 @@ const Roles = ({
                                                     label="Coordinator"
                                                     roleChecker={isWorkspaceCoordinator}
                                                     value={rolesPrefixes.coordinator + workspace}
-                                                    disabled
+                                                    disabled={!isCurrentUserAdmin}
                                                 />
                                                 <RoleCheckbox
                                                     userId={id}
@@ -158,7 +165,7 @@ const Roles = ({
                                                 />
                                                 <RoleCheckbox
                                                     userId={id}
-                                                    label="DataSteward"
+                                                    label="Data steward"
                                                     roleChecker={isWorkspaceDatasteward}
                                                     value={rolesPrefixes.datasteward + workspace}
                                                 />

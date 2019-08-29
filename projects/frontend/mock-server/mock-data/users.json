@@ -4,8 +4,7 @@
     "username": "test-workspace-ci",
     "firstName": "John",
     "lastName": "Snow",
-    "roles": [
-      "organisation-admin",
+    "authorizations": [
       "user-Example workspace",
       "datasteward-Example workspace",
       "coordinator-Example workspace"
@@ -15,7 +14,7 @@
     "id": "13300b41-b4a0-463f-95aa-764d9efdc5cc",
     "firstName": "Ygritte",
     "lastName": "Lopez",
-    "roles": [
+    "authorizations": [
       "datasteward-Example workspace"
     ]
   },
@@ -23,7 +22,7 @@
     "id": "ab161dae-e402-4fd2-9d86-130387dc25ef",
     "firstName": "Daenarys",
     "lastName": "Targaryen",
-    "roles": [
+    "authorizations": [
       "coordinator-Example workspace"
     ]
   },
@@ -31,15 +30,15 @@
     "id": "f12ff9c5-89f1-4f75-8530-cbd0ae1396c8",
     "firstName": "Gregor",
     "lastName": "Clegane",
-    "roles": [
-      "user-Example workspace"
+    "authorizations": [
+      "user-Melanoma"
     ]
   },
   {
     "id": "05364a93-cd21-4c48-8b01-948512d63a8b",
     "firstName": "Cersei",
     "lastName": "Lannister",
-    "roles": [
+    "authorizations": [
       "user-Example workspace",
       "sparql-Example workspace"
     ]
