@@ -81,6 +81,9 @@ public class WorkspaceService {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
                 if (release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
+                    log.info("Release name: {}", release.getName());
+                    log.info("Release config raw: {}", release.getConfig().getRaw());
+                    log.info("Release config values map: {}", release.getConfig().getValuesMap());
                     result.add(Workspace.builder()
                             .name(release.getName())
                             .url(ofNullable(release.getConfig().getValuesMap().get(WORKSPACE_INGRESS_DOMAIN_YAML_PATH)).map(domain -> "https://" + domain.getValue()).orElse(null))
