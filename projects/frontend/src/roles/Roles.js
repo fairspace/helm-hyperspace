@@ -41,11 +41,10 @@ const columns = {
     }
 };
 
-
 const Roles = ({
     classes, location: {search}, workspace = queryString.parse(search).workspace
 }) => {
-    const {currentUser: {authorizations: userAuthorizations}} = useContext(UserContext);
+    const {currentUser: {authorizations: userAuthorizations}, currentUserLoading, currentUserError} = useContext(UserContext);
     const {users, usersError, usersLoading} = useContext(UsersContext);
 
     const isCurrentUserAdmin = isOrganisationAdmin(userAuthorizations);
@@ -57,18 +56,10 @@ const Roles = ({
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [fromDirty, setFromDirty] = useState(false);
 
-    // TODO: there should be 2 checks here, the workspace exists and the current user is coordinator or admin
+    // TODO: check that the workspace exists
 
-    if (!workspace || workspace.trim().length === 0) {
-        return <MessageDisplay message="No workspace is provided." />;
-    }
-
-    if (usersLoading) {
-        return <LoadingInlay />;
-    }
-
-    if (usersError) {
-        return <MessageDisplay message="Unable to retrieve the list of users." />;
+    if (!isWorkspaceCoordinator(userAuthorizations, workspace) && !isCurrentUserAdmin) {
+        return <MessageDisplay message={`You do not have access to the roles in ${workspace}.`} />;
     }
 
     const handleChange = (id) => (event) => {
@@ -88,6 +79,18 @@ const Roles = ({
     };
 
     const {roles, rolesPrefixes} = Config.get();
+
+    if (!workspace || workspace.trim().length === 0) {
+        return <MessageDisplay message="No workspace is provided." />;
+    }
+
+    if (usersLoading || currentUserLoading) {
+        return <LoadingInlay />;
+    }
+
+    if (usersError || currentUserError) {
+        return <MessageDisplay message="Unable to retrieve the list of users." />;
+    }
 
     const RoleCheckbox = ({userId, label, roleChecker, value, disabled}) => (
         <Grid item xs={4}>
