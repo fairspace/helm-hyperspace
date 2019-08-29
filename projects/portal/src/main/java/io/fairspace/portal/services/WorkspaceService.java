@@ -31,9 +31,9 @@ public class WorkspaceService {
     private static final long EXPIRATION_INTERVAL_MS = 300_000;
     private static final long INSTALLATION_TIMEOUT_SEC = 900;
     private static final long MAX_RELEASES_TO_RETURN = 100L;
-    private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "workspace.ingress.domain";
-    private static final String FILE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.files.size";
-    private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.database.size";
+    private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "/workspace/ingress/domain";
+    private static final String FILE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/files/size";
+    private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/database/size";
     private static final String GIGABYTE_SUFFIX = "Gi";
     private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
             StatusOuterClass.Status.Code.UNKNOWN,
@@ -81,17 +81,19 @@ public class WorkspaceService {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
                 if (release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
-                    log.info("Release name: {}", release.getName());
-                    log.info("Release config raw: {}", release.getConfig().getRaw());
-                    log.info("Release config values map: {}", release.getConfig().getValuesMap());
-                    result.add(Workspace.builder()
-                            .name(release.getName())
-                            .url(ofNullable(release.getConfig().getValuesMap().get(WORKSPACE_INGRESS_DOMAIN_YAML_PATH)).map(domain -> "https://" + domain.getValue()).orElse(null))
-                            .version(release.getChart().getMetadata().getVersion())
-                            .status(release.getInfo().getStatus().getCode())
-                            .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(FILE_STORAGE_SIZE_YAML_PATH)))
-                            .databaseVolumeSize(getSize(release.getConfig().getValuesMap().get(DATABASE_STORAGE_SIZE_YAML_PATH)))
-                            .build());
+                    try {
+                        var config = objectMapper.readTree(release.getConfig().getRaw());
+                        result.add(Workspace.builder()
+                                .name(release.getName())
+                                .url("https://" +config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
+                                .version(release.getChart().getMetadata().getVersion())
+                                .status(release.getInfo().getStatus().getCode())
+                                .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
+                                .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
+                                .build());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
         }
@@ -137,10 +139,10 @@ public class WorkspaceService {
         }
     }
 
-    private static int getSize(ConfigOuterClass.Value value) {
+    private static int getSize(String value) {
         return ofNullable(value)
-                .map(ConfigOuterClass.Value::getValue)
-                .map(str -> parseInt(str.substring(0, str.length() - GIGABYTE_SUFFIX.length())))
+                .filter(str -> !str.isEmpty())
+                .map(str -> parseInt(str.replace(GIGABYTE_SUFFIX, "")))
                 .orElse(-1);
     }
 }
