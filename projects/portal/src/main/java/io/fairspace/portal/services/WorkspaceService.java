@@ -16,14 +16,13 @@ import org.microbean.helm.ReleaseManager;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @Slf4j
@@ -34,10 +33,6 @@ public class WorkspaceService {
     private static final long MAX_RELEASES_TO_RETURN = 100L;
     private static final String FILE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.files.size";
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.database.size";
-    private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "workspace.ingress.domain";
-    private static final String HYPERSPACE_DOMAIN_YAML_PATH = "hyperspace.domain";
-    private static final String ELASTICSEARCH_INDEX_YAML_PATH = "hyperspace.elasticsearch.indexName";
-    private static final String HYPERSPACE_PREFIX = "hyperspace.";
     private static final String GIGABYTE_SUFFIX = "Gi";
     private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
             StatusOuterClass.Status.Code.UNKNOWN,
@@ -84,13 +79,13 @@ public class WorkspaceService {
         while (responseIterator.hasNext()) {
             var response = responseIterator.next();
             response.getReleasesList().forEach(release -> {
-                if(release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
+                if (release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
                     result.add(Workspace.builder()
                             .name(release.getName())
                             .version(release.getChart().getMetadata().getVersion())
                             .status(release.getInfo().getStatus().getCode())
-                            .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(FILE_STORAGE_SIZE_YAML_PATH).getValue()))
-                            .databaseVolumeSize(getSize(release.getConfig().getValuesMap().get(DATABASE_STORAGE_SIZE_YAML_PATH).getValue()))
+                            .logAndFilesVolumeSize(getSize(release.getConfig().getValuesMap().get(FILE_STORAGE_SIZE_YAML_PATH)))
+                            .databaseVolumeSize(getSize(release.getConfig().getValuesMap().get(DATABASE_STORAGE_SIZE_YAML_PATH)))
                             .build());
                 }
             });
@@ -99,33 +94,48 @@ public class WorkspaceService {
     }
 
     public void installWorkspace(Workspace workspace) throws IOException {
-        var config = ConfigOuterClass.Config.newBuilder()
-                .setRaw(objectMapper.writeValueAsString(workspaceValues))
-                .putValues(WORKSPACE_INGRESS_DOMAIN_YAML_PATH, stringValue(workspace.getName() + "." + domain))
-                .putValues(HYPERSPACE_DOMAIN_YAML_PATH, stringValue(HYPERSPACE_PREFIX + domain))
-                .putValues(FILE_STORAGE_SIZE_YAML_PATH, stringValue(workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX))
-                .putValues(DATABASE_STORAGE_SIZE_YAML_PATH, stringValue(workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX))
-                .putValues(ELASTICSEARCH_INDEX_YAML_PATH, stringValue(workspace.getName()))
-                .build();
+        var yaml = objectMapper.writeValueAsString(workspaceValues) +
+                format("workspace:\n" +
+                       "  ingress:\n" +
+                       "    domain: %s.%s\n" +
+                       "hyperspace:\n" +
+                       "  domain: hyperspace.%s\n" +
+                       "  elasticsearch:\n" +
+                       "    indexName: %s\n" +
+                       "saturn:\n" +
+                       "  persistence:\n" +
+                       "    files:\n" +
+                       "      size: %sGi\n" +
+                       "    database:\n" +
+                       "      size: %sGi\n",
+                       workspace.getName(),
+                       domain,
+                       domain,
+                       workspace.getName(),
+                       workspace.getLogAndFilesVolumeSize(),
+                       workspace.getDatabaseVolumeSize());
+
         var requestBuilder = InstallReleaseRequest.newBuilder()
                 .setName(workspace.getName())
                 .setNamespace(workspace.getName())
-                .setValues(config)
+                .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build())
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
         var future = (ListenableFuture<InstallReleaseResponse>) releaseManager.install(requestBuilder, chart);
-        future.addListener(() -> {
-            synchronized (lock) {
-                lastUpdateTime = 0;
-            }
-        }, worker);
+        future.addListener(this::invalidateCache, worker);
+        invalidateCache();
     }
 
-    private static int getSize(String value) {
-        return parseInt(value.substring(0, value.length() - GIGABYTE_SUFFIX.length()));
+    private void invalidateCache() {
+        synchronized (lock) {
+            lastUpdateTime = 0;
+        }
     }
 
-    private static ConfigOuterClass.Value stringValue(String value) {
-        return ConfigOuterClass.Value.newBuilder().setValue(value).build();
+    private static int getSize(ConfigOuterClass.Value value) {
+        return ofNullable(value)
+                .map(ConfigOuterClass.Value::getValue)
+                .map(str -> parseInt(str.substring(0, str.length() - GIGABYTE_SUFFIX.length())))
+                .orElse(-1);
     }
 }

@@ -30,4 +30,4 @@ data:
             host: {{ .Release.Name }}-elasticsearch-client.{{ .Release.Namespace }}.svc.cluster.local
       saturn:
         mail:
-{{ toYaml .Values.portal.mail | indent 6 }}
+{{ toYaml .Values.portal.mail | indent 10 }}
