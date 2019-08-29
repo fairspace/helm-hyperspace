@@ -80,7 +80,8 @@ public class WorkspaceServiceTest {
 
         verify(releaseManager).install(argThat(request ->
                 request.getName().equals(ws.getName())
-                && request.getValues().getRaw().equals("---\n" +
+                && request.getValues().getRaw().equals(
+                        "---\n" +
                         "key:\n" +
                         "  subkey: \"value\"\n" +
                         "workspace:\n" +

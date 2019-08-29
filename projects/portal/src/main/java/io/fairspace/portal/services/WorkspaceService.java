@@ -119,11 +119,14 @@ public class WorkspaceService {
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
         var future = (ListenableFuture<InstallReleaseResponse>) releaseManager.install(requestBuilder, chart);
-        future.addListener(() -> {
-            synchronized (lock) {
-                lastUpdateTime = 0;
-            }
-        }, worker);
+        future.addListener(this::invalidateCache, worker);
+        invalidateCache();
+    }
+
+    private void invalidateCache() {
+        synchronized (lock) {
+            lastUpdateTime = 0;
+        }
     }
 
     private static int getSize(ConfigOuterClass.Value value) {
