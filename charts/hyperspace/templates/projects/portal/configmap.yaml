@@ -25,4 +25,4 @@ data:
           clientSecret: {{ .Values.hyperspace.keycloak.clientSecret }}
       saturn:
         mail:
-{{ toYaml .Values.portal.mail | indent 6 }}
+{{ toYaml .Values.portal.mail | indent 11 }}

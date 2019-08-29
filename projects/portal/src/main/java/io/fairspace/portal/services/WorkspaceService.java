@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.Executor;
 
 import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
@@ -32,9 +33,6 @@ public class WorkspaceService {
     private static final long MAX_RELEASES_TO_RETURN = 100L;
     private static final String FILE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.files.size";
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "saturn.persistence.database.size";
-    private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "workspace.ingress.domain";
-    private static final String HYPERSPACE_DOMAIN_YAML_PATH = "hyperspace.domain";
-    private static final String HYPERSPACE_PREFIX = "hyperspace.";
     private static final String GIGABYTE_SUFFIX = "Gi";
     private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
             StatusOuterClass.Status.Code.UNKNOWN,
@@ -96,17 +94,22 @@ public class WorkspaceService {
     }
 
     public void installWorkspace(Workspace workspace) throws IOException {
-        var config = ConfigOuterClass.Config.newBuilder()
-                .setRaw(objectMapper.writeValueAsString(workspaceValues))
-                .putValues(WORKSPACE_INGRESS_DOMAIN_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(workspace.getName() + "." + domain).build())
-                .putValues(HYPERSPACE_DOMAIN_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(HYPERSPACE_PREFIX + domain).build())
-                .putValues(FILE_STORAGE_SIZE_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX).build())
-                .putValues(DATABASE_STORAGE_SIZE_YAML_PATH, ConfigOuterClass.Value.newBuilder().setValue(workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX).build())
-                .build();
+        var yaml = format("%s\n" +
+                        "workspace.ingress.domain: %s%s\n" +
+                        "hyperspace.domain: hyperspace.%s\n" +
+                        "saturn.persistence.files.size: %sGi\n" +
+                        "saturn.persistence.database.size: %sGi\n",
+                objectMapper.writeValueAsString(workspaceValues),
+                workspace.getName(),
+                domain,
+                domain,
+                workspace.getLogAndFilesVolumeSize(),
+                workspace.getDatabaseVolumeSize());
+
         var requestBuilder = InstallReleaseRequest.newBuilder()
                 .setName(workspace.getName())
                 .setNamespace(workspace.getName())
-                .setValues(config)
+                .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build())
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
         var future = (ListenableFuture<InstallReleaseResponse>) releaseManager.install(requestBuilder, chart);
