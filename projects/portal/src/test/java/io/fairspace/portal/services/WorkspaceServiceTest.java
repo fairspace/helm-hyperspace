@@ -80,11 +80,13 @@ public class WorkspaceServiceTest {
 
         verify(releaseManager).install(argThat(request ->
                 request.getName().equals(ws.getName())
-                && request.getValues().getRaw().equals("---\nkey:\n  subkey: \"value\"\n")
-                && request.getValues().getValuesOrThrow("hyperspace.domain").getValue().equals("hyperspace." + domain)
-                && request.getValues().getValuesOrThrow("workspace.ingress.domain").getValue().equals(ws.getName() + "." + domain)
-                && request.getValues().getValuesOrThrow("saturn.persistence.files.size").getValue().equals(ws.getLogAndFilesVolumeSize() + "Gi")
-                && request.getValues().getValuesOrThrow("saturn.persistence.database.size").getValue().equals(ws.getDatabaseVolumeSize() + "Gi")),
+                && request.getValues().getRaw().equals("---\n" +
+                        "key:\n" +
+                        "  subkey: \"value\"\n" +
+                        "workspace.ingress.domain: testexample.com\n" +
+                        "hyperspace.domain: hyperspace.example.com\n" +
+                        "saturn.persistence.files.size: 1Gi\n" +
+                        "saturn.persistence.database.size: 2Gi\n")),
                 eq(chart));
     }
 }

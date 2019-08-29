@@ -94,17 +94,16 @@ public class WorkspaceService {
     }
 
     public void installWorkspace(Workspace workspace) throws IOException {
-        var yaml = format("%s\n" +
-                        "workspace.ingress.domain: %s%s\n" +
-                        "hyperspace.domain: hyperspace.%s\n" +
-                        "saturn.persistence.files.size: %sGi\n" +
-                        "saturn.persistence.database.size: %sGi\n",
-                objectMapper.writeValueAsString(workspaceValues),
-                workspace.getName(),
-                domain,
-                domain,
-                workspace.getLogAndFilesVolumeSize(),
-                workspace.getDatabaseVolumeSize());
+        var yaml = objectMapper.writeValueAsString(workspaceValues) +
+                format("workspace.ingress.domain: %s%s\n" +
+                       "hyperspace.domain: hyperspace.%s\n" +
+                       "saturn.persistence.files.size: %sGi\n" +
+                       "saturn.persistence.database.size: %sGi\n",
+                       workspace.getName(),
+                       domain,
+                       domain,
+                       workspace.getLogAndFilesVolumeSize(),
+                       workspace.getDatabaseVolumeSize());
 
         var requestBuilder = InstallReleaseRequest.newBuilder()
                 .setName(workspace.getName())
