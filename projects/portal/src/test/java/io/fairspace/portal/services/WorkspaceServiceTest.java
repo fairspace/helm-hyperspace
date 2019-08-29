@@ -83,10 +83,17 @@ public class WorkspaceServiceTest {
                 && request.getValues().getRaw().equals("---\n" +
                         "key:\n" +
                         "  subkey: \"value\"\n" +
-                        "workspace.ingress.domain: testexample.com\n" +
-                        "hyperspace.domain: hyperspace.example.com\n" +
-                        "saturn.persistence.files.size: 1Gi\n" +
-                        "saturn.persistence.database.size: 2Gi\n")),
+                        "workspace:\n" +
+                        "  ingress:\n" +
+                        "    domain: test.example.com\n" +
+                        "hyperspace:\n" +
+                        "  domain: hyperspace.example.com\n" +
+                        "saturn:\n" +
+                        "  persistence:\n" +
+                        "    files:\n" +
+                        "      size: 1Gi\n" +
+                        "    database:\n" +
+                        "      size: 2Gi\n")),
                 eq(chart));
     }
 }
