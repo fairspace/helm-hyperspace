@@ -73,6 +73,62 @@ keycloak:
                 cpu: "500m"
                 memory: "512Mi"
 
+#####################################################################
+# Specific settings for ElasticSearch
+#####################################################################
+elasticsearch:
+    enabled: true
+    persistence:
+        enabled: true
+        size: 20Gi
+        storageClass: standard
+    client:
+        resources:
+            requests:
+                memory: "800Mi"
+                cpu: 0.1
+            limits:
+                memory: "1024Mi"
+                cpu: 1
+        initResources:
+            limits:
+                cpu: "25m"
+                memory: "128Mi"
+            requests:
+                cpu: "25m"
+                memory: "128Mi"
+    data:
+        exposeHttp: true
+        resources:
+            requests:
+                memory: "1600Mi"
+                cpu: 0.1
+            limits:
+                memory: "2048Mi"
+                cpu: 1
+        initResources:
+            limits:
+                cpu: "25m"
+                memory: "128Mi"
+            requests:
+                cpu: "25m"
+                memory: "128Mi"
+    master:
+        resources:
+            requests:
+                memory: "800Mi"
+                cpu: 0.1
+            limits:
+                memory: "1024Mi"
+                cpu: 1
+        initResources:
+            limits:
+                cpu: "25m"
+                memory: "128Mi"
+            requests:
+                cpu: "25m"
+                memory: "128Mi"
+
 # Generic settings for tracing
 tracing:
     enabled: true
