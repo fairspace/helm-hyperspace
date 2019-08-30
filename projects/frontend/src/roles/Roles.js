@@ -10,7 +10,7 @@ import Config from "../common/services/Config/Config";
 import UsersContext from '../common/contexts/UsersContext';
 import {
     isWorkspaceUser, isWorkspaceCoordinator, isWorkspaceDatasteward,
-    isWorkspaceSparql, isOrganisationAdmin, isUserTheGivenWorkspace, idToRoles
+    isWorkspaceSparql, isOrganisationAdmin, userHasAnyRoleInWorkspace, idToRoles
 } from '../common/utils/userUtils';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
@@ -49,7 +49,7 @@ const Roles = ({classes, workspace}) => {
     const {users, usersError, usersLoading} = useContext(UsersContext);
 
     const isCurrentUserAdmin = isOrganisationAdmin(userAuthorizations);
-    const allWorkspaceUsers = users.filter(({authorizations}) => isUserTheGivenWorkspace(authorizations, workspace));
+    const allWorkspaceUsers = users.filter(({authorizations}) => userHasAnyRoleInWorkspace(authorizations, workspace));
     const usersToHandle = isCurrentUserAdmin ? allWorkspaceUsers : allWorkspaceUsers.filter(({authorizations}) => !isWorkspaceCoordinator(authorizations, workspace));
 
     const [usersRolesMapping, setUsersRolesMapping] = useState(usersToHandle.reduce(idToRoles, {}));

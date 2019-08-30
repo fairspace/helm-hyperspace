@@ -16,7 +16,7 @@ export const isWorkspaceDatasteward = (authorizations, workspace) => authorizati
 export const isWorkspaceSparql = (authorizations, workspace) => authorizations && workspace
     && !!authorizations.find(a => a === Config.get().rolesPrefixes.sparql + workspace);
 
-export const isUserTheGivenWorkspace = (authorizations, workspace) => !!workspace
+export const userHasAnyRoleInWorkspace = (authorizations, workspace) => !!workspace
     && (isWorkspaceUser(authorizations, workspace)
         || isWorkspaceCoordinator(authorizations, workspace)
         || isWorkspaceDatasteward(authorizations, workspace)
