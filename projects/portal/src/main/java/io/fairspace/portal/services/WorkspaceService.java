@@ -106,7 +106,7 @@ public class WorkspaceService {
                        "  ingress:\n" +
                        "    domain: %s.%s\n" +
                        "hyperspace:\n" +
-                       "  domain: hyperspace.%s\n" +
+                       "  domain: %s\n" +
                        "  elasticsearch:\n" +
                        "    indexName: %s\n" +
                        "saturn:\n" +
