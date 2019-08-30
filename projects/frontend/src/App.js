@@ -9,7 +9,6 @@ import Layout from "./common/components/Layout/Layout";
 import LoadingInlay from './common/components/LoadingInlay';
 import {UserProvider} from './common/contexts/UserContext';
 import {VersionProvider} from "./common/contexts/VersionContext";
-import {UsersProvider} from './common/contexts/UsersContext';
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -26,15 +25,13 @@ const App = () => {
 
     return (
         <VersionProvider>
-            <UsersProvider>
-                <UserProvider>
-                    <MuiThemeProvider theme={theme}>
-                        <Router>
-                            <Layout />
-                        </Router>
-                    </MuiThemeProvider>
-                </UserProvider>
-            </UsersProvider>
+            <UserProvider>
+                <MuiThemeProvider theme={theme}>
+                    <Router>
+                        <Layout />
+                    </Router>
+                </MuiThemeProvider>
+            </UserProvider>
         </VersionProvider>
     );
 };

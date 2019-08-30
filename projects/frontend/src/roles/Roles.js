@@ -5,7 +5,6 @@ import {
     TableCell, TableHead, TableRow, Paper, FormGroup, FormControlLabel,
     Checkbox, Grid, Typography, Button,
 } from '@material-ui/core';
-import queryString from 'query-string';
 
 import Config from "../common/services/Config/Config";
 import UsersContext from '../common/contexts/UsersContext';
@@ -41,9 +40,11 @@ const columns = {
     }
 };
 
-const Roles = ({
-    classes, location: {search}, workspace = queryString.parse(search).workspace
-}) => {
+const Roles = ({classes, workspace}) => {
+    if (!workspace) {
+        throw new Error('The workspace must be provided');
+    }
+
     const {currentUser: {authorizations: userAuthorizations}, currentUserLoading, currentUserError} = useContext(UserContext);
     const {users, usersError, usersLoading} = useContext(UsersContext);
 

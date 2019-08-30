@@ -50,7 +50,7 @@ const WorkspaceList = ({history}) => {
     };
 
     const openWorkspaceRoles = (workspace) => {
-        history.push(`/roles?workspace=${workspace}`);
+        history.push(`workspaces/${workspace}/roles`);
     };
 
     const canManageRoles = (workspace) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspace));
