@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import HyperspaceAPI from "../services/HyperspaceAPI";
+import KeycloakAPI from '../services/KeycloakAPI';
 import UserContext from './UserContext';
 import {isOrganisationAdmin, isWorkspaceCoordinator} from '../utils/userUtils';
 import useAsync from '../hooks/UseAsync';
@@ -11,7 +11,7 @@ export const UsersProvider = ({children, workspace}) => {
 
     const canFetchUsers = () => isOrganisationAdmin(userAuthorizations) || isWorkspaceCoordinator(userAuthorizations, workspace);
 
-    const {data: users = [], loading, error, refresh} = useAsync(canFetchUsers() ? HyperspaceAPI.getUsers : Promise.resolve());
+    const {data: users = [], loading, error, refresh} = useAsync(canFetchUsers() ? KeycloakAPI.getUsers : Promise.resolve());
 
     return (
         <UsersContext.Provider

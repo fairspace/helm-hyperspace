@@ -7,12 +7,12 @@ const requestOptions = {
     headers: {Accept: 'application/json'}
 };
 
-class HyperspaceAPI {
-    getVersion() {
-        return axios.get(Config.get().urls.version, requestOptions)
-            .catch(handleHttpError('Error while loading version details'))
+class KeycloakAPI {
+    getUsers() {
+        return axios.get(Config.get().urls.users, requestOptions)
+            .catch(handleHttpError('Error while loading users'))
             .then(extractJsonData);
     }
 }
 
-export default new HyperspaceAPI();
+export default new KeycloakAPI();
