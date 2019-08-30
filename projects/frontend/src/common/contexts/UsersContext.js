@@ -1,33 +1,17 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useContext} from 'react';
 import HyperspaceAPI from "../services/HyperspaceAPI";
 import UserContext from './UserContext';
 import {isOrganisationAdmin, isWorkspaceCoordinator} from '../utils/userUtils';
+import useAsync from '../hooks/UseAsync';
 
 const UsersContext = React.createContext({});
 
 export const UsersProvider = ({children, workspace}) => {
-    const [users, setUsers] = useState([]);
-    const [error, setError] = useState(false);
-    const [loading, setLoading] = useState(false);
-
     const {currentUser: {authorizations: userAuthorizations}} = useContext(UserContext);
 
     const canFetchUsers = () => isOrganisationAdmin(userAuthorizations) || isWorkspaceCoordinator(userAuthorizations, workspace);
 
-    const refresh = () => {
-        if (canFetchUsers()) {
-            setLoading(true);
-            HyperspaceAPI.getUsers()
-                .then(setUsers)
-                .catch(setError)
-                .finally(() => {
-                    setLoading(false);
-                });
-        }
-    };
-
-    // Refresh the permissions whenever the component is rerendered
-    useEffect(refresh, []);
+    const {data: users = [], loading, error, refresh} = useAsync(canFetchUsers() ? HyperspaceAPI.getUsers : Promise.resolve());
 
     return (
         <UsersContext.Provider

@@ -22,9 +22,14 @@ const useAsync = (callback) => {
         .catch((e) => setError(e || true))
         .finally(() => setLoading(false)), [callback]);
 
-    useEffect(() => { refresh(); }, [refresh]);
+    useEffect(() => {refresh();}, [refresh]);
 
-    return [data, loading, error, refresh];
+    return {
+        data,
+        loading,
+        error,
+        refresh
+    };
 };
 
 export default useAsync;

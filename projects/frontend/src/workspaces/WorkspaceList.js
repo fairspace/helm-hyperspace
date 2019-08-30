@@ -31,7 +31,7 @@ const columns = {
 };
 
 const WorkspaceList = ({history}) => {
-    const [workspaces = [], loading, error, refresh] = useAsync(WorkspaceAPI.getWorkspaces);
+    const {data: workspaces = [], loading, error, refresh} = useAsync(WorkspaceAPI.getWorkspaces);
     const [anchorEl, setAnchorEl] = useState(null);
 
     // refresh every 30 seconds
