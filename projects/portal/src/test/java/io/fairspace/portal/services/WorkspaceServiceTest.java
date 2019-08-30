@@ -88,7 +88,7 @@ public class WorkspaceServiceTest {
                         "  ingress:\n" +
                         "    domain: test.example.com\n" +
                         "hyperspace:\n" +
-                        "  domain: hyperspace.example.com\n" +
+                        "  domain: example.com\n" +
                         "  elasticsearch:\n" +
                         "    indexName: test\n" +
                         "saturn:\n" +
