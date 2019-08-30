@@ -1,5 +1,8 @@
 package io.fairspace.portal.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.services.tiller.Tiller;
@@ -21,14 +24,14 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkspaceServiceTest {
+    private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+
     @Mock
     private ReleaseManager releaseManager;
     @Mock
     private ChartOuterClass.Chart.Builder chart;
 
     private static final String domain = "example.com";
-
-    private final Map<String, Object> workspaceValues = Map.of("key", Map.of("subkey", "value"));
 
     @Mock
     private ListenableFuture<Tiller.InstallReleaseResponse> future;
@@ -37,6 +40,7 @@ public class WorkspaceServiceTest {
 
     @Before
     public void setUp() throws IOException {
+        var workspaceValues = (ObjectNode) new ObjectMapper().readTree("{\"saturn\": {\"persistence\": {\"key\": \"value\"}}}");
         workspaceService = new WorkspaceService(releaseManager, chart, domain, workspaceValues);
 
         when(releaseManager.list(any())).thenReturn(List.<Tiller.ListReleasesResponse>of().iterator());
@@ -82,21 +86,18 @@ public class WorkspaceServiceTest {
                 request.getName().equals(ws.getName())
                 && request.getValues().getRaw().equals(
                         "---\n" +
-                        "key:\n" +
-                        "  subkey: \"value\"\n" +
-                        "workspace:\n" +
-                        "  ingress:\n" +
-                        "    domain: test.example.com\n" +
-                        "hyperspace:\n" +
-                        "  domain: example.com\n" +
-                        "  elasticsearch:\n" +
-                        "    indexName: test\n" +
                         "saturn:\n" +
                         "  persistence:\n" +
-                        "    files:\n" +
-                        "      size: 1Gi\n" +
-                        "    database:\n" +
-                        "      size: 2Gi\n")),
+                        "    key: \"value\"\n" +
+                        "    files: \"1Gi\"\n" +
+                        "    database: \"2Gi\"\n" +
+                        "workspace:\n" +
+                        "  ingress:\n" +
+                        "    domain: \"test.example.com\"\n" +
+                        "hyperspace:\n" +
+                        "  domain: \"example.com\"\n" +
+                        "  elasticsearch:\n" +
+                        "    indexName: \"test\"\n")),
                 eq(chart));
     }
 }
