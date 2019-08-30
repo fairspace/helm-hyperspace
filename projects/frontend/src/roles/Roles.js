@@ -1,4 +1,5 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
+import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
 import {
     withStyles, TableSortLabel, TablePagination, Table, TableBody,
@@ -7,16 +8,12 @@ import {
 } from '@material-ui/core';
 
 import Config from "../common/services/Config/Config";
-import UsersContext from '../common/contexts/UsersContext';
 import {
     isWorkspaceUser, isWorkspaceCoordinator, isWorkspaceDatasteward,
-    isWorkspaceSparql, isOrganisationAdmin, userHasAnyRoleInWorkspace, idToRoles
+    isWorkspaceSparql, isOrganisationAdmin, idToRoles
 } from '../common/utils/userUtils';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
-import LoadingInlay from '../common/components/LoadingInlay';
-import MessageDisplay from '../common/components/MessageDisplay';
-import UserContext from '../common/contexts/UserContext';
 
 const styles = theme => ({
     header: {
@@ -40,28 +37,11 @@ const columns = {
     }
 };
 
-const Roles = ({classes, workspace}) => {
-    if (!workspace) {
-        throw new Error('The workspace must be provided');
-    }
-
-    const {currentUser: {authorizations: userAuthorizations}, currentUserLoading, currentUserError} = useContext(UserContext);
-    const {users, usersError, usersLoading} = useContext(UsersContext);
-
-    const isCurrentUserAdmin = isOrganisationAdmin(userAuthorizations);
-    const allWorkspaceUsers = users.filter(({authorizations}) => userHasAnyRoleInWorkspace(authorizations, workspace));
-    const usersToHandle = isCurrentUserAdmin ? allWorkspaceUsers : allWorkspaceUsers.filter(({authorizations}) => !isWorkspaceCoordinator(authorizations, workspace));
-
-    const [usersRolesMapping, setUsersRolesMapping] = useState(usersToHandle.reduce(idToRoles, {}));
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(usersToHandle, columns, 'firstName');
+const Roles = ({classes, workspace, users, canManageCoordinators = false}) => {
+    const [usersRolesMapping, setUsersRolesMapping] = useState(users.reduce(idToRoles, {}));
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [fromDirty, setFromDirty] = useState(false);
-
-    // TODO: check that the workspace exists
-
-    if (!isWorkspaceCoordinator(userAuthorizations, workspace) && !isCurrentUserAdmin) {
-        return <MessageDisplay message={`You do not have access to the roles in ${workspace}.`} />;
-    }
 
     const handleChange = (id) => (event) => {
         setFromDirty(true);
@@ -81,18 +61,6 @@ const Roles = ({classes, workspace}) => {
 
     const {roles, rolesPrefixes} = Config.get();
 
-    if (!workspace || workspace.trim().length === 0) {
-        return <MessageDisplay message="No workspace is provided." />;
-    }
-
-    if (usersLoading || currentUserLoading) {
-        return <LoadingInlay />;
-    }
-
-    if (usersError || currentUserError) {
-        return <MessageDisplay message="Unable to retrieve the list of users." />;
-    }
-
     const RoleCheckbox = ({userId, label, roleChecker, value, disabled}) => (
         <Grid item xs={4}>
             <FormControlLabel
@@ -109,10 +77,6 @@ const Roles = ({classes, workspace}) => {
             />
         </Grid>
     );
-
-    if (pagedItems && pagedItems.length === 0) {
-        return <MessageDisplay message={`No users for ${workspace}`} />;
-    }
 
     return (
         <>
@@ -159,7 +123,7 @@ const Roles = ({classes, workspace}) => {
                                                     label="Coordinator"
                                                     roleChecker={isWorkspaceCoordinator}
                                                     value={rolesPrefixes.coordinator + workspace}
-                                                    disabled={!isCurrentUserAdmin}
+                                                    disabled={!canManageCoordinators}
                                                 />
                                                 <RoleCheckbox
                                                     userId={id}
@@ -203,10 +167,18 @@ const Roles = ({classes, workspace}) => {
                 color="primary"
                 disabled={!fromDirty}
             >
-                Save Roles Changes
+                Save Changes
             </Button>
         </>
     );
+};
+
+
+Roles.propTypes = {
+    classes: PropTypes.shape(),
+    users: PropTypes.array.isRequired,
+    workspace: PropTypes.string.isRequired,
+    canManageCoordinators: PropTypes.bool,
 };
 
 export default withRouter(withStyles(styles)(Roles));

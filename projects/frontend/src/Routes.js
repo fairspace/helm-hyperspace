@@ -4,8 +4,8 @@ import {Route} from "react-router-dom";
 import Home from "./home/Home";
 import logout from "./common/services/logout";
 import Workspaces from "./workspaces/Workspaces";
-import Roles from './roles/Roles';
 import {UsersProvider} from './common/contexts/UsersContext';
+import RolesContainer from './roles/RolesContainer';
 
 const routes = () => (
     <>
@@ -16,7 +16,7 @@ const routes = () => (
             exact
             render={({match: {params: {workspace}}}) => (
                 <UsersProvider workspace={workspace}>
-                    <Roles workspace={workspace} />
+                    <RolesContainer workspace={workspace} />
                 </UsersProvider>
             )}
         />
