@@ -49,7 +49,7 @@ data:
           strip-prefix: false
         keycloak:
           path: /api/keycloak/**
-          url: {{ .Values.pluto.backends.keycloak | default (printf "http://%s-headless.%s.svc.cluster.local:8080/auth/admin/realms/%s" (template "keycloak.prefix" .) .Release.Namespace .Values.hyperspace.keycloak.realm)}}
+          url: {{ .Values.pluto.backends.keycloak | default (printf "http://%s-headless.%s.svc.cluster.local:8080/auth/admin/realms/%s" (include "keycloak.prefix" .) .Release.Namespace .Values.hyperspace.keycloak.realm)}}
           strip-prefix: true
         frontend:
           path: /**
