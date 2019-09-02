@@ -127,7 +127,7 @@ public class WorkspaceService {
             } catch (ExecutionException e) {
                 log.error("Error installing workspace {}", workspace.getName(), e);
             } catch (InterruptedException e) {
-                currentThread().interrupt();;
+                currentThread().interrupt();
             }
 
         }, worker);
