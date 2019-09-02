@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useState, useContext} from 'react';
+import {withRouter} from "react-router-dom";
 import {
-    Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel
+    Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel, IconButton, Menu, MenuItem
 } from "@material-ui/core";
-import FolderOpen from "@material-ui/icons/FolderOpen";
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
@@ -11,6 +12,8 @@ import WorkspaceAPI from "./WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
 import useRepeat from "../common/hooks/UseRepeat";
 import useAsync from "../common/hooks/UseAsync";
+import UserContext from '../common/contexts/UserContext';
+import {isOrganisationAdmin, isWorkspaceCoordinator} from '../common/utils/userUtils';
 
 const columns = {
     name: {
@@ -27,21 +30,37 @@ const columns = {
     }
 };
 
-const WorkspaceList = () => {
-    const [workspaces = [], loading, error, refresh] = useAsync(WorkspaceAPI.getWorkspaces);
+const WorkspaceList = ({history}) => {
+    const {data: workspaces = [], loading, error, refresh} = useAsync(WorkspaceAPI.getWorkspaces);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     // refresh every 30 seconds
     useRepeat(refresh, 30000);
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+    const {currentUser: {authorizations}} = useContext(UserContext);
+
+    const handleMenuClick = event => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const openWorkspaceRoles = (workspace) => {
+        history.push(`workspaces/${workspace}/roles`);
+    };
+
+    const canManageRoles = (workspace) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspace));
 
     if (loading) {
-        return <LoadingInlay/>;
+        return <LoadingInlay />;
     }
 
     if (error) {
-        return <MessageDisplay message="An error occurred while loading workspaces"/>;
+        return <MessageDisplay message="An error occurred while loading workspaces" />;
     }
 
     return (
@@ -49,7 +68,6 @@ const WorkspaceList = () => {
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell/>
                         <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'name'}
@@ -77,26 +95,50 @@ const WorkspaceList = () => {
                                 Status
                             </TableSortLabel>
                         </TableCell>
+                        <TableCell />
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map((workspace) => {
+                    {pagedItems.map(({name, version, status}) => {
+                        const actionsButtonId = name + 'ActionsBtn';
+
                         return (
                             <TableRow
                                 hover
-                                key={workspace.name}
+                                key={name}
                             >
-                                <TableCell align="left">
-                                    <FolderOpen/>
+                                <TableCell>
+                                    {name}
                                 </TableCell>
                                 <TableCell>
-                                    {workspace.name}
+                                    {version}
                                 </TableCell>
                                 <TableCell>
-                                    {workspace.version}
+                                    {status}
                                 </TableCell>
                                 <TableCell>
-                                    {workspace.status}
+                                    <>
+                                        <IconButton
+                                            id={actionsButtonId}
+                                            aria-label="Roles"
+                                            aria-owns={anchorEl ? 'actions-menu' : undefined}
+                                            aria-haspopup="true"
+                                            onClick={handleMenuClick}
+                                            disabled={canManageRoles(name)}
+                                        >
+                                            <MoreVertIcon />
+                                        </IconButton>
+                                        <Menu
+                                            id="actions-menu"
+                                            anchorEl={anchorEl}
+                                            open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
+                                            onClose={handleMenuClose}
+                                        >
+                                            <MenuItem onClick={() => openWorkspaceRoles(name)}>
+                                                Manage Roles
+                                            </MenuItem>
+                                        </Menu>
+                                    </>
                                 </TableCell>
                             </TableRow>
                         );
@@ -116,4 +158,4 @@ const WorkspaceList = () => {
     );
 };
 
-export default WorkspaceList;
+export default withRouter(WorkspaceList);

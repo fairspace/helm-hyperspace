@@ -2,6 +2,7 @@
   "urls": {
     "logout": "/logout",
     "userInfo": "/api/v1/account",
+    "users": "/api/keycloak",
     "version": "/config/version.json",
     "workspaces": "/api/v1/workspaces"
   },
@@ -12,5 +13,11 @@
     "user": "",
     "organisationAdmin": "",
     "workspaceCoordinator": ""
+  },
+  "rolesPrefixes": {
+    "user": "",
+    "coordinator": "",
+    "datasteward": "",
+    "sparql": ""
   }
 }

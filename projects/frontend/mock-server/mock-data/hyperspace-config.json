@@ -3,5 +3,11 @@
     "user": "user-workspace",
     "organisationAdmin": "organisation-admin",
     "workspaceCoordinator": "workspace-coordinator"
+  },
+  "rolesPrefixes": {
+    "user": "user-",
+    "coordinator": "coordinator-",
+    "datasteward": "datasteward-",
+    "sparql": "sparql-"
   }
 }
