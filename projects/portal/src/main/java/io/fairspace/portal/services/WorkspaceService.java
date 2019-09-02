@@ -7,7 +7,6 @@ import hapi.chart.ChartOuterClass;
 import hapi.chart.ConfigOuterClass;
 import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
-import hapi.services.tiller.Tiller.InstallReleaseResponse;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
 import lombok.NonNull;
@@ -19,8 +18,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executor;
 
+import static io.fairspace.portal.utils.JacksonUtils.merge;
 import static java.lang.Integer.parseInt;
-import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
@@ -47,13 +46,13 @@ public class WorkspaceService {
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
     private final String domain;
-    private final Map<String, Object> workspaceValues;
+    private final Map<String, ?> workspaceValues;
     private final Object lock = new Object();
     private List<Workspace> workspaces = new ArrayList<>();
     private long lastUpdateTime;
     private final Executor worker = newSingleThreadExecutor();
 
-    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NotNull ChartOuterClass.Chart.Builder chart, @NonNull String domain, @NonNull Map<String, Object> workspaceValues) {
+    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NotNull ChartOuterClass.Chart.Builder chart, @NonNull String domain, @NonNull Map<String, ?> workspaceValues) {
         this.releaseManager = releaseManager;
         this.chart = chart;
         this.domain = domain;
@@ -101,26 +100,15 @@ public class WorkspaceService {
     }
 
     public void installWorkspace(Workspace workspace) throws IOException {
-        var yaml = objectMapper.writeValueAsString(workspaceValues) +
-                format("workspace:\n" +
-                       "  ingress:\n" +
-                       "    domain: %s.%s\n" +
-                       "hyperspace:\n" +
-                       "  domain: %s\n" +
-                       "  elasticsearch:\n" +
-                       "    indexName: %s\n" +
-                       "saturn:\n" +
-                       "  persistence:\n" +
-                       "    files:\n" +
-                       "      size: %sGi\n" +
-                       "    database:\n" +
-                       "      size: %sGi\n",
-                       workspace.getName(),
-                       domain,
-                       domain,
-                       workspace.getName(),
-                       workspace.getLogAndFilesVolumeSize(),
-                       workspace.getDatabaseVolumeSize());
+        var customValues = objectMapper.createObjectNode();
+        customValues.with("hyperspace").put("domain", domain);;
+        customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getName());
+        customValues.with("workspace").with("ingress").put("domain", workspace.getName() + "." + domain);
+        customValues.with("saturn").with("persistence").put("files", workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX);
+        customValues.with("saturn").with("persistence").put("database", workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX);
+
+        var values = merge(objectMapper.valueToTree(workspaceValues), customValues);
+        var yaml = objectMapper.writeValueAsString(values);
 
         var requestBuilder = InstallReleaseRequest.newBuilder()
                 .setName(workspace.getName())
@@ -128,7 +116,7 @@ public class WorkspaceService {
                 .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build())
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
-        var future = (ListenableFuture<InstallReleaseResponse>) releaseManager.install(requestBuilder, chart);
+        var future = (ListenableFuture<?>) releaseManager.install(requestBuilder, chart);
         future.addListener(this::invalidateCache, worker);
         invalidateCache();
     }
