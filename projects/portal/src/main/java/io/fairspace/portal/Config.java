@@ -2,7 +2,6 @@ package io.fairspace.portal;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.net.URL;
@@ -14,7 +13,7 @@ public class Config {
     public String domain = "ci.fairway.app";
     public final Auth auth = new Auth();
     public final Map<String, URL> charts = new HashMap<>();
-    public ObjectNode workspace;
+    public final Map<String, Object> workspace = new HashMap<>();
 
     public static class Auth {
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";

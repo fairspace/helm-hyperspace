@@ -1,7 +1,6 @@
 package io.fairspace.portal.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
@@ -47,13 +46,13 @@ public class WorkspaceService {
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
     private final String domain;
-    private final ObjectNode workspaceValues;
+    private final Map<String, ?> workspaceValues;
     private final Object lock = new Object();
     private List<Workspace> workspaces = new ArrayList<>();
     private long lastUpdateTime;
     private final Executor worker = newSingleThreadExecutor();
 
-    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NotNull ChartOuterClass.Chart.Builder chart, @NonNull String domain, @NonNull ObjectNode workspaceValues) {
+    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NotNull ChartOuterClass.Chart.Builder chart, @NonNull String domain, @NonNull Map<String, ?> workspaceValues) {
         this.releaseManager = releaseManager;
         this.chart = chart;
         this.domain = domain;
@@ -108,7 +107,7 @@ public class WorkspaceService {
         customValues.with("saturn").with("persistence").put("files", workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX);
         customValues.with("saturn").with("persistence").put("database", workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX);
 
-        var values = merge(workspaceValues.deepCopy(), customValues);
+        var values = merge(objectMapper.valueToTree(workspaceValues), customValues);
         var yaml = objectMapper.writeValueAsString(values);
 
         var requestBuilder = InstallReleaseRequest.newBuilder()

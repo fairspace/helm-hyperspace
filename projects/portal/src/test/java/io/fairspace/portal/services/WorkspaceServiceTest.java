@@ -1,8 +1,5 @@
 package io.fairspace.portal.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.services.tiller.Tiller;
@@ -24,8 +21,6 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkspaceServiceTest {
-    private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-
     @Mock
     private ReleaseManager releaseManager;
     @Mock
@@ -40,7 +35,7 @@ public class WorkspaceServiceTest {
 
     @Before
     public void setUp() throws IOException {
-        var workspaceValues = (ObjectNode) new ObjectMapper().readTree("{\"saturn\": {\"persistence\": {\"key\": \"value\"}}}");
+        var workspaceValues = Map.of("saturn", Map.of("persistence",  Map.of("key", "value")));
         workspaceService = new WorkspaceService(releaseManager, chart, domain, workspaceValues);
 
         when(releaseManager.list(any())).thenReturn(List.<Tiller.ListReleasesResponse>of().iterator());
@@ -91,13 +86,13 @@ public class WorkspaceServiceTest {
                         "    key: \"value\"\n" +
                         "    files: \"1Gi\"\n" +
                         "    database: \"2Gi\"\n" +
-                        "workspace:\n" +
-                        "  ingress:\n" +
-                        "    domain: \"test.example.com\"\n" +
                         "hyperspace:\n" +
                         "  domain: \"example.com\"\n" +
                         "  elasticsearch:\n" +
-                        "    indexName: \"test\"\n")),
+                        "    indexName: \"test\"\n" +
+                        "workspace:\n" +
+                        "  ingress:\n" +
+                        "    domain: \"test.example.com\"\n")),
                 eq(chart));
     }
 }
