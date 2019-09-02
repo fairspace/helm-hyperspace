@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.eclipse.jetty.http.HttpHeader.AUTHORIZATION;
 
 public class UserService {
-    private static final String USER_ROLE_PREFIX = "user-";
+    private static final String USER_ROLE_SUFFIX = "-users";
     private static final TypeReference<List<Group>> GROUP_LIST_TYPE = new TypeReference<>() {};
     private final HttpClient httpClient = new HttpClient(new SslContextFactory(true));
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -41,7 +41,7 @@ public class UserService {
 
             return groups.stream()
                     .map(Group::getName)
-                    .filter(name -> name.startsWith(USER_ROLE_PREFIX))
+                    .filter(name -> name.endsWith(USER_ROLE_SUFFIX))
                     .collect(toList());
         } catch (Exception e) {
             throw new RuntimeException("Error while retrieving user's groups", e);
