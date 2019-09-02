@@ -10,7 +10,7 @@ import {
 import Config from "../common/services/Config/Config";
 import {
     isWorkspaceUser, isWorkspaceCoordinator, isWorkspaceDatasteward,
-    isWorkspaceSparql, isOrganisationAdmin, idToRoles
+    isWorkspaceSparql, idToRoles
 } from '../common/utils/userUtils';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
@@ -38,13 +38,14 @@ const columns = {
 };
 
 const Roles = ({classes, workspace, users, canManageCoordinators = false}) => {
+    // The state would look like: {"user-id": Set()} where the set contains the roles
     const [usersRolesMapping, setUsersRolesMapping] = useState(users.reduce(idToRoles, {}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-    const [fromDirty, setFromDirty] = useState(false);
+    const [isDirty, setIsDirty] = useState(false);
 
-    const handleChange = (id) => (event) => {
-        setFromDirty(true);
+    const handleChange = (event, id) => {
+        setIsDirty(true);
         const roles = usersRolesMapping[id];
 
         if (event.target.checked) {
@@ -59,16 +60,16 @@ const Roles = ({classes, workspace, users, canManageCoordinators = false}) => {
         }));
     };
 
-    const {roles, rolesPrefixes} = Config.get();
+    const {rolesPrefixes} = Config.get();
 
-    const RoleCheckbox = ({userId, label, roleChecker, value, disabled}) => (
+    const RoleCheckbox = ({checked, onChange, label, value, disabled}) => (
         <Grid item xs={4}>
             <FormControlLabel
                 control={(
                     <Checkbox
                         className={classes.roleCheckbox}
-                        checked={roleChecker(Array.from(usersRolesMapping[userId] || {}), workspace)}
-                        onChange={handleChange(userId)}
+                        checked={checked}
+                        onChange={onChange}
                         value={value}
                         disabled={disabled}
                     />
@@ -113,34 +114,31 @@ const Roles = ({classes, workspace, users, canManageCoordinators = false}) => {
                                             <Grid container>
                                                 <RoleCheckbox
                                                     userId={id}
-                                                    label="Admin"
-                                                    roleChecker={isOrganisationAdmin}
-                                                    value={roles.organisationAdmin}
-                                                    disabled
-                                                />
-                                                <RoleCheckbox
-                                                    userId={id}
                                                     label="Coordinator"
-                                                    roleChecker={isWorkspaceCoordinator}
+                                                    checked={isWorkspaceCoordinator(Array.from(usersRolesMapping[id] || {}), workspace)}
+                                                    onChange={(e) => handleChange(e, id)}
                                                     value={rolesPrefixes.coordinator + workspace}
                                                     disabled={!canManageCoordinators}
                                                 />
                                                 <RoleCheckbox
                                                     userId={id}
                                                     label="User"
-                                                    roleChecker={isWorkspaceUser}
+                                                    checked={isWorkspaceUser(Array.from(usersRolesMapping[id] || {}), workspace)}
+                                                    onChange={(e) => handleChange(e, id)}
                                                     value={rolesPrefixes.user + workspace}
                                                 />
                                                 <RoleCheckbox
                                                     userId={id}
                                                     label="Data steward"
-                                                    roleChecker={isWorkspaceDatasteward}
+                                                    checked={isWorkspaceDatasteward(Array.from(usersRolesMapping[id] || {}), workspace)}
+                                                    onChange={(e) => handleChange(e, id)}
                                                     value={rolesPrefixes.datasteward + workspace}
                                                 />
                                                 <RoleCheckbox
                                                     userId={id}
                                                     label="SAPRQL"
-                                                    roleChecker={isWorkspaceSparql}
+                                                    checked={isWorkspaceSparql(Array.from(usersRolesMapping[id] || {}), workspace)}
+                                                    onChange={(e) => handleChange(e, id)}
                                                     value={rolesPrefixes.sparql + workspace}
                                                 />
                                             </Grid>
@@ -165,7 +163,7 @@ const Roles = ({classes, workspace, users, canManageCoordinators = false}) => {
                 style={{marginTop: 8}}
                 variant="contained"
                 color="primary"
-                disabled={!fromDirty}
+                disabled={!isDirty}
             >
                 Save Changes
             </Button>
