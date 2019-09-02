@@ -8,7 +8,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 import MessageDisplay from "../common/components/MessageDisplay";
-import WorkspaceAPI from "./WorkspaceAPI";
+import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
 import useRepeat from "../common/hooks/UseRepeat";
 import useAsync from "../common/hooks/UseAsync";
@@ -19,6 +19,10 @@ const columns = {
     name: {
         valueExtractor: 'name',
         label: 'Name'
+    },
+    description: {
+        valueExtractor: 'description',
+        label: 'Description'
     },
     version: {
         valueExtractor: 'version',
@@ -79,6 +83,15 @@ const WorkspaceList = ({history}) => {
                         </TableCell>
                         <TableCell>
                             <TableSortLabel
+                                active={orderBy === 'description'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('description')}
+                            >
+                                Name
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
                                 active={orderBy === 'version'}
                                 direction={orderAscending ? 'asc' : 'desc'}
                                 onClick={() => toggleSort('version')}
@@ -99,7 +112,7 @@ const WorkspaceList = ({history}) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({name, version, status}) => {
+                    {pagedItems.map(({name, description, version, status}) => {
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -109,6 +122,9 @@ const WorkspaceList = ({history}) => {
                             >
                                 <TableCell>
                                     {name}
+                                </TableCell>
+                                <TableCell>
+                                    {description}
                                 </TableCell>
                                 <TableCell>
                                     {version}

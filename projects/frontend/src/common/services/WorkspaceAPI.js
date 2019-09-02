@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-import Config from "../common/services/Config/Config";
-import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
+import Config from "./Config/Config";
+import {extractJsonData, handleHttpError} from "../utils/httpUtils";
 
 class WorkspaceAPI {
     getWorkspaces() {
