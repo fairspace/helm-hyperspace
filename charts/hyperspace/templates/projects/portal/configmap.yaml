@@ -11,6 +11,7 @@ data:
   application.yaml: |-
     domain: {{ .Values.hyperspace.ingress.domain }}
     auth:
+      enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: RS256
       organisationAdminRole: admin-organisation
