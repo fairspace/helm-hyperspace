@@ -10,10 +10,12 @@ metadata:
 data:
   application.yaml: |-
     domain: {{ .Values.hyperspace.ingress.domain }}
+    elasticSearchUrlTemplate: {{ .Release.Name }}-elasticsearch-client.{{ .Release.Namespace }}.svc.cluster.local/%s/_seaarch
     auth:
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: RS256
       organisationAdminRole: admin-organisation
+      userGroupsUrlTemplate: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/users/%s/groups
     charts:
       workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7-SNAPSHOT.tgz
     workspace:

@@ -6,6 +6,7 @@ import hapi.chart.ChartOuterClass;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.portal.model.Workspace;
+import io.fairspace.portal.services.UserService;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ import static io.fairspace.portal.Config.WORKSPACE_CHART;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static io.fairspace.portal.errors.ErrorHelper.errorBody;
 import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
+import static java.lang.String.format;
+import static java.lang.String.join;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
@@ -30,7 +33,7 @@ public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
 
     public static void main(String[] args) throws IOException {
-        initSpark(initWorkspaceService());
+        initSpark(initWorkspaceService(), initUserService());
     }
 
     private static WorkspaceService initWorkspaceService() throws IOException {
@@ -55,7 +58,11 @@ public class App {
         return new WorkspaceService(releaseManager, chart, CONFIG.domain, CONFIG.workspace);
     }
 
-    private static void initSpark(@NonNull WorkspaceService workspaceService) {
+    private static UserService initUserService() {
+        return new UserService(CONFIG.auth.userGroupsUrlTemplate);
+    }
+
+    private static void initSpark(@NonNull WorkspaceService workspaceService, @NonNull UserService userService) {
         port(8080);
 
         before((request, response) -> {
@@ -88,6 +95,13 @@ public class App {
             });
 
             get("/health", (request, response) -> "OK");
+
+            post("/search/hyperspace/_search", (request, response) -> {
+                var token = getUserInfo(request, tokenValidator);
+                var indices = userService.getAvailableWorkspaces(token);
+                response.redirect(format(CONFIG.elasticSearchUrlTemplate, join(",", indices)));
+                return "";
+            });
         });
 
         notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));

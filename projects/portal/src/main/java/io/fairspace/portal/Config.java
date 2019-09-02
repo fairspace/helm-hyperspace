@@ -14,6 +14,7 @@ public class Config {
     public final Auth auth = new Auth();
     public final Map<String, URL> charts = new HashMap<>();
     public final Map<String, Object> workspace = new HashMap<>();
+    public String elasticSearchUrlTemplate = "http://hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local:9200/%s/_search";
 
     public static class Auth {
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
@@ -21,6 +22,8 @@ public class Config {
         public String jwtAlgorithm = "RS256";
 
         public String organisationAdminRole = "organisation-admin";
+
+        public String userGroupsUrlTemplate = "https://keycloak.ci.fairway.app/auth/admin/realms/ci/users/%s/groups";
     }
 
     @Override
