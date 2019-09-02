@@ -16,11 +16,13 @@ import org.microbean.helm.ReleaseManager;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 import static io.fairspace.portal.utils.JacksonUtils.merge;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
@@ -104,8 +106,8 @@ public class WorkspaceService {
         customValues.with("hyperspace").put("domain", domain);;
         customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getName());
         customValues.with("workspace").with("ingress").put("domain", workspace.getName() + "." + domain);
-        customValues.with("saturn").with("persistence").put("files", workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX);
-        customValues.with("saturn").with("persistence").put("database", workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX);
+        customValues.with("saturn").with("persistence").with("files").put("size", workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX);
+        customValues.with("saturn").with("persistence").with("database").put("size", workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX);
 
         var values = merge(objectMapper.valueToTree(workspaceValues), customValues);
         var yaml = objectMapper.writeValueAsString(values);
@@ -117,7 +119,19 @@ public class WorkspaceService {
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
         var future = (ListenableFuture<?>) releaseManager.install(requestBuilder, chart);
-        future.addListener(this::invalidateCache, worker);
+
+        future.addListener(() -> {
+            try {
+                future.get();
+                invalidateCache();
+            } catch (ExecutionException e) {
+                log.error("Error installing workspace {}", workspace.getName(), e);
+            } catch (InterruptedException e) {
+                currentThread().interrupt();
+            }
+
+        }, worker);
+
         invalidateCache();
     }
 

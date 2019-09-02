@@ -84,8 +84,10 @@ public class WorkspaceServiceTest {
                         "saturn:\n" +
                         "  persistence:\n" +
                         "    key: \"value\"\n" +
-                        "    files: \"1Gi\"\n" +
-                        "    database: \"2Gi\"\n" +
+                        "    files:\n" +
+                        "      size: \"1Gi\"\n" +
+                        "    database:\n" +
+                        "      size: \"2Gi\"\n" +
                         "hyperspace:\n" +
                         "  domain: \"example.com\"\n" +
                         "  elasticsearch:\n" +
