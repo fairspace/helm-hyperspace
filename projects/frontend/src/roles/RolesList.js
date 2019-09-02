@@ -37,7 +37,7 @@ const columns = {
     }
 };
 
-const Roles = ({classes, workspace, users, canManageCoordinators = false}) => {
+const RolesList = ({classes, workspace, users, canManageCoordinators = false}) => {
     // The state would look like: {"user-id": Set()} where the set contains the roles
     const [usersRolesMapping, setUsersRolesMapping] = useState(users.reduce(idToRoles, {}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
@@ -172,11 +172,11 @@ const Roles = ({classes, workspace, users, canManageCoordinators = false}) => {
 };
 
 
-Roles.propTypes = {
+RolesList.propTypes = {
     classes: PropTypes.shape(),
     users: PropTypes.array.isRequired,
     workspace: PropTypes.string.isRequired,
     canManageCoordinators: PropTypes.bool,
 };
 
-export default withRouter(withStyles(styles)(Roles));
+export default withRouter(withStyles(styles)(RolesList));

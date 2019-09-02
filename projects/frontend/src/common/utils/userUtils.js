@@ -5,16 +5,16 @@ export const getDisplayName = (user) => (user && user.name) || '';
 export const isOrganisationAdmin = (authorizations) => authorizations && authorizations.includes(Config.get().roles.organisationAdmin);
 
 export const isWorkspaceUser = (authorizations, workspace) => authorizations && workspace
-    && !!authorizations.find(a => a === Config.get().rolesPrefixes.user + workspace);
+    && authorizations.includes(Config.get().rolesPrefixes.user + workspace);
 
 export const isWorkspaceCoordinator = (authorizations, workspace) => authorizations && workspace
-    && !!authorizations.find(a => a === Config.get().rolesPrefixes.coordinator + workspace);
+    && authorizations.includes(Config.get().rolesPrefixes.coordinator + workspace);
 
 export const isWorkspaceDatasteward = (authorizations, workspace) => authorizations && workspace
-    && !!authorizations.find(a => a === Config.get().rolesPrefixes.datasteward + workspace);
+    && authorizations.includes(Config.get().rolesPrefixes.datasteward + workspace);
 
 export const isWorkspaceSparql = (authorizations, workspace) => authorizations && workspace
-    && !!authorizations.find(a => a === Config.get().rolesPrefixes.sparql + workspace);
+    && authorizations.includes(Config.get().rolesPrefixes.sparql + workspace);
 
 export const userHasAnyRoleInWorkspace = (authorizations, workspace) => !!workspace
     && (isWorkspaceUser(authorizations, workspace)

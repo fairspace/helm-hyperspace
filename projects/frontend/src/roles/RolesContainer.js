@@ -7,7 +7,7 @@ import {isWorkspaceCoordinator, isOrganisationAdmin, userHasAnyRoleInWorkspace} 
 import LoadingInlay from '../common/components/LoadingInlay';
 import MessageDisplay from '../common/components/MessageDisplay';
 import UserContext from '../common/contexts/UserContext';
-import Roles from './Roles';
+import Roles from './RolesList';
 
 /**
  * This container will gaurd the access to the users fetching and user's access to the roles of the given workspace

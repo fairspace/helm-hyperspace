@@ -11,7 +11,9 @@ export const UsersProvider = ({children, workspace}) => {
 
     const canFetchUsers = () => isOrganisationAdmin(userAuthorizations) || isWorkspaceCoordinator(userAuthorizations, workspace);
 
-    const {data: users = [], loading, error, refresh} = useAsync(canFetchUsers() ? KeycloakAPI.getUsers : Promise.resolve());
+    const fetchUsers = () => (canFetchUsers() ? KeycloakAPI.getUsers : () => Promise.reject(new Error('Loggged-in user not allowed to fetch list of users')));
+
+    const {data: users = [], loading, error, refresh} = useAsync(fetchUsers());
 
     return (
         <UsersContext.Provider
@@ -28,3 +30,4 @@ export const UsersProvider = ({children, workspace}) => {
 };
 
 export default UsersContext;
+
