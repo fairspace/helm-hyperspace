@@ -129,7 +129,6 @@ public class WorkspaceService {
             } catch (InterruptedException e) {
                 currentThread().interrupt();;
             }
-            invalidateCache();
 
         }, worker);
 
