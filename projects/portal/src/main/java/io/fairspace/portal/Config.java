@@ -16,6 +16,8 @@ public class Config {
     public final Map<String, Object> workspace = new HashMap<>();
 
     public static class Auth {
+        public boolean enabled = false;
+
         public String jwksUrl = "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs";
 
         public String jwtAlgorithm = "RS256";

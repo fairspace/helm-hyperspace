@@ -1,5 +1,6 @@
 domain: ci.fairway.app
 auth:
+  enabled: false
   # JWKS URL
   jwksUrl: "https://keycloak.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
   # JWK encryption algorithm. Defaults to "RS256"

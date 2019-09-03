@@ -58,17 +58,19 @@ public class App {
     private static void initSpark(@NonNull WorkspaceService workspaceService) {
         port(8080);
 
-        before((request, response) -> {
-            if (request.uri().equals("/api/v1/health")) {
-                return;
-            }
+        if (CONFIG.auth.enabled) {
+            before((request, response) -> {
+                if (request.uri().equals("/api/v1/health")) {
+                    return;
+                }
 
-            var token = getUserInfo(request, tokenValidator);
+                var token = getUserInfo(request, tokenValidator);
 
-            if (token == null) {
-                halt(SC_UNAUTHORIZED);
-            }
-        });
+                if (token == null) {
+                    halt(SC_UNAUTHORIZED);
+                }
+            });
+        }
 
         path("/api/v1", () -> {
             path("/workspaces", () -> {
@@ -78,9 +80,11 @@ public class App {
                 }, mapper::writeValueAsString);
 
                 put("", (request, response) -> {
-                    var token = getUserInfo(request, tokenValidator);
-                    if (!token.getAuthorities().contains(CONFIG.auth.organisationAdminRole)) {
-                        halt(SC_FORBIDDEN);
+                    if (CONFIG.auth.enabled) {
+                        var token = getUserInfo(request, tokenValidator);
+                        if (!token.getAuthorities().contains(CONFIG.auth.organisationAdminRole)) {
+                            halt(SC_FORBIDDEN);
+                        }
                     }
                     workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));
                     return "";
