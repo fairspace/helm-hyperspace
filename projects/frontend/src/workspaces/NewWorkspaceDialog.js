@@ -40,7 +40,7 @@ export default ({onCreate, onClose}) => {
                 onChange={(event) => setName(event.target.value)}
                 fullWidth
                 required
-                helperText="Chart names should use lower case letters, numbers and hypgens, and start with a letter."
+                helperText="Release names should use lower case letters, numbers and hypgens, and start with a letter."
             />
             <TextField
                 margin="dense"
