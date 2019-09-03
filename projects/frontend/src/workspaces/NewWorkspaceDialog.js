@@ -14,6 +14,7 @@ const releaseNamePattern = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-
 
 export default ({onCreate, onClose}) => {
     const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
     const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
     const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
     const valid = !!(logAndFilesVolumeSize >= 1 && databaseVolumeSize >= 1 && releaseNamePattern.test(name));
@@ -41,6 +42,15 @@ export default ({onCreate, onClose}) => {
                 fullWidth
                 required
                 helperText="Release names should use lower case letters, numbers and hyphens, and start with a letter."
+            />
+            <TextField
+                margin="dense"
+                id="description"
+                label="Description"
+                value={description}
+                name="description"
+                onChange={(event) => setDescription(event.target.value)}
+                fullWidth
             />
             <TextField
                 margin="dense"
@@ -75,7 +85,7 @@ export default ({onCreate, onClose}) => {
                 Cancel
             </Button>
             <Button
-                onClick={() => onCreate({name, logAndFilesVolumeSize, databaseVolumeSize})}
+                onClick={() => onCreate({name, description, logAndFilesVolumeSize, databaseVolumeSize})}
                 disabled={!valid}
                 color="primary"
                 variant="contained"

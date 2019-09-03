@@ -32,6 +32,7 @@ public class WorkspaceService {
     private static final long EXPIRATION_INTERVAL_MS = 300_000;
     private static final long INSTALLATION_TIMEOUT_SEC = 900;
     private static final long MAX_RELEASES_TO_RETURN = 100L;
+    private static final String WORKSPACE_DESCRIPTION_YAML_PATH = "/workspace/description";
     private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "/workspace/ingress/domain";
     private static final String FILE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/files/size";
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/database/size";
@@ -86,9 +87,10 @@ public class WorkspaceService {
                         var config = objectMapper.readTree(release.getConfig().getRaw());
                         result.add(Workspace.builder()
                                 .name(release.getName())
-                                .url("https://" +config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
+                                .description(config.at(WORKSPACE_DESCRIPTION_YAML_PATH).asText())
+                                .url("https://" + config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
                                 .version(release.getChart().getMetadata().getVersion())
-                                .status(release.getInfo().getStatus().getCode())
+                                .status(release.getInfo().getDescription())
                                 .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .build());
@@ -105,6 +107,7 @@ public class WorkspaceService {
         var customValues = objectMapper.createObjectNode();
         customValues.with("hyperspace").put("domain", domain);;
         customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getName());
+        customValues.with("workspace").put("description", workspace.getDescription());
         customValues.with("workspace").with("ingress").put("domain", workspace.getName() + "." + domain);
         customValues.with("saturn").with("persistence").with("files").put("size", workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX);
         customValues.with("saturn").with("persistence").with("database").put("size", workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX);
@@ -129,7 +132,6 @@ public class WorkspaceService {
             } catch (InterruptedException e) {
                 currentThread().interrupt();
             }
-
         }, worker);
 
         invalidateCache();
