@@ -88,7 +88,7 @@ public class WorkspaceService {
                                 .name(release.getName())
                                 .url("https://" +config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
                                 .version(release.getChart().getMetadata().getVersion())
-                                .status(release.getInfo().getStatus().getCode())
+                                .status(release.getInfo().getDescription())
                                 .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .build());
