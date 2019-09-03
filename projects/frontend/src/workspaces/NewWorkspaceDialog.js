@@ -7,13 +7,16 @@ import Button from "@material-ui/core/Button";
 import DialogContent from "@material-ui/core/DialogContent";
 import TextField from "@material-ui/core/TextField";
 
-const defaultLogAndFilesVolumeSize = 1024;
-const defaultDatabaseVolumeSize = 1024;
+const defaultLogAndFilesVolumeSize = 100;
+const defaultDatabaseVolumeSize = 50;
+
+const releaseNamePattern = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
 export default ({onCreate, onClose}) => {
     const [name, setName] = useState("");
     const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
     const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
+    const valid = !!(logAndFilesVolumeSize > 0 && databaseVolumeSize > 0 && releaseNamePattern.test(name));
 
     return (<Dialog
         open
@@ -37,11 +40,12 @@ export default ({onCreate, onClose}) => {
                 onChange={(event) => setName(event.target.value)}
                 fullWidth
                 required
+                helperText="Chart names should use lower case letters, numbers and hypgens, and start with a letter."
             />
             <TextField
                 margin="dense"
                 id="logAndFilesVolumeSize"
-                label="Log and files volume size, Gb"
+                label="Log and files volume size, GiB"
                 value={logAndFilesVolumeSize}
                 name="logAndFilesVolumeSize"
                 type="number"
@@ -52,7 +56,7 @@ export default ({onCreate, onClose}) => {
             <TextField
                 margin="dense"
                 id="databaseVolumeSize"
-                label="Log and files volume size, Gb"
+                label="Database volume size, GiB"
                 value={databaseVolumeSize}
                 name="databaseVolumeSize"
                 type="number"
@@ -70,6 +74,7 @@ export default ({onCreate, onClose}) => {
             </Button>
             <Button
                 onClick={() => onCreate({name, logAndFilesVolumeSize, databaseVolumeSize})}
+                disabled={!valid}
                 color="primary"
                 variant="contained"
             >
