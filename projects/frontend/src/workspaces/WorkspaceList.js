@@ -47,7 +47,7 @@ const WorkspaceList = ({history}) => {
     useRepeat(refresh, 30000);
 
     const {currentUser: {authorizations}} = useContext(UserContext);
-    const workspacesWithAccess = workspaces.map(ws => Object.assign({}, ws, {access: isWorkspaceUser(authorizations, ws.name)}))
+    const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.name)}))
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
