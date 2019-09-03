@@ -1,6 +1,6 @@
 [
   {
-    "name": "example",
+    "name": "workspace",
     "description": "Example workspace",
     "url": "http://localhost:3000",
     "version": "0.6.1",

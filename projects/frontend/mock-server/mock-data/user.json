@@ -5,9 +5,9 @@
   "lastName": "Snow",
   "fullName": "John Snow",
   "authorizations": [
-    "user-Example workspace",
-    "datasteward-Example workspace",
-    "coordinator-Example workspace",
+    "user-workspace",
+    "datasteward-workspace",
+    "coordinator-workspace",
     "organisation-admin"
   ]
 }

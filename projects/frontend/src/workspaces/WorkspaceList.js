@@ -13,7 +13,7 @@ import LoadingInlay from "../common/components/LoadingInlay";
 import useRepeat from "../common/hooks/UseRepeat";
 import useAsync from "../common/hooks/UseAsync";
 import UserContext from '../common/contexts/UserContext';
-import {isOrganisationAdmin, isWorkspaceCoordinator} from '../common/utils/userUtils';
+import {isOrganisationAdmin, isWorkspaceCoordinator, isWorkspaceUser} from '../common/utils/userUtils';
 
 const columns = {
     name: {
@@ -59,8 +59,8 @@ const WorkspaceList = ({history}) => {
 
     const canManageRoles = (workspace) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspace));
 
-    const gotoWorkspace = (name, url) => {
-        if (authorizations.includes(`user-${name}`)) {
+    const gotoWorkspace = (workspace, url) => {
+        if (isWorkspaceUser(authorizations, workspace)) {
             window.location.href = url
         }
     };
@@ -125,7 +125,7 @@ const WorkspaceList = ({history}) => {
                             <TableRow
                                 hover
                                 key={name}
-                                onDoubleClick={() => gotoWorkspace(name, workspace) }
+                                onDoubleClick={() => gotoWorkspace(name, url) }
                             >
                                 <TableCell>
                                     {name}
