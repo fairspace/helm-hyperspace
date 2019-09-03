@@ -87,7 +87,7 @@ public class WorkspaceService {
                         var config = objectMapper.readTree(release.getConfig().getRaw());
                         result.add(Workspace.builder()
                                 .name(release.getName())
-                                .description(WORKSPACE_DESCRIPTION_YAML_PATH)
+                                .description(config.at(WORKSPACE_DESCRIPTION_YAML_PATH).asText())
                                 .url("https://" + config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
                                 .version(release.getChart().getMetadata().getVersion())
                                 .status(release.getInfo().getStatus().getCode())
