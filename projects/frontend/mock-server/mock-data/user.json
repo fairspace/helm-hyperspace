@@ -7,6 +7,7 @@
   "authorizations": [
     "user-Example workspace",
     "datasteward-Example workspace",
-    "coordinator-Example workspace"
+    "coordinator-Example workspace",
+    "organisation-admin"
   ]
 }

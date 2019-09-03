@@ -12,6 +12,7 @@ const defaultDatabaseVolumeSize = 1024;
 
 export default ({onCreate, onClose}) => {
     const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
     const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
     const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
 
@@ -37,6 +38,15 @@ export default ({onCreate, onClose}) => {
                 onChange={(event) => setName(event.target.value)}
                 fullWidth
                 required
+            />
+            <TextField
+                margin="dense"
+                id="description"
+                label="Description"
+                value={description}
+                name="description"
+                onChange={(event) => setDescription(event.target.value)}
+                fullWidth
             />
             <TextField
                 margin="dense"
@@ -69,7 +79,7 @@ export default ({onCreate, onClose}) => {
                 Cancel
             </Button>
             <Button
-                onClick={() => onCreate({name, logAndFilesVolumeSize, databaseVolumeSize})}
+                onClick={() => onCreate({name, description, logAndFilesVolumeSize, databaseVolumeSize})}
                 color="primary"
                 variant="contained"
             >

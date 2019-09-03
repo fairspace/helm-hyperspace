@@ -20,6 +20,10 @@ const columns = {
         valueExtractor: 'name',
         label: 'Name'
     },
+    description: {
+        valueExtractor: 'description',
+        label: 'Description'
+    },
     version: {
         valueExtractor: 'version',
         label: 'Version'
@@ -79,6 +83,15 @@ const WorkspaceList = ({history}) => {
                         </TableCell>
                         <TableCell>
                             <TableSortLabel
+                                active={orderBy === 'description'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('description')}
+                            >
+                                Name
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
                                 active={orderBy === 'version'}
                                 direction={orderAscending ? 'asc' : 'desc'}
                                 onClick={() => toggleSort('version')}
@@ -99,7 +112,7 @@ const WorkspaceList = ({history}) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({name, version, status}) => {
+                    {pagedItems.map(({name, description, version, status}) => {
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -109,6 +122,9 @@ const WorkspaceList = ({history}) => {
                             >
                                 <TableCell>
                                     {name}
+                                </TableCell>
+                                <TableCell>
+                                    {description}
                                 </TableCell>
                                 <TableCell>
                                     {version}

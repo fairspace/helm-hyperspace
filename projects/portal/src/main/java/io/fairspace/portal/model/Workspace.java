@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Workspace {
     private String name;
+    private String description;
     private String version;
     private String url;
     private String status;

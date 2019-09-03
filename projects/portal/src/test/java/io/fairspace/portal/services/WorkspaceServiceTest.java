@@ -71,6 +71,7 @@ public class WorkspaceServiceTest {
     public void itSetsConfiguration() throws IOException {
         var ws = Workspace.builder()
                 .name("test")
+                .description("description")
                 .logAndFilesVolumeSize(1)
                 .databaseVolumeSize(2)
                 .build();
@@ -93,6 +94,7 @@ public class WorkspaceServiceTest {
                         "  elasticsearch:\n" +
                         "    indexName: \"test\"\n" +
                         "workspace:\n" +
+                        "  description: \"description\"\n" +
                         "  ingress:\n" +
                         "    domain: \"test.example.com\"\n")),
                 eq(chart));
