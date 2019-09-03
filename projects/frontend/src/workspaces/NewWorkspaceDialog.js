@@ -40,7 +40,7 @@ export default ({onCreate, onClose}) => {
                 onChange={(event) => setName(event.target.value)}
                 fullWidth
                 required
-                helperText="Release names should use lower case letters, numbers and hypgens, and start with a letter."
+                helperText="Release names should use lower case letters, numbers and hyphens, and start with a letter."
             />
             <TextField
                 margin="dense"
@@ -60,6 +60,7 @@ export default ({onCreate, onClose}) => {
                 value={databaseVolumeSize}
                 name="databaseVolumeSize"
                 type="number"
+                inputProps={{m}}
                 onChange={(event) => setDatabaseVolumeSize(event.target.value)}
                 fullWidth
                 required
