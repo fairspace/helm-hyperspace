@@ -16,7 +16,7 @@ export default ({onCreate, onClose}) => {
     const [name, setName] = useState("");
     const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
     const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
-    const valid = !!(logAndFilesVolumeSize > 0 && databaseVolumeSize > 0 && releaseNamePattern.test(name));
+    const valid = !!(logAndFilesVolumeSize >= 1 && databaseVolumeSize >= 1 && releaseNamePattern.test(name));
 
     return (<Dialog
         open
@@ -45,10 +45,11 @@ export default ({onCreate, onClose}) => {
             <TextField
                 margin="dense"
                 id="logAndFilesVolumeSize"
-                label="Log and files volume size, GiB"
+                label="Log and files volume size in gigabytes"
                 value={logAndFilesVolumeSize}
                 name="logAndFilesVolumeSize"
                 type="number"
+                inputProps={{min: 1}}
                 onChange={(event) => setLogAndFilesVolumeSize(event.target.value)}
                 fullWidth
                 required
@@ -56,11 +57,11 @@ export default ({onCreate, onClose}) => {
             <TextField
                 margin="dense"
                 id="databaseVolumeSize"
-                label="Database volume size, GiB"
+                label="Database volume size in gigabytes"
                 value={databaseVolumeSize}
                 name="databaseVolumeSize"
                 type="number"
-                inputProps={{m}}
+                inputProps={{min: 1}}
                 onChange={(event) => setDatabaseVolumeSize(event.target.value)}
                 fullWidth
                 required
