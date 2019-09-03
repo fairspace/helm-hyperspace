@@ -8,7 +8,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";
 import MessageDisplay from "../common/components/MessageDisplay";
-import WorkspaceAPI from "../common/services/WorkspaceAPI";
+import WorkspaceAPI from "./WorkspaceAPI";
 import LoadingInlay from "../common/components/LoadingInlay";
 import useRepeat from "../common/hooks/UseRepeat";
 import useAsync from "../common/hooks/UseAsync";
