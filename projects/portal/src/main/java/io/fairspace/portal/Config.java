@@ -22,8 +22,6 @@ public class Config {
         public String jwtAlgorithm = "RS256";
 
         public String organisationAdminRole = "organisation-admin";
-
-        public String userGroupsUrlTemplate = "https://keycloak.ci.fairway.app/auth/admin/realms/ci/users/%s/groups";
     }
 
     @Override

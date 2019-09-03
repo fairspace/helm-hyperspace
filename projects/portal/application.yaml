@@ -7,8 +7,6 @@ auth:
   jwtAlgorithm: RS256
   # Organisation admin role
   organisationAdminRole: organisation-admin
-  # User's groups URL template
-  userGroupsUrlTemplate: "https://keycloak.ci.fairway.app/auth/admin/realms/ci/users/%s/groups"
 charts:
   workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7-SNAPSHOT.tgz
 workspace:

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hapi.chart.ChartOuterClass;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.portal.model.Workspace;
-import io.fairspace.portal.services.UserService;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,7 @@ import org.microbean.helm.Tiller;
 import org.microbean.helm.chart.URLChartLoader;
 
 import java.io.IOException;
+import java.util.List;
 
 import static io.fairspace.portal.Authentication.getUserInfo;
 import static io.fairspace.portal.Config.WORKSPACE_CHART;
@@ -23,6 +24,7 @@ import static io.fairspace.portal.errors.ErrorHelper.errorBody;
 import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static java.util.stream.Collectors.toList;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
@@ -31,9 +33,10 @@ import static spark.Spark.*;
 public class App {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
+    private static final String USER_ROLE_PREFIX = "user-";
 
     public static void main(String[] args) throws IOException {
-        initSpark(initWorkspaceService(), initUserService());
+        initSpark(initWorkspaceService());
     }
 
     private static WorkspaceService initWorkspaceService() throws IOException {
@@ -58,11 +61,7 @@ public class App {
         return new WorkspaceService(releaseManager, chart, CONFIG.domain, CONFIG.workspace);
     }
 
-    private static UserService initUserService() {
-        return new UserService(CONFIG.auth.userGroupsUrlTemplate);
-    }
-
-    private static void initSpark(@NonNull WorkspaceService workspaceService, @NonNull UserService userService) {
+    private static void initSpark(@NonNull WorkspaceService workspaceService) {
         port(8080);
 
         before((request, response) -> {
@@ -98,7 +97,7 @@ public class App {
 
             post("/search/hyperspace/_search", (request, response) -> {
                 var token = getUserInfo(request, tokenValidator);
-                var indices = userService.getAvailableWorkspaces(token);
+                var indices = getAvailableWorkspaces(token);
                 response.redirect(format(CONFIG.elasticSearchUrlTemplate, join(",", indices)));
                 return "";
             });
@@ -108,5 +107,13 @@ public class App {
         exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
         exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
         exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
+    }
+
+    private static  List<String> getAvailableWorkspaces(OAuthAuthenticationToken authToken) {
+        return authToken.getAuthorities()
+                .stream()
+                .filter(role -> role.startsWith(USER_ROLE_PREFIX))
+                .map(role -> role.substring(USER_ROLE_PREFIX.length()))
+                .collect(toList());
     }
 }
