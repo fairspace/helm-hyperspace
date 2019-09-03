@@ -14,6 +14,7 @@ public class Config {
     public final Auth auth = new Auth();
     public final Map<String, URL> charts = new HashMap<>();
     public final Map<String, Object> workspace = new HashMap<>();
+    public String elasticSearchUrlTemplate = "http://hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local:9200/%s/_search";
 
     public static class Auth {
         public boolean enabled = false;
