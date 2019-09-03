@@ -1,9 +1,9 @@
 dependencies:
-- name: nginx-ingress
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.20.3
 - name: keycloak
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.0.0
-digest: sha256:c13a04f0181476d75203ab15e18e3de4eadb830131961e890a87c8b7427c6c17
-generated: 2019-02-21T17:07:09.41839258+01:00
+- name: elasticsearch
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 1.31.0
+digest: sha256:4a684e758abd78441f224b32291e416d2f33208384dfedec304a21b2a401f2c0
+generated: "2019-08-30T11:11:57.132574042+02:00"

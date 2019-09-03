@@ -1,5 +1,5 @@
 hyperspace:
-  name: "Fairspace-CI"
+  name: "ci"
   keycloak:
     clientSecret: e38026bd-c9d2-4430-8171-d3c58e8cec53
     realm: ci

@@ -28,8 +28,6 @@ public class WorkspaceServiceTest {
 
     private static final String domain = "example.com";
 
-    private final Map<String, Object> workspaceValues = Map.of("key", Map.of("subkey", "value"));
-
     @Mock
     private ListenableFuture<Tiller.InstallReleaseResponse> future;
 
@@ -37,6 +35,7 @@ public class WorkspaceServiceTest {
 
     @Before
     public void setUp() throws IOException {
+        var workspaceValues = Map.of("saturn", Map.of("persistence",  Map.of("key", "value")));
         workspaceService = new WorkspaceService(releaseManager, chart, domain, workspaceValues);
 
         when(releaseManager.list(any())).thenReturn(List.<Tiller.ListReleasesResponse>of().iterator());
@@ -72,6 +71,7 @@ public class WorkspaceServiceTest {
     public void itSetsConfiguration() throws IOException {
         var ws = Workspace.builder()
                 .name("test")
+                .description("description")
                 .logAndFilesVolumeSize(1)
                 .databaseVolumeSize(2)
                 .build();
@@ -82,21 +82,21 @@ public class WorkspaceServiceTest {
                 request.getName().equals(ws.getName())
                 && request.getValues().getRaw().equals(
                         "---\n" +
-                        "key:\n" +
-                        "  subkey: \"value\"\n" +
-                        "workspace:\n" +
-                        "  ingress:\n" +
-                        "    domain: test.example.com\n" +
-                        "hyperspace:\n" +
-                        "  domain: hyperspace.example.com\n" +
-                        "  elasticsearch:\n" +
-                        "    indexName: test\n" +
                         "saturn:\n" +
                         "  persistence:\n" +
+                        "    key: \"value\"\n" +
                         "    files:\n" +
-                        "      size: 1Gi\n" +
+                        "      size: \"1Gi\"\n" +
                         "    database:\n" +
-                        "      size: 2Gi\n")),
+                        "      size: \"2Gi\"\n" +
+                        "hyperspace:\n" +
+                        "  domain: \"example.com\"\n" +
+                        "  elasticsearch:\n" +
+                        "    indexName: \"test\"\n" +
+                        "workspace:\n" +
+                        "  description: \"description\"\n" +
+                        "  ingress:\n" +
+                        "    domain: \"test.example.com\"\n")),
                 eq(chart));
     }
 }

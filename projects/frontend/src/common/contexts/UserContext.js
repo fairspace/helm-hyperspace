@@ -1,35 +1,20 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 
 import onLogout from "../services/logout";
 import AccountAPI from '../services/AccountAPI';
+import useAsync from '../hooks/UseAsync';
 
 const UserContext = React.createContext({});
 
 export const UserProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState({});
-    const [currentUserLoading, setCurrentUserLoading] = useState(false);
-    const [currentUserError, setCurrentUserError] = useState(null);
-
-    useEffect(() => {
-        setCurrentUserLoading(true);
-
-        AccountAPI.getUser()
-            .then(user => {
-                setCurrentUser(user);
-                setCurrentUserError(null);
-            })
-            .catch(setCurrentUserError)
-            .finally(() => {
-                setCurrentUserLoading(false);
-            });
-    }, []);
+    const {data: currentUser = {}, loading, error} = useAsync(AccountAPI.getUser);
 
     return (
         <UserContext.Provider
             value={{
                 currentUser,
-                currentUserLoading,
-                currentUserError,
+                currentUserLoading: loading,
+                currentUserError: error,
                 onLogout
             }}
         >

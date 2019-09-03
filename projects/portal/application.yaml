@@ -1,7 +1,9 @@
 domain: ci.fairway.app
+elasticSearchUrlTemplate: "http://hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local:9200/%s/_search"
 auth:
+  enabled: false
   # JWKS URL
-  jwksUrl: "https://keycloak.hyperspace.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
+  jwksUrl: "https://keycloak.ci.fairway.app/auth/realms/ci/protocol/openid-connect/certs"
   # JWK encryption algorithm. Defaults to "RS256"
   jwtAlgorithm: RS256
   # Organisation admin role
