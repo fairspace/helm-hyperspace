@@ -18,5 +18,5 @@ data:
   version.json: |-
     {
       "name": "{{ .Release.Name }}",
-      "version": "{{ .Release.Version }}"
+      "version": "{{ .Chart.Version }}"
     }
