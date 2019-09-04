@@ -220,7 +220,7 @@ portal:
         timeoutSeconds: 1
     terminationGracePeriodSeconds: 10
     workspace:
-      tag: RELEASEVERSION
+      tag: 0.6.7
     mail:
         mail.from: info@fairspace.io
         mail.user: user
