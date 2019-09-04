@@ -13,9 +13,14 @@ import LoadingInlay from "../common/components/LoadingInlay";
 import useRepeat from "../common/hooks/UseRepeat";
 import useAsync from "../common/hooks/UseAsync";
 import UserContext from '../common/contexts/UserContext';
-import {isOrganisationAdmin, isWorkspaceCoordinator} from '../common/utils/userUtils';
+import {isOrganisationAdmin, isWorkspaceCoordinator, isWorkspaceUser} from '../common/utils/userUtils';
+import Icon from "@material-ui/core/Icon";
 
 const columns = {
+    access: {
+        valueExtractor: 'access',
+        label: 'Access'
+    },
     name: {
         valueExtractor: 'name',
         label: 'Name'
@@ -41,9 +46,11 @@ const WorkspaceList = ({history}) => {
     // refresh every 30 seconds
     useRepeat(refresh, 30000);
 
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
-    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const {currentUser: {authorizations}} = useContext(UserContext);
+    const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.name)}))
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'name');
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+
 
     const handleMenuClick = event => {
         setAnchorEl(event.currentTarget);
@@ -59,6 +66,7 @@ const WorkspaceList = ({history}) => {
 
     const canManageRoles = (workspace) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspace));
 
+
     if (loading) {
         return <LoadingInlay />;
     }
@@ -72,6 +80,13 @@ const WorkspaceList = ({history}) => {
             <Table size="small">
                 <TableHead>
                     <TableRow>
+                        <TableCell padding="dense">
+                            <TableSortLabel
+                                active={orderBy === 'access'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('access')}
+                            />
+                        </TableCell>
                         <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'name'}
@@ -87,7 +102,7 @@ const WorkspaceList = ({history}) => {
                                 direction={orderAscending ? 'asc' : 'desc'}
                                 onClick={() => toggleSort('description')}
                             >
-                                Name
+                                Description
                             </TableSortLabel>
                         </TableCell>
                         <TableCell>
@@ -112,14 +127,20 @@ const WorkspaceList = ({history}) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({name, description, version, status}) => {
+                    {pagedItems.map(({access, name, description, url, version, status}) => {
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
                             <TableRow
                                 hover
                                 key={name}
+                                onDoubleClick={() => {
+                                    if (access) window.location.href = url
+                                }}
                             >
+                                <TableCell padding="dense">
+                                    {!access && <Icon>lock</Icon>}
+                                </TableCell>
                                 <TableCell>
                                     {name}
                                 </TableCell>
