@@ -219,6 +219,8 @@ portal:
         successThreshold: 1
         timeoutSeconds: 1
     terminationGracePeriodSeconds: 10
+    workspace:
+      tag: RELEASEVERSION
     mail:
         mail.from: info@fairspace.io
         mail.user: user
