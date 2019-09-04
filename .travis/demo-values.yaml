@@ -1,10 +1,13 @@
 hyperspace:
-  name: "Fairspace-Demo"
+  name: "demo"
   keycloak:
     clientSecret: b91575e7-a61d-489d-8302-e25a29d794ed
     realm: demo
   ingress:
     domain: demo.fairway.app
+  testuser:
+    generate: true
+    password: fairspace123
 
 # Set password to prevent having a new password at every upgrade
 keycloak:
@@ -13,3 +16,13 @@ keycloak:
   postgresql:
     postgresPassword: "mf5-Y5Q5E5_P33eB"
 
+portal:
+  mail:
+    mail.from: pavel@thehyve.nl
+    mail.user: AKIAISXHGXUIMMU75YVA
+    mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
+    mail.transport.protocol: smtp
+    mail.smtp.auth: true
+    mail.smtp.host: email-smtp.us-east-1.amazonaws.com
+    mail.smtp.port: 587
+    mail.smtp.starttls.enable: true
