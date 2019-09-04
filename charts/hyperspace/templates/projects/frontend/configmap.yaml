@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "frontend.fullname" . }}
+  labels:
+    app: frontend
+    chart: {{ template "hyperspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  config.json: |-
+    {
+      "roles": {
+        "organisationAdmin": "admin-organisation",
+        "workspaceCoordinator": "workspace-coordinator"
+      }
+    }
+  version.json: |-
+    {
+      "name": "{{ .Release.Name }}",
+      "version": "{{ .Release.Version }}"
+    }

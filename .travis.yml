@@ -4,11 +4,12 @@ language: java
 
 env:
   global:
+    - NODE_VERSION="10.16.3"
     - APPNAME="hyperspace"
     - ORG="fairspace"
     - ARTIFACT_BUILD_FILE=""
     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
-    - DEPLOYMENT_CONFIG_DIR="./ci-deployment"
+    - DEPLOYMENT_CONFIG_DIR="./.travis"
     - RELEASE_BRANCH="master"
     - SNAPSHOT_BRANCH="dev"
     - GCP_PROJECT="fairspace-207108"
@@ -20,7 +21,10 @@ env:
     - RELEASE_CLUSTER_ZONE="europe-west1-b"
     - DOCKER_USERNAME="fairspace"
     - GITHUB_USERNAME="fairspace-ci"
-    # Github credentials:
+
+    # DOCKER_PASSWORD=...
+    - secure: "vXd6WTtZ5wO5hXi2Tm9lgSDWXkf8MyZ+zkSKr0DNXRqBFPPGpifzhB8qN1qRYVLD8UsdrFwU4q53kxqlmWd6/P9dQkFuFpkouZkax4LRoP7QhRbxcLUcbcqEui4pA579uAIynu61q+furr+4Yl6RcTTG6nE9T43eofgGQqf0haVRM9hYeeMXjHGBNPooHJepGxFqpMBSN/+nb3MoB9dOzqc+dvj99Z5BLiAnl5t9ZCHcqTaLlZpwhWY+vR5WyEj7D2mkAiswXmRCOB7n0z2dN/mxDvMLtXAM7pfmmpQUoZYI8bGUc2zBnzKb5slSvvVG4vgZKx0Tv8RDQnpj7geLmIoiWYfz4wGolp1kn4tvjIA5pSx/xXxpOAX/dVAM9hvtOYt48Unr76UzpQm1e3+2DYIZdf0jz5n9V3H2ZqYY81UWFI8nSTmvaO/dw3GtLiPts/+FAHPsXVAkUFmDf0AGrIXIQ7P31pLgtXwXMslr7HkDUDmdN3PMHn30QhJWsaFe+MWXKnqNjCgIfflHpmAVBkbjsKWG1wpsNUHB66rq3U9UPCXpxu1XVpJLxT5QfVXR8p10s4YBvhwHHqhBDbMETTCYz4Q5T7YwgWIU0JTwCut+OMmW4rR3IAwmgIF0Pnr64y+fZL+qNXSJp/W/wrN84ZoGFGBflSnaCIhK7dm+paA="
+
     # GITHUB_PASSWORD=....
     - secure: "JGk+4XeLruK1LMZ4zJcmX4k4T7nR7DVwPcl/IaPNKaR2+MdiN2Wi5gAXrsXDDKIs4fJzHtRBK1K+VNam4K8vwb5aOX0MnYDoHPZc3ye+UYUXLlTeoozSmfMy08zGaNtz+GjP+QSzvFcRMlhFRLjJ+Cae+Rwpt9gldSLhc04VPGBCMmnHAIg86m2PFqfEfm3Kjy7HkvrPYkAN8JvMRzSjXfBi0JmDjSFuXS0mcp/UOUZLtTzfASpaApijbkp2iposBfN83TbkmnZ/DbZULHtXcKB+mZWADRsh7vyIQQQLVkRWx3HcQSJKSEyCazYoINBufKXDek8v6EbPpIupwF8MVIZTL+vZKXteaNVkcad69ZD3iBhSje8M41ev1Q+m68z6+0IFm6xwajVPL02P3P64zaqWShrG8MLwNiZ7bYmZnziik+fKLGG0/ABiiTxVbUD4qW7XHzbdDNPSE4D9xTuKg+A2naydSNAdozKZLQUNK4/sk5S4xj5Ot0An3Jt9lHKMb/ayqn2b42MfvO3b6cW2pbJTd6f79z2O3bSjL0tNAWbkLrtQLnEPcr0d/CDPBnjWWk4N+1kcOaYqd6/KegkgxXCXSwDnbEhDp/GlEKiIvGo/F3JduqMnVZFfEK8IBIL0pm1z3T7Kvv2Fq5hE19TUB22dlExwudM1nDu8UUFjuig="
 
@@ -30,8 +34,10 @@ env:
 cache:
   directories:
   - $HOME/downloads
-
+  - $HOME/.gradle
+  -
 before_install:
+  - nvm install $NODE_VERSION
   - export KUBE_CONFIG_ENC_KEY=$encrypted_985abdf32880_key
   - export KUBE_CONFIG_ENC_IV=$encrypted_985abdf32880_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
@@ -44,28 +50,36 @@ before_install:
 
 jobs:
   include:
-    - stage: Build
-      name: Helm chart
+    - stage: build
+      name: Build projects
+      install:
+        - ci/gcp/install.sh
+        - ci/gcp/login.sh
       script:
-      - 'if [[ "$SHOULD_RELEASE" ]] ; then ./ci/login-provider.sh ; fi'
-      - source ./ci/helm/install_helm.sh
-      - ./ci/helm/tag.sh
-      - source ./ci/helm/add_repos.sh
-      - ./ci/helm/build.sh
-      - 'if [[ "$SHOULD_RELEASE" ]]; then ./ci/helm/release.sh ; fi'
-      - 'if [[ "$SHOULD_RELEASE" ]]; then ./ci/k8s/ics_kubectl.sh ; fi'
-      - # Need to refresh helm repository if it's on Azure, because it times out after a while
-      - 'if [[ "$DEPLOY_PLATFORM" = "AZURE" ]]; then ./ci/helm/add_repos.sh ; fi'
-      - 'if [[ "$SHOULD_RELEASE" ]]; then travis_retry travis_wait ./ci/helm/deploy.sh $DEPLOY_TARGET; fi'
-    - # For release branch, update git with the new tag and update version
-      if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+        - .travis/build.sh projects/portal
+        - .travis/build.sh projects/frontend
+    - stage: build
+      cache: false
+      name: Build helm charts
+      install:
+        - source charts/.travis/install.sh
+      script:
+        - charts/.travis/build.sh
+    - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+      cache: false
       stage: Versioning
-      install: skip
       name: Set tag and update version
       script:
-        - ./ci/helm/tag.sh
-        - ./ci/versioning/add_tag_to_git.sh
-        - ./ci/versioning/set_next_version.sh
+        - "./ci/helm/tag.sh"
+        - "ci/versioning/add_tag_to_git.sh"
+        - "ci/versioning/set_next_version.sh"
+    - stage: deploy
+      cache: false
+      if: branch IN (env(RELEASE_BRANCH), env(SNAPSHOT_BRANCH)) AND type != pull_request
+      install:
+        - source charts/.travis/install.sh
+      script:
+        - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET
 
 notifications:
   slack:

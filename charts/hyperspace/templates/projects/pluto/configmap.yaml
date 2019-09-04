@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "pluto.fullname" . }}
+  labels:
+    app: pluto
+    chart: {{ template "hyperspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  application.yaml: |-
+    app:
+      domains:
+        - {{ template "hyperspace.url" . }}
+      oauth2:
+        base-url: {{ template "keycloak.baseUrl" . }}
+        realm: {{ .Values.hyperspace.keycloak.realm }}
+      apiVersion:
+        pluto: v1
+        portal: v1
+
+    security:
+      oidc:
+        redirect-after-logout-url: {{ .Values.pluto.keycloak.redirectAfterLogoutUrl | default (include "hyperspace.url" .) }}
+      urls:
+        # Please note that by default pluto is configured to allow certain urls anonymously
+        # (e.g. login or health), and is configured to require specific authorization for anything else
+        # This configuration will make sure that anyone with a valid token will be able to access the
+        # organisation portal. This means that specific authorizations will have to be checked in the
+        # applications themselves
+        needsAuthentication:
+        - /*
+        needsAuthorization: []
+    spring:
+      zipkin:
+        enabled: {{ .Values.tracing.enabled }}
+        base-url: {{ .Values.tracing.baseUrl }}
+
+    zuul:
+      retryable: false
+      host:
+        connect-timeout-millis: {{ .Values.pluto.connectTimeoutMillis }}
+        socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}
+      routes:
+        # Please note that the order of the routes is relevant
+        portal:
+          path: /api/${app.apiVersion.portal}/**
+          url: {{ .Values.pluto.backends.portal | default (printf "http://%s-portal.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+          strip-prefix: false
+        keycloak:
+          path: /api/keycloak/**
+          url: {{ .Values.pluto.backends.keycloak | default (printf "http://%s-headless.%s.svc.cluster.local:8080/auth/admin/realms/%s" (include "keycloak.prefix" .) .Release.Namespace .Values.hyperspace.keycloak.realm)}}
+          strip-prefix: true
+        frontend:
+          path: /**
+          url: {{ .Values.pluto.backends.frontend | default (printf "http://%s-frontend.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}

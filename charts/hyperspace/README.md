@@ -7,8 +7,7 @@ Contains:
 
 ## Prerequisites
 This chart relies on the following prerequisites:
-- If ingress is enabled, an active ingress controller should be present in the cluster. If this has not been setup, you can 
-  let this chart handle the installation by setting `hyperspace.ingress.controller.required` to true.
+- If ingress is enabled, an active nginx ingress controller should be present in the cluster. 
 - If a TLS certificate is to be obtained automatically, an installation of `cert-manager` should be present in the cluster. See
   https://cert-manager.readthedocs.io/en/latest/getting-started/2-installing.html#with-helm for the easiest way to set it up. Please
   note that the certificate that is being created, relies on a dns01 challenge provider being configured properly, as well as on a 
@@ -43,14 +42,16 @@ Use `helm ... -f config.yaml` to override default configuration parameters from 
 
 | Parameter  | Description  | Default |
 |---|---|---|
+| `hyperspace.name`  | Name of the hyperspace | Fairspace |
 | `hyperspace.keycloak.realm`  | Realm to be used within keycloak |  |
 | `keycloak.keycloak.service.type`  | [Servicetype](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for the Keycloak service. |  ClusterIP |
+| `hyperspace.organisationadmin.username` | Username for the organisation admin that will be created for this hyperspace | `organisation-admin-<realm>` |
+| `hyperspace.organisationadmin.password` | Password for the organisation admin that will be created for this hyperspace | `fairspace123` |
 | `ingress.enabled`  | Whether or not an ingress is setup for the hyperspace components. Should be set to false when running locally.  | true  |
-| `ingress.domain`   | Domain that is used for setting up the hyperspace. Is used as postfix for the hostname for the specific components. For example setting `fairspace.app` as domain will setup keycloak at `keycloak.fairspace.app`  | hyperspace.ci.test.fairdev.app  |
+| `ingress.domain`   | Domain that is used for setting up the hyperspace. Is used as postfix for the hostname for the specific components. For example setting `fairspace.app` as domain will setup keycloak at `keycloak.fairspace.app`  | ci.test.fairdev.app  |
 | `ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for hyperspace  | true  |
 | `ingress.tls.secretNameOverride`  | If set, this secret name is used for loading certificates for TLS. | `tls-<release name>` |
 | `ingress.tls.certificate.obtain`  | If set, a `Certificate` object will be created, such that [cert-manager](https://cert-manager.readthedocs.io/en/latest/) will request a certificate automatically. | true |
-| `ingress.controller.required`  | If set to true, an nginx-ingress controller will be installed along with the application. | false |
 
 To retrieve the initial user password run:
 

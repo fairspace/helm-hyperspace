@@ -1,0 +1,37 @@
+[
+  {
+    "name": "workspace",
+    "description": "Example workspace",
+    "url": "http://localhost:3000",
+    "version": "0.6.1",
+    "status": "DEPLOYED",
+    "logAndFilesVolumeSize": 1024,
+    "databaseVolumeSize": 1024
+  },
+  {
+    "name": "melanoma",
+    "description": "Melanoma",
+    "url": "http://example.com/ws1",
+    "version": "0.6.4",
+    "logAndFilesVolumeSize": 1024,
+    "databaseVolumeSize": 1024
+  },
+  {
+    "name": "curie",
+    "description": "Curie",
+    "url": "http://example.com/ws2",
+    "version": "0.0.1",
+    "status": "PENDING_INSTALL",
+    "logAndFilesVolumeSize": 1024,
+    "databaseVolumeSize": 1024
+  },
+  {
+    "name": "sales",
+    "description": "Sales team",
+    "url": "http://example.com/ws3",
+    "version": "0.5.1-SNAPSHOT",
+    "status": "PENDING_INSTALL",
+    "logAndFilesVolumeSize": 1024,
+    "databaseVolumeSize": 1024
+  }
+]
