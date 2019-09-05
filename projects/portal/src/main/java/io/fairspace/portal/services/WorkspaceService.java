@@ -5,7 +5,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.chart.ConfigOuterClass;
-import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import io.fairspace.portal.model.Workspace;
@@ -19,6 +18,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
+import static hapi.release.StatusOuterClass.Status.Code;
 import static io.fairspace.portal.utils.JacksonUtils.merge;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.currentTimeMillis;
@@ -37,14 +37,14 @@ public class WorkspaceService {
     private static final String FILE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/files/size";
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/database/size";
     private static final String GIGABYTE_SUFFIX = "Gi";
-    private static final EnumSet<StatusOuterClass.Status.Code> RELEVANT_STATUSES = EnumSet.of(
-            StatusOuterClass.Status.Code.UNKNOWN,
-            StatusOuterClass.Status.Code.DEPLOYED,
-            StatusOuterClass.Status.Code.FAILED,
-            StatusOuterClass.Status.Code.DELETING,
-            StatusOuterClass.Status.Code.PENDING_INSTALL,
-            StatusOuterClass.Status.Code.PENDING_UPGRADE,
-            StatusOuterClass.Status.Code.PENDING_ROLLBACK);
+    private static final EnumSet<Code> RELEVANT_STATUSES = EnumSet.of(
+            Code.UNKNOWN,
+            Code.DEPLOYED,
+            Code.FAILED,
+            Code.DELETING,
+            Code.PENDING_INSTALL,
+            Code.PENDING_UPGRADE,
+            Code.PENDING_ROLLBACK);
 
     private final ReleaseManager releaseManager;
     private final ChartOuterClass.Chart.Builder chart;
@@ -90,7 +90,7 @@ public class WorkspaceService {
                                 .description(config.at(WORKSPACE_DESCRIPTION_YAML_PATH).asText())
                                 .url("https://" + config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
                                 .version(release.getChart().getMetadata().getVersion())
-                                .status(release.getInfo().getStatus().getCode() == StatusOuterClass.Status.Code.FAILED ? "Failed" : release.getInfo().getDescription())
+                                .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
                                 .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .build());
