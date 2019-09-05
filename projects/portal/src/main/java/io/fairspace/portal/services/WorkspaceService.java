@@ -90,7 +90,7 @@ public class WorkspaceService {
                                 .description(config.at(WORKSPACE_DESCRIPTION_YAML_PATH).asText())
                                 .url("https://" + config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
                                 .version(release.getChart().getMetadata().getVersion())
-                                .status(release.getInfo().getDescription())
+                                .status(release.getInfo().getStatus().getCode() == StatusOuterClass.Status.Code.FAILED ? "Failed" : release.getInfo().getDescription())
                                 .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .build());
