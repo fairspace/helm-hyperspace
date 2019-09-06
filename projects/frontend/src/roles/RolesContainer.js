@@ -1,12 +1,9 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
+import {LoadingInlay, MessageDisplay, UserContext, UsersContext} from '@fairspace/shared-frontend';
 
-import UsersContext from '../common/contexts/UsersContext';
 import {isWorkspaceCoordinator, isOrganisationAdmin, userHasAnyRoleInWorkspace} from '../common/utils/userUtils';
-import LoadingInlay from '../common/components/LoadingInlay';
-import MessageDisplay from '../common/components/MessageDisplay';
-import UserContext from '../common/contexts/UserContext';
 import Roles from './RolesList';
 
 /**

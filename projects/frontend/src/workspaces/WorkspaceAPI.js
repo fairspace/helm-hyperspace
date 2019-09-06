@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+import {extractJsonData, handleHttpError} from "@fairspace/shared-frontend";
+
 import Config from "../common/services/Config/Config";
-import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
 
 class WorkspaceAPI {
     getWorkspaces() {

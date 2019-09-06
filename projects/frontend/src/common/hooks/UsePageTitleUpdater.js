@@ -1,5 +1,5 @@
 import {useContext, useEffect} from 'react';
-import VersionContext from "../contexts/VersionContext";
+import {VersionContext} from '@fairspace/shared-frontend';
 
 const separator = '-';
 

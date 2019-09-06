@@ -6,14 +6,13 @@ import {
     TableCell, TableHead, TableRow, Paper, FormGroup, FormControlLabel,
     Checkbox, Grid, Typography, Button,
 } from '@material-ui/core';
+import {useSorting, usePagination} from '@fairspace/shared-frontend';
 
 import Config from "../common/services/Config/Config";
 import {
     isWorkspaceUser, isWorkspaceCoordinator, isWorkspaceDatasteward,
     isWorkspaceSparql, idToRoles
 } from '../common/utils/userUtils';
-import useSorting from '../common/hooks/UseSorting';
-import usePagination from '../common/hooks/UsePagination';
 
 const styles = theme => ({
     header: {

@@ -4,17 +4,15 @@ import {
     Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel, IconButton, Menu, MenuItem
 } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import MessageDisplay from "../common/components/MessageDisplay";
-import WorkspaceAPI from "./WorkspaceAPI";
-import LoadingInlay from "../common/components/LoadingInlay";
-import useRepeat from "../common/hooks/UseRepeat";
-import useAsync from "../common/hooks/UseAsync";
-import UserContext from '../common/contexts/UserContext';
-import {isOrganisationAdmin, isWorkspaceCoordinator, isWorkspaceUser} from '../common/utils/userUtils';
 import Icon from "@material-ui/core/Icon";
+import {
+    LoadingInlay, MessageDisplay, UserContext, useSorting,
+    usePagination, useAsync,
+} from '@fairspace/shared-frontend';
+
+import WorkspaceAPI from "./WorkspaceAPI";
+import useRepeat from "../common/hooks/UseRepeat";
+import {isOrganisationAdmin, isWorkspaceCoordinator, isWorkspaceUser} from '../common/utils/userUtils';
 
 const columns = {
     access: {
@@ -47,7 +45,7 @@ const WorkspaceList = ({history}) => {
     useRepeat(refresh, 30000);
 
     const {currentUser: {authorizations}} = useContext(UserContext);
-    const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.name)}))
+    const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.name)}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
@@ -135,7 +133,7 @@ const WorkspaceList = ({history}) => {
                                 hover
                                 key={name}
                                 onDoubleClick={() => {
-                                    if (access) window.location.href = url
+                                    if (access) window.location.href = url;
                                 }}
                             >
                                 <TableCell padding="dense">

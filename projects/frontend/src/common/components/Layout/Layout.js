@@ -1,16 +1,14 @@
 import React, {useContext, useState} from 'react';
 import {withStyles} from '@material-ui/core/styles';
+import {LoadingInlay, VersionContext, UserContext} from '@fairspace/shared-frontend';
 
 import styles from './Layout.styles';
 import TopBar from "./TopBar/TopBar";
 import Footer from './Footer/Footer';
 import AuthorizationCheck from '../AuthorizationCheck';
 import MenuDrawer from "./MenuDrawer/MenuDrawer";
-import LoadingInlay from "../LoadingInlay";
 import {LEFT_MENU_EXPANSION_DELAY, LOCAL_STORAGE_MENU_KEY} from "../../../constants";
 import Routes from "../../../Routes";
-import VersionContext from "../../contexts/VersionContext";
-import UserContext from "../../contexts/UserContext";
 
 const Layout = ({classes}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');

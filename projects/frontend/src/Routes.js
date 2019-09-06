@@ -1,10 +1,10 @@
 import React from 'react';
 import {Route} from "react-router-dom";
+import {UsersProvider, logout} from '@fairspace/shared-frontend';
 
+import Config from "./common/services/Config/Config";
 import Home from "./home/Home";
-import logout from "./common/services/logout";
 import Workspaces from "./workspaces/Workspaces";
-import {UsersProvider} from './common/contexts/UsersContext';
 import RolesContainer from './roles/RolesContainer';
 
 const routes = () => (
@@ -15,7 +15,7 @@ const routes = () => (
             path="/workspaces/:workspace/roles"
             exact
             render={({match: {params: {workspace}}}) => (
-                <UsersProvider workspace={workspace}>
+                <UsersProvider configs={Config.get()} workspace={workspace}>
                     <RolesContainer workspace={workspace} />
                 </UsersProvider>
             )}
