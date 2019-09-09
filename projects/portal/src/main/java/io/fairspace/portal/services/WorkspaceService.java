@@ -108,10 +108,10 @@ public class WorkspaceService {
     public void installWorkspace(Workspace workspace) throws IOException {
         var customValues = objectMapper.createObjectNode();
         customValues.with("hyperspace").put("domain", domain);;
-        customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getName());
+        customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getId());
         customValues.with("workspace").put("name", workspace.getName());
         customValues.with("workspace").put("description", workspace.getDescription());
-        customValues.with("workspace").with("ingress").put("domain", workspace.getName() + "." + domain);
+        customValues.with("workspace").with("ingress").put("domain", workspace.getId() + "." + domain);
         customValues.with("saturn").with("persistence").with("files").put("size", workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX);
         customValues.with("saturn").with("persistence").with("database").put("size", workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX);
 
@@ -119,8 +119,8 @@ public class WorkspaceService {
         var yaml = objectMapper.writeValueAsString(values);
 
         var requestBuilder = InstallReleaseRequest.newBuilder()
-                .setName(workspace.getName())
-                .setNamespace(workspace.getName())
+                .setName(workspace.getId())
+                .setNamespace(workspace.getId())
                 .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build())
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
