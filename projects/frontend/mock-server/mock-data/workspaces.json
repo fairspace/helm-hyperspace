@@ -1,7 +1,8 @@
 [
   {
-    "name": "workspace",
-    "description": "Example workspace",
+    "id": "workspace",
+    "name": "Example workspace",
+    "description": "Workspace\ndescription",
     "url": "http://localhost:3000",
     "version": "0.6.1",
     "status": "DEPLOYED",
@@ -9,16 +10,18 @@
     "databaseVolumeSize": 1024
   },
   {
-    "name": "melanoma",
-    "description": "Melanoma",
+    "id": "melanoma",
+    "name": "Melanoma",
+    "description": "Workspace\ndescription",
     "url": "http://example.com/ws1",
     "version": "0.6.4",
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024
   },
   {
-    "name": "curie",
-    "description": "Curie",
+    "id": "curie",
+    "name": "Curie",
+    "description": "Workspace\ndescription",
     "url": "http://example.com/ws2",
     "version": "0.0.1",
     "status": "PENDING_INSTALL",
@@ -26,8 +29,9 @@
     "databaseVolumeSize": 1024
   },
   {
-    "name": "sales",
-    "description": "Sales team",
+    "id": "sales",
+    "name": "Sales team",
+    "description": "Workspace\ndescription",
     "url": "http://example.com/ws3",
     "version": "0.5.1-SNAPSHOT",
     "status": "PENDING_INSTALL",
