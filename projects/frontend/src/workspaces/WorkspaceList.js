@@ -21,13 +21,13 @@ const columns = {
         valueExtractor: 'access',
         label: 'Access'
     },
+    description: {
+        valueExtractor: 'id',
+        label: 'Id'
+    },
     name: {
         valueExtractor: 'name',
         label: 'Name'
-    },
-    description: {
-        valueExtractor: 'description',
-        label: 'Description'
     },
     version: {
         valueExtractor: 'version',
@@ -89,20 +89,20 @@ const WorkspaceList = ({history}) => {
                         </TableCell>
                         <TableCell>
                             <TableSortLabel
+                                active={orderBy === 'id'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('id')}
+                            >
+                                Description
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
                                 active={orderBy === 'name'}
                                 direction={orderAscending ? 'asc' : 'desc'}
                                 onClick={() => toggleSort('name')}
                             >
                                 Name
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                            <TableSortLabel
-                                active={orderBy === 'description'}
-                                direction={orderAscending ? 'asc' : 'desc'}
-                                onClick={() => toggleSort('description')}
-                            >
-                                Description
                             </TableSortLabel>
                         </TableCell>
                         <TableCell>
