@@ -15,13 +15,19 @@ const routes = () => (
             path="/workspaces/:workspace/roles"
             exact
             render={({match: {params: {workspace}}}) => (
-                <UsersProvider config={Config.get()} workspace={workspace}>
+                <UsersProvider url={Config.get().urls.users} workspace={workspace}>
                     <RolesContainer workspace={workspace} />
                 </UsersProvider>
             )}
         />
         <Route path="/login" render={() => {window.location.href = '/login';}} />
-        <Route path="/logout" render={logout} />
+        <Route
+            path="/logout"
+            render={() => logout({
+                logoutUrl: Config.get().urls.logout,
+                jupyterhubUrl: Config.get().urls.jupyterhub
+            })}
+        />
     </>
 );
 

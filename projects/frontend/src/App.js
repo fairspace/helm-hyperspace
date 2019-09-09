@@ -23,8 +23,8 @@ const App = () => {
     }
 
     return (
-        <VersionProvider config={Config.get()}>
-            <UserProvider config={Config.get()}>
+        <VersionProvider url={Config.get().urls.version}>
+            <UserProvider url={Config.get().urls.userInfo}>
                 <MuiThemeProvider theme={theme}>
                     <Router>
                         <Layout />
