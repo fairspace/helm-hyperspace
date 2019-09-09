@@ -93,7 +93,7 @@ const WorkspaceList = ({history}) => {
                                 direction={orderAscending ? 'asc' : 'desc'}
                                 onClick={() => toggleSort('id')}
                             >
-                                Description
+                                Id
                             </TableSortLabel>
                         </TableCell>
                         <TableCell>
@@ -127,7 +127,7 @@ const WorkspaceList = ({history}) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({access, name, description, url, version, status}) => {
+                    {pagedItems.map(({access, id, name, url, version, status}) => {
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -142,10 +142,10 @@ const WorkspaceList = ({history}) => {
                                     {!access && <Icon>lock</Icon>}
                                 </TableCell>
                                 <TableCell>
-                                    {name}
+                                    {id}
                                 </TableCell>
                                 <TableCell>
-                                    {description}
+                                    {name}
                                 </TableCell>
                                 <TableCell>
                                     {version}
