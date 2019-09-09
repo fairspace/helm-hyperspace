@@ -21,7 +21,16 @@ app.get('/config/version.json', (req, res) => res.sendFile(`${mockDataDir}/versi
 
 app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
 app.get('/api/v1/workspaces', (req, res) => res.sendFile(`${mockDataDir}/workspaces.json`));
-app.put('/api/v1/workspaces', (req, res) => res.status(200));
-app.get('/api/keycloak', (req, res) => res.sendFile(`${mockDataDir}/users.json`));
+app.put('/api/v1/workspaces', (req, res) => res.sendStatus(200));
+
+app.get('/api/keycloak/roles/:roleName', (req, res) => res.sendFile(`${mockDataDir}/keycloak/role.json`));
+app.get('/api/keycloak/roles/:roleName/users', (req, res) => {
+    if(req.params.roleName.startsWith("coordinator"))
+        res.sendFile(`${mockDataDir}/keycloak/coordinators.json`)
+    else
+        res.sendFile(`${mockDataDir}/keycloak/users.json`)
+});
+app.post('/api/keycloak/users/:userId/role-mappings/realm', (req, res) => res.sendStatus(204));
+app.delete('/api/keycloak/users/:userId/role-mappings/realm', (req, res) => res.sendStatus(204));
 
 app.listen(port);
