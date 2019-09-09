@@ -18,7 +18,7 @@ export default ({onCreate, onClose}) => {
     const [description, setDescription] = useState("");
     const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
     const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
-    const valid = !!(id && logAndFilesVolumeSize >= 1 && databaseVolumeSize >= 1 && releaseNamePattern.test(name));
+    const valid = !!(id && releaseNamePattern.test(id) && logAndFilesVolumeSize >= 1 && databaseVolumeSize >= 1);
 
     return (<Dialog
         open
