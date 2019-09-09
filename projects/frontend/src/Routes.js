@@ -15,7 +15,7 @@ const routes = () => (
             path="/workspaces/:workspace/roles"
             exact
             render={({match: {params: {workspace}}}) => (
-                <UsersProvider configs={Config.get()} workspace={workspace}>
+                <UsersProvider config={Config.get()} workspace={workspace}>
                     <RolesContainer workspace={workspace} />
                 </UsersProvider>
             )}

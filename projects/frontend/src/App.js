@@ -23,8 +23,8 @@ const App = () => {
     }
 
     return (
-        <VersionProvider configs={Config.get()}>
-            <UserProvider configs={Config.get()}>
+        <VersionProvider config={Config.get()}>
+            <UserProvider config={Config.get()}>
                 <MuiThemeProvider theme={theme}>
                     <Router>
                         <Layout />
