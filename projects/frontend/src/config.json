@@ -3,6 +3,7 @@
     "logout": "/logout",
     "userInfo": "/api/v1/account",
     "keycloak": {
+      "userSearch": "/api/keycloak/users",
       "usersForRole": "/api/keycloak/roles/{roleName}/users?max=1000",
       "roleMappings": "/api/keycloak/users/{userId}/role-mappings/realm",
       "role": "/api/keycloak/roles/{roleName}"

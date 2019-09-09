@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 import Config from "./Config/Config";
 import {handleHttpError, extractJsonData} from "../utils/httpUtils";
 
@@ -7,9 +6,16 @@ const requestOptions = {
     headers: {Accept: 'application/json'}
 };
 
+const SEARCH_DEFAULT_SIZE = 50;
+
 class KeycloakAPI {
-    getUsers() {
-        return axios.get(Config.get().urls.keycloak.users, requestOptions)
+    /**
+     * Searches keycloak with the qiven query string on the specified users
+     * @param query
+     * @return Promise
+     */
+    searchUsers({query, size = SEARCH_DEFAULT_SIZE}) {
+        return axios.get(Config.get().urls.keycloak.userSearch + '?search=' + encodeURIComponent(query) + '&max=' + size, requestOptions)
             .catch(handleHttpError('Error while loading users'))
             .then(extractJsonData);
     }

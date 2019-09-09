@@ -1,14 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
 import {
     Checkbox, FormControlLabel, FormGroup, Grid, Paper, Table, TableBody, TableCell, TableHead, TablePagination,
-    TableRow, TableSortLabel, Typography, withStyles,
+    TableRow, TableSortLabel, withStyles,
 } from '@material-ui/core';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import RolesBreadcrumbsContextProvider from "./RolesBreadcrumbsContextProvider";
+import Button from "@material-ui/core/Button";
+import AddUserDialog from "./AddUserDialog";
 
 const styles = theme => ({
     header: {
@@ -32,26 +34,27 @@ const columns = {
     }
 };
 
+const RoleCheckbox = ({classes, checked, onChange, label, value, disabled}) => (
+    <Grid item xs={4}>
+        <FormControlLabel
+            control={(
+                <Checkbox
+                    className={classes.roleCheckbox}
+                    checked={checked}
+                    onChange={onChange}
+                    value={value}
+                    disabled={disabled}
+                />
+            )}
+            label={label}
+        />
+    </Grid>
+);
+
 const RolesList = ({classes, workspace, users = [], roles = {}, update = () => {}, canManageCoordinators = false}) => {
+    const [dialogOpen, showDialog] = useState(false);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-
-    const RoleCheckbox = ({checked, onChange, label, value, disabled}) => (
-        <Grid item xs={4}>
-            <FormControlLabel
-                control={(
-                    <Checkbox
-                        className={classes.roleCheckbox}
-                        checked={checked}
-                        onChange={onChange}
-                        value={value}
-                        disabled={disabled}
-                    />
-                )}
-                label={label}
-            />
-        </Grid>
-    );
 
     const isRoleDisabled = role => {
         if(role === 'coordinator') return !canManageCoordinators;
@@ -91,6 +94,7 @@ const RolesList = ({classes, workspace, users = [], roles = {}, update = () => {
                                             <Grid container>
                                                 {Object.keys(roles).map(role => (
                                                     <RoleCheckbox
+                                                        classes={classes}
                                                         key={role}
                                                         userId={id}
                                                         label={role}
@@ -117,10 +121,27 @@ const RolesList = ({classes, workspace, users = [], roles = {}, update = () => {
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                 />
             </Paper>
+
+            <Button
+                style={{marginTop: 8}}
+                color="primary"
+                variant="contained"
+                aria-label="Add"
+                title="Add user to workspace"
+                onClick={() => showDialog(true)}
+            >
+                New
+            </Button>
+            <AddUserDialog
+                open={dialogOpen}
+                users={users}
+                onSubmit={(user) => update(user.id, 'user', true)}
+                onClose={() => showDialog(false)}
+            />
+
         </RolesBreadcrumbsContextProvider>
     );
 };
-
 
 RolesList.propTypes = {
     classes: PropTypes.object,

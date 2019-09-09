@@ -30,6 +30,8 @@ app.get('/api/keycloak/roles/:roleName/users', (req, res) => {
     else
         res.sendFile(`${mockDataDir}/keycloak/users.json`)
 });
+
+app.get('/api/keycloak/users', (req, res) => res.sendFile(`${mockDataDir}/keycloak/users.json`));
 app.post('/api/keycloak/users/:userId/role-mappings/realm', (req, res) => res.sendStatus(204));
 app.delete('/api/keycloak/users/:userId/role-mappings/realm', (req, res) => res.sendStatus(204));
 
