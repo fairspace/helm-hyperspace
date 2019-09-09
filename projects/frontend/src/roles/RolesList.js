@@ -7,6 +7,8 @@ import {
 } from '@material-ui/core';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
+import BreadCrumbs from "../common/components/BreadCrumbs";
+import RolesBreadcrumbsContextProvider from "./RolesBreadcrumbsContextProvider";
 
 const styles = theme => ({
     header: {
@@ -57,10 +59,8 @@ const RolesList = ({classes, workspace, users = [], roles = {}, update = () => {
     };
 
     return (
-        <>
-            <Typography variant="h5" className={classes.header}>
-                {workspace}
-            </Typography>
+        <RolesBreadcrumbsContextProvider workspace={workspace}>
+            <BreadCrumbs />
             <Paper className={classes.tableRoot}>
                 <Table style={{tableLayout: 'fixed'}}>
                     <TableHead>
@@ -117,7 +117,7 @@ const RolesList = ({classes, workspace, users = [], roles = {}, update = () => {
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                 />
             </Paper>
-        </>
+        </RolesBreadcrumbsContextProvider>
     );
 };
 
