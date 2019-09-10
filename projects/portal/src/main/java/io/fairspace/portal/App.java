@@ -1,23 +1,17 @@
 package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import hapi.chart.ChartOuterClass;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.portal.apps.WorkspacesApp;
 import io.fairspace.portal.services.WorkspaceService;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
-import org.microbean.helm.Tiller;
-import org.microbean.helm.chart.URLChartLoader;
 
 import java.io.IOException;
 import java.util.List;
 
 import static io.fairspace.portal.Authentication.getUserInfo;
-import static io.fairspace.portal.Config.WORKSPACE_CHART;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static io.fairspace.portal.errors.ErrorHelper.errorBody;
 import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
