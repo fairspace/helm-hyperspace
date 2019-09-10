@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
 import {
     Checkbox, FormControlLabel, FormGroup, Grid, Paper, Table, TableBody, TableCell, TableHead, TablePagination,
-    TableRow, TableSortLabel, withStyles,
+    TableRow, TableSortLabel, Button, withStyles
 } from '@material-ui/core';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import RolesBreadcrumbsContextProvider from "./RolesBreadcrumbsContextProvider";
-import Button from "@material-ui/core/Button";
 import AddUserDialog from "./AddUserDialog";
 
 const styles = theme => ({
@@ -51,13 +50,13 @@ const RoleCheckbox = ({classes, checked, onChange, label, value, disabled}) => (
     </Grid>
 );
 
-const RolesList = ({classes, workspace, users = [], roles = {}, update = () => {}, canManageCoordinators = false}) => {
+const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, update = () => {}, canManageCoordinators = false}) => {
     const [dialogOpen, showDialog] = useState(false);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     const isRoleDisabled = role => {
-        if(role === 'coordinator') return !canManageCoordinators;
+        if (role === 'coordinator') return !canManageCoordinators;
         return false;
     };
 
@@ -135,6 +134,7 @@ const RolesList = ({classes, workspace, users = [], roles = {}, update = () => {
             <AddUserDialog
                 open={dialogOpen}
                 users={users}
+                currentUser={currentUser}
                 onSubmit={(user) => update(user.id, 'user', true)}
                 onClose={() => showDialog(false)}
             />

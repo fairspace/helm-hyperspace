@@ -1,5 +1,5 @@
-import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import React from "react";
+import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 
 export default ({workspace, children}) => (
     <BreadcrumbsContext.Provider value={{

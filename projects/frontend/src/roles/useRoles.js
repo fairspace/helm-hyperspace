@@ -1,14 +1,13 @@
-import KeycloakAPI from "../common/services/KeycloakAPI";
-import useAsync from "../common/hooks/UseAsync";
 import {useCallback} from "react";
+import useAsync from "../common/hooks/UseAsync";
 import {getRoleName, hasError, isLoading, roles} from "./roleUtils";
 
 const combineRoleLists = calls => {
-    if(hasError(calls) || isLoading(calls)) return {};
+    if (hasError(calls) || isLoading(calls)) return {};
 
-    return Object.fromEntries(
-        roles.map(role => [role, calls[role].data])
-    );
+    // Create an object where each role is a key and the value is the role representation
+    // as given by the backend
+    return roles.reduce((obj, role) => ({...obj, [role]: calls[role].data}), {});
 };
 
 /**
@@ -26,7 +25,7 @@ const combineRoleLists = calls => {
  * @param workspace Workspace name
  * @returns {{roles: {}, error, loading}}
  */
-export const useRoles = workspace => {
+export const useRoles = (workspace, KeycloakAPI) => {
     const calls = {};
 
     roles.forEach(role => {
@@ -42,5 +41,5 @@ export const useRoles = workspace => {
         error: hasError(calls),
         loading: isLoading(calls),
         roles: combineRoleLists(calls)
-    }
-}
+    };
+};

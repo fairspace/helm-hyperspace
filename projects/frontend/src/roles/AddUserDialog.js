@@ -37,7 +37,7 @@ const AddUserDialog = ({classes, open, users, onSubmit, onClose, currentUser = {
     }, [open]);
 
     const isOptionDisabled = option => {
-        const isAlreadySelected = users.find(user => user.id === option.id) !== undefined;
+        const isAlreadySelected = users.find(u => u.id === option.id) !== undefined;
         const isCurrentUser = option.id === currentUser.id;
         return isAlreadySelected || isCurrentUser;
     };
@@ -76,7 +76,7 @@ const AddUserDialog = ({classes, open, users, onSubmit, onClose, currentUser = {
                 </Button>
             </DialogActions>
         </Dialog>
-    )
-}
+    );
+};
 
 export default withStyles(styles, {withTheme: true})(AddUserDialog);

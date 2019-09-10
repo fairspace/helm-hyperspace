@@ -1,29 +1,31 @@
-import KeycloakAPI from "../common/services/KeycloakAPI";
-import useAsync from "../common/hooks/UseAsync";
 import {useCallback} from "react";
+import useAsync from "../common/hooks/UseAsync";
 import {getRoleName, hasError, isLoading, roles} from "./roleUtils";
 
 const hasRole = (users, userId) => users.some(user => user.id === userId);
 const refresh = (calls, role) => {
-    if(role) {
-        return calls[role].refresh()
-    } else {
-        Object.values(calls).map(call => call.refresh());
+    if (role) {
+        return calls[role].refresh();
     }
+
+    return Promise.all(Object.values(calls).map(call => call.refresh()));
 };
 
 const combineUserLists = calls => {
-    if(hasError(calls) || isLoading(calls)) return [];
+    if (hasError(calls) || isLoading(calls)) return [];
 
     // Return a list of all users with 'user' role, and add
     // a list of roles that the user has
-    return calls.user.data.map(user => ({
-        ...user,
-        authorizations: Object.fromEntries(roles.map(role => {
-            if(role === 'user') return [role, true];
-            return [role, hasRole(calls[role].data, user.id)];
-        }))
-    }));
+    return calls.user.data.map(user => {
+        // Create an object where each role is a key and the value is a boolean representing whether
+        // the user has the specific role for this workspace
+        const authorizations = roles.reduce((obj, role) => ({...obj, [role]: role === 'user' || hasRole(calls[role].data, user.id)}), {});
+
+        return ({
+            ...user,
+            authorizations
+        });
+    });
 };
 
 /**
@@ -41,7 +43,7 @@ const combineUserLists = calls => {
  * @param workspace Workspace name
  * @returns {{users: {}, error, loading}}
  */
-export const useWorkspaceUsers = workspace => {
+export const useWorkspaceUsers = (workspace, KeycloakAPI) => {
     const calls = {};
 
     roles.forEach(role => {
@@ -58,5 +60,5 @@ export const useWorkspaceUsers = workspace => {
         loading: isLoading(calls),
         users: combineUserLists(calls),
         refresh: (role) => refresh(calls, role)
-    }
-}
+    };
+};

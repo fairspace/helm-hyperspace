@@ -12,6 +12,7 @@ class KeycloakAPI {
     /**
      * Searches keycloak with the qiven query string on the specified users
      * @param query
+     * @param size
      * @return Promise
      */
     searchUsers({query, size = SEARCH_DEFAULT_SIZE}) {
@@ -43,7 +44,6 @@ class KeycloakAPI {
         return method(Config.get().urls.keycloak.roleMappings.replace("{userId}", userId), postBody, requestOptions)
             .catch(handleHttpError('Error while updating roles for user'));
     }
-
 }
 
 export default new KeycloakAPI();

@@ -17,10 +17,12 @@ import {useRoles} from "./useRoles";
  * @param {*} workspace
  */
 const RolesContainer = ({workspace}) => {
-    const {currentUser: {authorizations}, currentUserLoading, currentUserError} = useContext(UserContext);
-    const isCurrentUserAdmin = isOrganisationAdmin(authorizations);
-    const {error: roleError, loading: roleLoading, roles} = useRoles(workspace);
-    const {error: userError, loading: userLoading, users, refresh} = useWorkspaceUsers(workspace);
+    const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
+    const {error: roleError, loading: roleLoading, roles} = useRoles(workspace, KeycloakAPI);
+    const {error: usersError, loading: usersLoading, users, refresh} = useWorkspaceUsers(workspace, KeycloakAPI);
+
+    const isCurrentUserAdmin = isOrganisationAdmin(currentUser.authorizations);
+    const isCurrentUserWorkspaceCoordinator = isWorkspaceCoordinator(currentUser.authorizations, workspace);
 
     const updateRole = (userId, role, hasRole) =>
         KeycloakAPI.setRoleForUser(userId, roles[role].id, roles[role].name, hasRole)
@@ -29,7 +31,7 @@ const RolesContainer = ({workspace}) => {
 
     // TODO: check that the workspace exists
 
-    if (!isWorkspaceCoordinator(authorizations, workspace) && !isCurrentUserAdmin) {
+    if (!isCurrentUserWorkspaceCoordinator && !isCurrentUserAdmin) {
         return <MessageDisplay message={`You do not have access to the roles in ${workspace}.`} />;
     }
 
@@ -37,11 +39,11 @@ const RolesContainer = ({workspace}) => {
         return <MessageDisplay message="No workspace is provided." />;
     }
 
-    if (roleLoading || userLoading || currentUserLoading) {
+    if (roleLoading || usersLoading || currentUserLoading) {
         return <LoadingInlay />;
     }
 
-    if (roleError || userError || currentUserError) {
+    if (roleError || usersError || currentUserError) {
         return <MessageDisplay message="Unable to retrieve the list of users or roles." />;
     }
 
@@ -49,6 +51,7 @@ const RolesContainer = ({workspace}) => {
         <RolesList
             workspace={workspace}
             users={users}
+            currentUser={currentUser}
             roles={roles}
             canManageCoordinators={isCurrentUserAdmin}
             update={updateRole}
