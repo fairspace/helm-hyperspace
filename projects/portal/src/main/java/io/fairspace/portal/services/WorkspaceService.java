@@ -11,14 +11,18 @@ import io.fairspace.portal.model.Workspace;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
+import org.microbean.helm.chart.URLChartLoader;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 import static hapi.release.StatusOuterClass.Status.Code;
+import static io.fairspace.portal.Config.WORKSPACE_CHART;
+import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static io.fairspace.portal.utils.JacksonUtils.merge;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.currentTimeMillis;
@@ -61,6 +65,19 @@ public class WorkspaceService {
         this.chart = chart;
         this.domain = domain;
         this.workspaceValues = workspaceValues;
+    }
+
+    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NonNull String domain, @NonNull Map<String, ?> workspaceValues) throws IOException {
+        this(releaseManager, loadChart(CONFIG.charts.get(WORKSPACE_CHART)), domain, workspaceValues);
+    }
+
+    private static ChartOuterClass.Chart.Builder loadChart(URL chartUrl) throws IOException {
+        try (var chartLoader = new URLChartLoader()) {
+            return chartLoader.load(CONFIG.charts.get(WORKSPACE_CHART));
+        } catch (Exception e) {
+            log.error("Error downloading the workspace chart.", e);
+            throw e;
+        }
     }
 
     public List<Workspace> listWorkspaces() {

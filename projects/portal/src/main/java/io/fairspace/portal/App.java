@@ -1,12 +1,11 @@
 package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hapi.chart.ChartOuterClass;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
-import io.fairspace.portal.model.Workspace;
+import io.fairspace.portal.apps.WorkspacesApp;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -26,42 +25,18 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;
 
 @Slf4j
 public class App {
-    private static final ObjectMapper mapper = new ObjectMapper();
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
     private static final String USER_ROLE_PREFIX = "user-";
 
     public static void main(String[] args) throws IOException {
-        initSpark(initWorkspaceService());
+        initSpark();
     }
 
-    private static WorkspaceService initWorkspaceService() throws IOException {
-        ReleaseManager releaseManager;
-        try {
-            var client = new DefaultKubernetesClient();
-            var tiller = new Tiller(client);
-            releaseManager = new ReleaseManager(tiller);
-        } catch(Exception e) {
-            log.error("Error while initializing release manager for tiller.", e);
-            throw e;
-        }
-
-        ChartOuterClass.Chart.Builder chart;
-        try (var chartLoader = new URLChartLoader()) {
-            chart = chartLoader.load(CONFIG.charts.get(WORKSPACE_CHART));
-        } catch (Exception e) {
-            log.error("Error downloading the workspace chart.", e);
-            throw e;
-        }
-
-        return new WorkspaceService(releaseManager, chart, CONFIG.domain, CONFIG.workspace);
-    }
-
-    private static void initSpark(@NonNull WorkspaceService workspaceService) {
+    private static void initSpark() throws IOException {
         port(8080);
 
         if (CONFIG.auth.enabled) {
@@ -78,27 +53,16 @@ public class App {
             });
         }
 
+        // Setup workspaces app
+        ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager();
+        WorkspacesApp workspacesApp = new WorkspacesApp(
+                new WorkspaceService(releaseManager, CONFIG.domain, CONFIG.workspace),
+                (request) -> getUserInfo(request, tokenValidator)
+        );
+
         path("/api/v1", () -> {
-            path("/workspaces", () -> {
-                get("", (request, response) -> {
-                    response.type(APPLICATION_JSON.asString());
-                    return workspaceService.listWorkspaces();
-                }, mapper::writeValueAsString);
-
-                put("", (request, response) -> {
-                    if (CONFIG.auth.enabled) {
-                        var token = getUserInfo(request, tokenValidator);
-                        if (!token.getAuthorities().contains(CONFIG.auth.organisationAdminRole)) {
-                            halt(SC_FORBIDDEN);
-                        }
-                    }
-                    workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));
-                    return "";
-                });
-            });
-
+            path("/workspaces", workspacesApp);
             get("/health", (request, response) -> "OK");
-
             post("/search/hyperspace/_search", (request, response) -> {
                 var token = getUserInfo(request, tokenValidator);
                 var indices = getAvailableWorkspaces(token);
