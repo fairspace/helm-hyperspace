@@ -5,13 +5,14 @@ import {
     Button, Checkbox, IconButton, Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow,
     TableSortLabel, withStyles
 } from '@material-ui/core';
+import {Delete} from "@material-ui/icons";
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import RolesBreadcrumbsContextProvider from "./RolesBreadcrumbsContextProvider";
 import AddUserDialog from "./AddUserDialog";
 import ConfirmationButton from "../common/components/ConfirmationButton";
-import {Delete} from "@material-ui/icons";
+import {ROLE_COORDINATOR, ROLE_USER} from "../constants";
 
 const styles = theme => ({
     header: {
@@ -41,11 +42,11 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     const isRoleDisabled = role => {
-        if (role === 'coordinator') return !canManageCoordinators;
+        if (role === ROLE_COORDINATOR) return !canManageCoordinators;
         return false;
     };
 
-    const rolesToShow = Object.keys(roles).filter(role => role !== 'user');
+    const rolesToShow = Object.keys(roles).filter(role => role !== ROLE_USER);
 
     // Remove all authorizations that the given user currently has
     const removeFromWorkspace = (id, authorizations) => Object.keys(authorizations)
@@ -68,8 +69,8 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
                                     User
                                 </TableSortLabel>
                             </TableCell>
-                            {rolesToShow.map(role => <TableCell align="center">{role}</TableCell>)}
-                            <TableCell></TableCell>
+                            {rolesToShow.map(role => <TableCell key={role} align="center">{role}</TableCell>)}
+                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -81,7 +82,7 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
                                     </TableCell>
                                     {rolesToShow
                                         .map(role => (
-                                            <TableCell align="center">
+                                            <TableCell key={role} align="center">
                                                 <Checkbox
                                                     key={role}
                                                     className={classes.roleCheckbox}
@@ -94,7 +95,8 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
                                     <TableCell>
                                         <ConfirmationButton
                                             onClick={() => removeFromWorkspace(id, authorizations)}
-                                            message="Are you sure you want to remove this user from the workspace?">
+                                            message="Are you sure you want to remove this user from the workspace?"q
+                                        >
                                             <IconButton>
                                                 <Delete />
                                             </IconButton>
@@ -130,7 +132,7 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
                 open={dialogOpen}
                 users={users}
                 currentUser={currentUser}
-                onSubmit={(user) => update(user.id, 'user', true)}
+                onSubmit={(user) => update(user.id, ROLE_USER, true)}
                 onClose={() => showDialog(false)}
             />
 

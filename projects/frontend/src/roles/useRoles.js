@@ -1,14 +1,6 @@
 import {useCallback} from "react";
 import useAsync from "../common/hooks/UseAsync";
-import {getRoleName, hasError, isLoading, roles} from "./roleUtils";
-
-const combineRoleLists = calls => {
-    if (hasError(calls) || isLoading(calls)) return {};
-
-    // Create an object where each role is a key and the value is the role representation
-    // as given by the backend
-    return roles.reduce((obj, role) => ({...obj, [role]: calls[role].data}), {});
-};
+import {getRoleName, hasError, isLoading} from "./roleUtils";
 
 /**
  * This hook will load information for all roles regarding the given workspace
@@ -25,8 +17,19 @@ const combineRoleLists = calls => {
  * @param workspace Workspace name
  * @returns {{roles: {}, error, loading}}
  */
-export const useRoles = (workspace, KeycloakAPI) => {
+export const useRoles = (workspace, roles, KeycloakAPI) => {
     const calls = {};
+
+    const combineRoleLists = roleCalls => {
+        if (hasError(roleCalls) || isLoading(roleCalls)) return {};
+
+        // Create an object where each role is a key and the value is the role representation
+        // as given by the backend
+        return roles.reduce((obj, role) => ({
+            ...obj,
+            [role]: roleCalls[role].data
+        }), {});
+    };
 
     roles.forEach(role => {
         const roleName = getRoleName(role, workspace);

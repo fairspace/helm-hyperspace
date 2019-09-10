@@ -1,6 +1,7 @@
 import {useCallback} from "react";
 import useAsync from "../common/hooks/UseAsync";
-import {getRoleName, hasError, isLoading, roles} from "./roleUtils";
+import {ROLE_USER} from "../constants";
+import {getRoleName, hasError, isLoading} from "./roleUtils";
 
 const hasRole = (users, userId) => users.some(user => user.id === userId);
 const refresh = (calls, role) => {
@@ -9,23 +10,6 @@ const refresh = (calls, role) => {
     }
 
     return Promise.all(Object.values(calls).map(call => call.refresh()));
-};
-
-const combineUserLists = calls => {
-    if (hasError(calls) || isLoading(calls)) return [];
-
-    // Return a list of all users with 'user' role, and add
-    // a list of roles that the user has
-    return calls.user.data.map(user => {
-        // Create an object where each role is a key and the value is a boolean representing whether
-        // the user has the specific role for this workspace
-        const authorizations = roles.reduce((obj, role) => ({...obj, [role]: role === 'user' || hasRole(calls[role].data, user.id)}), {});
-
-        return ({
-            ...user,
-            authorizations
-        });
-    });
 };
 
 /**
@@ -43,8 +27,28 @@ const combineUserLists = calls => {
  * @param workspace Workspace name
  * @returns {{users: {}, error, loading}}
  */
-export const useWorkspaceUsers = (workspace, KeycloakAPI) => {
+export const useWorkspaceUsers = (workspace, roles, KeycloakAPI) => {
     const calls = {};
+
+    const combineUserLists = userCalls => {
+        if (hasError(userCalls) || isLoading(userCalls)) return [];
+
+        // Return a list of all users with 'user' role, and add
+        // a list of roles that the user has
+        return userCalls.user.data.map(user => {
+            // Create an object where each role is a key and the value is a boolean representing whether
+            // the user has the specific role for this workspace
+            const authorizations = roles.reduce((obj, role) => ({
+                ...obj,
+                [role]: role === ROLE_USER || hasRole(userCalls[role].data, user.id)
+            }), {});
+
+            return ({
+                ...user,
+                authorizations
+            });
+        });
+    };
 
     roles.forEach(role => {
         const roleName = getRoleName(role, workspace);
