@@ -24,10 +24,10 @@ const RolesContainer = ({workspace}) => {
     const isCurrentUserAdmin = isOrganisationAdmin(currentUser.authorizations);
     const isCurrentUserWorkspaceCoordinator = isWorkspaceCoordinator(currentUser.authorizations, workspace);
 
-    const updateRole = (userId, role, hasRole) =>
-        KeycloakAPI.setRoleForUser(userId, roles[role].id, roles[role].name, hasRole)
-            .then(() => refresh(role))
-            .catch(e => ErrorDialog.showError(e, "An error occurred updating the role for this user"));
+    const updateRole = (userId, role, hasRole) => KeycloakAPI
+        .setRoleForUser(userId, roles[role].id, roles[role].name, hasRole)
+        .then(() => refresh(role))
+        .catch(e => ErrorDialog.showError(e, "An error occurred updating the role for this user"));
 
     // TODO: check that the workspace exists
 

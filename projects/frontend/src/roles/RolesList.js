@@ -2,14 +2,16 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
 import {
-    Checkbox, FormControlLabel, FormGroup, Grid, Paper, Table, TableBody, TableCell, TableHead, TablePagination,
-    TableRow, TableSortLabel, Button, withStyles
+    Button, Checkbox, IconButton, Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow,
+    TableSortLabel, withStyles
 } from '@material-ui/core';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import RolesBreadcrumbsContextProvider from "./RolesBreadcrumbsContextProvider";
 import AddUserDialog from "./AddUserDialog";
+import ConfirmationButton from "../common/components/ConfirmationButton";
+import {Delete} from "@material-ui/icons";
 
 const styles = theme => ({
     header: {
@@ -33,23 +35,6 @@ const columns = {
     }
 };
 
-const RoleCheckbox = ({classes, checked, onChange, label, value, disabled}) => (
-    <Grid item xs={4}>
-        <FormControlLabel
-            control={(
-                <Checkbox
-                    className={classes.roleCheckbox}
-                    checked={checked}
-                    onChange={onChange}
-                    value={value}
-                    disabled={disabled}
-                />
-            )}
-            label={label}
-        />
-    </Grid>
-);
-
 const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, update = () => {}, canManageCoordinators = false}) => {
     const [dialogOpen, showDialog] = useState(false);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
@@ -59,6 +44,13 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
         if (role === 'coordinator') return !canManageCoordinators;
         return false;
     };
+
+    const rolesToShow = Object.keys(roles).filter(role => role !== 'user');
+
+    // Remove all authorizations that the given user currently has
+    const removeFromWorkspace = (id, authorizations) => Object.keys(authorizations)
+        .filter(role => authorizations[role])
+        .map(role => update(id, role, false));
 
     return (
         <RolesBreadcrumbsContextProvider workspace={workspace}>
@@ -76,9 +68,8 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
                                     User
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>
-                                Roles
-                            </TableCell>
+                            {rolesToShow.map(role => <TableCell align="center">{role}</TableCell>)}
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -88,22 +79,26 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
                                     <TableCell component="th" scope="row">
                                         {`${firstName} ${lastName}`}
                                     </TableCell>
+                                    {rolesToShow
+                                        .map(role => (
+                                            <TableCell align="center">
+                                                <Checkbox
+                                                    key={role}
+                                                    className={classes.roleCheckbox}
+                                                    checked={authorizations[role]}
+                                                    onChange={(e) => update(id, role, e.target.checked)}
+                                                    disabled={isRoleDisabled(role)}
+                                                />
+                                            </TableCell>
+                                        ))}
                                     <TableCell>
-                                        <FormGroup>
-                                            <Grid container>
-                                                {Object.keys(roles).map(role => (
-                                                    <RoleCheckbox
-                                                        classes={classes}
-                                                        key={role}
-                                                        userId={id}
-                                                        label={role}
-                                                        checked={authorizations[role]}
-                                                        onChange={(e) => update(id, role, e.target.checked)}
-                                                        disabled={isRoleDisabled(role)}
-                                                    />
-                                                ))}
-                                            </Grid>
-                                        </FormGroup>
+                                        <ConfirmationButton
+                                            onClick={() => removeFromWorkspace(id, authorizations)}
+                                            message="Are you sure you want to remove this user from the workspace?">
+                                            <IconButton>
+                                                <Delete />
+                                            </IconButton>
+                                        </ConfirmationButton>
                                     </TableCell>
                                 </TableRow>
                             ))
