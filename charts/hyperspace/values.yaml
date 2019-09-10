@@ -179,6 +179,7 @@ pluto:
     # Where to find the backends for this proxy
     backends:
       portal:
+      keycloak:
       frontend:
 
     # Zuul timeouts when connecting to upstream services
