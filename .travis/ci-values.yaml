@@ -8,6 +8,8 @@ hyperspace:
   testuser:
     generate: true
     password: fairspace123
+  configurationScripts:
+    pullPolicy: Always
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
