@@ -21,7 +21,7 @@ const columns = {
         valueExtractor: 'access',
         label: 'Access'
     },
-    description: {
+    id: {
         valueExtractor: 'id',
         label: 'Id'
     },
