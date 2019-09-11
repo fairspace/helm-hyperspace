@@ -1,5 +1,6 @@
 import {useCallback} from "react";
-import useAsync from "../common/hooks/UseAsync";
+import {useAsync} from '@fairspace/shared-frontend';
+
 import {ROLE_USER} from "../constants";
 import {getRoleName, hasError, isLoading} from "./roleUtils";
 

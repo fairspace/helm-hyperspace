@@ -2,13 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import useIsMounted from 'react-is-mounted-hook';
+import {LoadingInlay, UserProvider, VersionProvider} from '@fairspace/shared-frontend';
 
 import Config from "./common/services/Config/Config";
 import theme from './App.theme';
 import Layout from "./common/components/Layout/Layout";
-import LoadingInlay from './common/components/LoadingInlay';
-import {UserProvider} from './common/contexts/UserContext';
-import {VersionProvider} from "./common/contexts/VersionContext";
 import ErrorDialog from "./common/components/ErrorDialog";
 
 const App = () => {
@@ -26,8 +24,8 @@ const App = () => {
     }
 
     return (
-        <VersionProvider>
-            <UserProvider>
+        <VersionProvider url={Config.get().urls.version}>
+            <UserProvider url={Config.get().urls.userInfo}>
                 <MuiThemeProvider theme={theme}>
                     <ErrorDialog>
                         <Router>

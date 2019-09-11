@@ -5,9 +5,9 @@ import {
     Button, Checkbox, IconButton, Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow,
     TableSortLabel, withStyles
 } from '@material-ui/core';
+import {useSorting, usePagination} from '@fairspace/shared-frontend';
+
 import {Delete} from "@material-ui/icons";
-import useSorting from '../common/hooks/UseSorting';
-import usePagination from '../common/hooks/UsePagination';
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import RolesBreadcrumbsContextProvider from "./RolesBreadcrumbsContextProvider";
 import AddUserDialog from "./AddUserDialog";

@@ -4,8 +4,7 @@ import {
     Paper, Popper, ClickAwayListener, MenuList
 } from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
-import UserContext from "../../../contexts/UserContext";
-import MessageDisplay from "../../MessageDisplay";
+import {MessageDisplay, UserContext} from '@fairspace/shared-frontend';
 
 const styles = {
     row: {

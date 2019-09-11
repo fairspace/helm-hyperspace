@@ -1,13 +1,12 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
-import UserContext from '../common/contexts/UserContext';
+import {LoadingInlay, MessageDisplay, UserContext} from '@fairspace/shared-frontend';
+
+import {isWorkspaceCoordinator, isOrganisationAdmin} from '../common/utils/userUtils';
 import {useWorkspaceUsers} from "./useWorkspaceUsers";
 import RolesList from "./RolesList";
-import {isOrganisationAdmin, isWorkspaceCoordinator} from "../common/utils/userUtils";
 import KeycloakAPI from "../common/services/KeycloakAPI";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
 import ErrorDialog from "../common/components/ErrorDialog";
 import Config from "../common/services/Config/Config";
 import {useRoles} from "./useRoles";

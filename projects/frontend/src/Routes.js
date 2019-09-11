@@ -1,8 +1,9 @@
 import React from 'react';
 import {Route} from "react-router-dom";
+import {logout} from '@fairspace/shared-frontend';
 
+import Config from "./common/services/Config/Config";
 import Home from "./home/Home";
-import logout from "./common/services/logout";
 import Workspaces from "./workspaces/Workspaces";
 import RolesContainer from './roles/RolesContainer';
 
@@ -18,7 +19,13 @@ const routes = () => (
             )}
         />
         <Route path="/login" render={() => {window.location.href = '/login';}} />
-        <Route path="/logout" render={logout} />
+        <Route
+            path="/logout"
+            render={() => logout({
+                logoutUrl: Config.get().urls.logout,
+                jupyterhubUrl: Config.get().urls.jupyterhub
+            })}
+        />
     </>
 );
 

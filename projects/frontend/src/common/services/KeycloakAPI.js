@@ -1,6 +1,7 @@
 import axios from 'axios';
+import {handleHttpError, extractJsonData} from "@fairspace/shared-frontend";
+
 import Config from "./Config/Config";
-import {handleHttpError, extractJsonData} from "../utils/httpUtils";
 
 const requestOptions = {
     headers: {Accept: 'application/json'}
