@@ -23,6 +23,8 @@ pluto:
     tag: 0.6.8-SNAPSHOT
 
 portal:
+  workspace:
+    tag: 0.6.8-SNAPSHOT
   image:
     pullPolicy: Always
   mail:
