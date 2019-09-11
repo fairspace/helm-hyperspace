@@ -18,7 +18,7 @@ import {useRoles} from "./useRoles";
  * @param {*} workspace
  */
 const RolesContainer = ({workspace}) => {
-    const {workspaceRoles} = Config.get();
+    const {roles: {workspaceRoles}} = Config.get();
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {error: roleError, loading: roleLoading, roles} = useRoles(workspace, workspaceRoles, KeycloakAPI);
     const {error: usersError, loading: usersLoading, users, refresh} = useWorkspaceUsers(workspace, workspaceRoles, KeycloakAPI);

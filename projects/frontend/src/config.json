@@ -15,7 +15,11 @@
     "/config/config.json"
   ],
   "roles": {
-    "organisationAdmin": ""
-  },
-  "workspaceRoles": [ "user", "coordinator", "datasteward", "sparqluser" ]
+    "organisationAdmin": "",
+    "workspaceRoles": [ "user", "coordinator", "datasteward", "sparqluser" ],
+    "prefixes": {
+      "user": "user",
+      "coordinator": "coordinator"
+    }
+  }
 }
