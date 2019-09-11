@@ -7,7 +7,7 @@ export const isOrganisationAdmin = (authorizations) => authorizations && authori
 export const getRoleName = (role, workspace) => role + '-' + workspace;
 
 export const isWorkspaceUser = (authorizations, workspace) => authorizations && workspace
-    && authorizations.includes(getRoleName(Config.get().workspaceRoles.user, workspace));
+    && authorizations.includes(getRoleName(Config.get().rolesPrefixes.user, workspace));
 
 export const isWorkspaceCoordinator = (authorizations, workspace) => authorizations && workspace
     && authorizations.includes(getRoleName(Config.get().rolesPrefixes.coordinator, workspace));
