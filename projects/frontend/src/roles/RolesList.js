@@ -29,16 +29,29 @@ const styles = theme => ({
     },
 });
 
-const columns = {
-    firstName: {
-        valueExtractor: 'firstName',
-        label: 'Name'
-    }
-};
-
 const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, update = () => {}, canManageCoordinators = false}) => {
+    const rolesToShow = Object.keys(roles).filter(role => role !== ROLE_USER);
+
+    // Define the columns to sort on. Users can sort on the name
+    // as well as on whether or not the user has a specific role
+    const columns = rolesToShow.reduce(
+        (curr, role) => ({
+            ...curr,
+            [role]: {
+                label: role,
+                valueExtractor: row => row.authorizations[role]
+            }
+        }),
+        {
+            name: {
+                valueExtractor: row => `${row.firstName} ${row.lastName}`,
+                label: 'Name'
+            }
+        }
+    );
+
     const [dialogOpen, showDialog] = useState(false);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     const isRoleDisabled = (userId, role) => {
@@ -46,8 +59,6 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
         if (role === ROLE_COORDINATOR) return !canManageCoordinators;
         return false;
     };
-
-    const rolesToShow = Object.keys(roles).filter(role => role !== ROLE_USER);
 
     // Remove all authorizations that the given user currently has
     const removeFromWorkspace = (id, authorizations) => Object.keys(authorizations)
@@ -63,14 +74,24 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
                         <TableRow>
                             <TableCell>
                                 <TableSortLabel
-                                    active={orderBy === 'firstName'}
+                                    active={orderBy === 'name'}
                                     direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('firstName')}
+                                    onClick={() => toggleSort('name')}
                                 >
                                     User
                                 </TableSortLabel>
                             </TableCell>
-                            {rolesToShow.map(role => <TableCell key={role} align="center">{role}</TableCell>)}
+                            {rolesToShow.map(role => (
+                                <TableCell key={role} align="center">
+                                    <TableSortLabel
+                                        active={orderBy === role}
+                                        direction={orderAscending ? 'asc' : 'desc'}
+                                        onClick={() => toggleSort(role)}
+                                    >
+                                        {role}
+                                    </TableSortLabel>
+                                </TableCell>
+                            ))}
                             <TableCell />
                         </TableRow>
                     </TableHead>
