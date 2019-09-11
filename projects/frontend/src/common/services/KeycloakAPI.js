@@ -34,10 +34,10 @@ class KeycloakAPI {
     }
 
     setRoleForUser(userId, roleId, roleName, hasRole = true) {
-        const postBody = {
+        const postBody = [{
             id: roleId,
             name: roleName
-        };
+        }];
 
         const method = hasRole ? axios.post : axios.delete;
 
