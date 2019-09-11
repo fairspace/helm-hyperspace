@@ -6,6 +6,8 @@ import {
 import {withStyles} from '@material-ui/core/styles';
 import {MessageDisplay, UserContext} from '@fairspace/shared-frontend';
 
+import Config from "../../../services/Config/Config";
+
 const styles = {
     row: {
         display: 'flex',
@@ -32,7 +34,10 @@ const UserMenu = ({classes}) => {
 
     const handleLogout = () => {
         handleClose();
-        onLogout();
+        onLogout({
+            logoutUrl: Config.get().urls.logout,
+            jupyterhubUrl: Config.get().urls.jupyterhub
+        });
     };
 
     if (currentUserLoading) {
