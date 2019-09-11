@@ -60,8 +60,8 @@ const WorkspaceList = ({history}) => {
         setAnchorEl(null);
     };
 
-    const openWorkspaceRoles = (workspace) => {
-        history.push(`workspaces/${workspace}/roles`);
+    const openWorkspaceRoles = (workspaceId) => {
+        history.push(`workspaces/${workspaceId}/roles`);
     };
 
     const canManageRoles = (workspace) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspace));
@@ -171,7 +171,7 @@ const WorkspaceList = ({history}) => {
                                             open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
                                             onClose={handleMenuClose}
                                         >
-                                            <MenuItem onClick={() => openWorkspaceRoles(name)}>
+                                            <MenuItem onClick={() => openWorkspaceRoles(id)}>
                                                 Manage Roles
                                             </MenuItem>
                                         </Menu>
