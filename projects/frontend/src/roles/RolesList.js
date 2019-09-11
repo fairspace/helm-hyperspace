@@ -41,7 +41,8 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
-    const isRoleDisabled = role => {
+    const isRoleDisabled = (userId, role) => {
+        if (userId === currentUser.id) return true;
         if (role === ROLE_COORDINATOR) return !canManageCoordinators;
         return false;
     };
@@ -88,14 +89,15 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
                                                     className={classes.roleCheckbox}
                                                     checked={authorizations[role]}
                                                     onChange={(e) => update(id, role, e.target.checked)}
-                                                    disabled={isRoleDisabled(role)}
+                                                    disabled={isRoleDisabled(id, role)}
                                                 />
                                             </TableCell>
                                         ))}
                                     <TableCell>
                                         <ConfirmationButton
                                             onClick={() => removeFromWorkspace(id, authorizations)}
-                                            message="Are you sure you want to remove this user from the workspace?"q
+                                            disabled={isRoleDisabled(id, ROLE_USER)}
+                                            message="Are you sure you want to remove this user from the workspace?"
                                         >
                                             <IconButton>
                                                 <Delete />
