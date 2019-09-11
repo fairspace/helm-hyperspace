@@ -1,10 +1,12 @@
 import React, {useState, useContext} from 'react';
 import {withRouter} from "react-router-dom";
 import {
-    Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel, IconButton, Menu, MenuItem
+    Paper, Table, TableBody, TableCell, TableHead,
+    TablePagination, TableRow, TableSortLabel, IconButton,
+    Menu, MenuItem, Tooltip, Typography,
 } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Icon from "@material-ui/core/Icon";
+import Lock from '@material-ui/icons/Lock';
 import {
     LoadingInlay, MessageDisplay, UserContext, useSorting,
     usePagination, useAsync,
@@ -45,10 +47,9 @@ const WorkspaceList = ({history}) => {
     useRepeat(refresh, 30000);
 
     const {currentUser: {authorizations}} = useContext(UserContext);
-    const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.name)}));
+    const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.id)}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-
 
     const handleMenuClick = event => {
         setAnchorEl(event.currentTarget);
@@ -137,7 +138,21 @@ const WorkspaceList = ({history}) => {
                                 }}
                             >
                                 <TableCell padding="dense">
-                                    {!access && <Icon>lock</Icon>}
+                                    {!access && (
+                                        <Tooltip
+                                            title={(
+                                                <Typography
+                                                    variant="caption"
+                                                    color="inherit"
+                                                    style={{whiteSpace: 'pre-line'}}
+                                                >
+                                                    You have no access to this workspace
+                                                </Typography>
+                                            )}
+                                        >
+                                            <Lock />
+                                        </Tooltip>
+                                    )}
                                 </TableCell>
                                 <TableCell>
                                     {id}
