@@ -64,7 +64,7 @@ const WorkspaceList = ({history}) => {
         history.push(`workspaces/${workspaceId}/roles`);
     };
 
-    const canManageRoles = (workspace) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspace));
+    const canManageRoles = (workspaceId) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspaceId));
 
 
     if (loading) {
@@ -135,7 +135,7 @@ const WorkspaceList = ({history}) => {
                                 hover
                                 key={name}
                                 onDoubleClick={() => {
-                                    if (access) window.location.href = url
+                                    if (access) window.location.href = url;
                                 }}
                             >
                                 <TableCell padding="dense">
@@ -161,7 +161,7 @@ const WorkspaceList = ({history}) => {
                                             aria-owns={anchorEl ? 'actions-menu' : undefined}
                                             aria-haspopup="true"
                                             onClick={handleMenuClick}
-                                            disabled={canManageRoles(name)}
+                                            disabled={canManageRoles(id)}
                                         >
                                             <MoreVertIcon />
                                         </IconButton>
