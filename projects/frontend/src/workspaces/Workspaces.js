@@ -1,13 +1,13 @@
 import React, {useContext, useState} from 'react';
+import {Button, Snackbar, IconButton} from "@material-ui/core";
+import CloseIcon from '@material-ui/icons/Close';
 import {UserContext} from '@fairspace/shared-frontend';
 
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import WorkspaceList from "./WorkspaceList";
-import Button from "@material-ui/core/Button";
 import NewWorkspaceDialog from "./NewWorkspaceDialog";
 import WorkspaceAPI from "./WorkspaceAPI";
-import AddingWorkspaceDialog from "./AddingWorkspaceDialog";
 import {isOrganisationAdmin} from "../common/utils/userUtils";
 
 export default () => {
@@ -43,16 +43,36 @@ export default () => {
                     disabled={showNewWorkspaceDialog || !isOrganisationAdmin(authorizations)}
                     onClick={() => setShowNewWorkspaceDialog(true)}
                 >
-                    New
-            </Button>
-                {showNewWorkspaceDialog && <NewWorkspaceDialog
-                    onCreate={createWorkspace}
-                    onClose={() => setShowNewWorkspaceDialog(false)}
-                />}
-                {addingWorkspace && <AddingWorkspaceDialog
-                    onClose={() => setAddingWorkspace(false)}
-                />}
+                    Add New Workspace
+                </Button>
+                {showNewWorkspaceDialog && (
+                    <NewWorkspaceDialog
+                        onCreate={createWorkspace}
+                        onClose={() => setShowNewWorkspaceDialog(false)}
+                    />
+                )}
+                {addingWorkspace && (
+                    <Snackbar
+                        open
+                        onClose={() => setAddingWorkspace(false)}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        message={<span>The workspace is being created, this might take a while</span>}
+                        autoHideDuration={6000}
+                        action={(
+                            <IconButton
+                                aria-label="Close"
+                                color="inherit"
+                                onClick={() => setAddingWorkspace(false)}
+                            >
+                                <CloseIcon />
+                            </IconButton>
+                        )}
+                    />
+                )}
             </BreadcrumbsContext.Provider>
         </>
-    )
+    );
 };
