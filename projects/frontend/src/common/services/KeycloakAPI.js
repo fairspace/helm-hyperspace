@@ -39,10 +39,18 @@ class KeycloakAPI {
             name: roleName
         }];
 
-        const method = hasRole ? axios.post : axios.delete;
-
-        return method(Config.get().urls.keycloak.roleMappings.replace("{userId}", userId), postBody, requestOptions)
-            .catch(handleHttpError('Error while updating roles for user'));
+        if (hasRole) {
+            return axios.post(
+                Config.get().urls.keycloak.roleMappings.replace("{userId}", userId),
+                postBody,
+                requestOptions
+            ).catch(handleHttpError('Error while updating roles for user'));
+        } else {
+            return axios.delete(
+                Config.get().urls.keycloak.roleMappings.replace("{userId}", userId),
+                {...requestOptions, data: postBody}
+            ).catch(handleHttpError('Error while updating roles for user'));
+        }
     }
 }
 
