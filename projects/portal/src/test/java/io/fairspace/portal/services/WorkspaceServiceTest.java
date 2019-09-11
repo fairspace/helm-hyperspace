@@ -25,6 +25,8 @@ public class WorkspaceServiceTest {
     private ReleaseManager releaseManager;
     @Mock
     private ChartOuterClass.Chart.Builder chart;
+    @Mock
+    private CachedReleaseList releaseList;
 
     private static final String domain = "example.com";
 
@@ -36,9 +38,8 @@ public class WorkspaceServiceTest {
     @Before
     public void setUp() throws IOException {
         var workspaceValues = Map.of("saturn", Map.of("persistence",  Map.of("key", "value")));
-        workspaceService = new WorkspaceService(releaseManager, chart, domain, workspaceValues);
+        workspaceService = new WorkspaceService(releaseManager, releaseList, chart, domain, workspaceValues);
 
-        when(releaseManager.list(any())).thenReturn(List.<Tiller.ListReleasesResponse>of().iterator());
         when(releaseManager.install(any(), eq(chart))).thenReturn(future);
 
         doAnswer(invocation -> {
@@ -50,21 +51,13 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void cachingWorks() {
-        workspaceService.listWorkspaces();
-        workspaceService.listWorkspaces();
-
-        verify(releaseManager, times(1)).list(any());
-    }
-
-    @Test
-    public void cacheIsInvalidatedWhenDeploymentIsFinished() throws IOException, InterruptedException {
-        workspaceService.listWorkspaces();
+    public void cacheIsInvalidatedAfterInstallation() throws IOException, InterruptedException {
         workspaceService.installWorkspace(Workspace.builder().id("test").build());
         Thread.sleep(100);
-        workspaceService.listWorkspaces();
 
-        verify(releaseManager, times(2)).list(any());
+        // The cache is supposed to be invalidated immediately after installation starts,
+        // and again when the installation finishes
+        verify(releaseList, times(2)).invalidateCache();
     }
 
     @Test

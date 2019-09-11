@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.portal.apps.WorkspacesApp;
+import io.fairspace.portal.services.CachedReleaseList;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
@@ -49,8 +50,9 @@ public class App {
 
         // Setup workspaces app
         ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager();
+        CachedReleaseList releaseList = new CachedReleaseList(releaseManager);
         WorkspacesApp workspacesApp = new WorkspacesApp(
-                new WorkspaceService(releaseManager, CONFIG.domain, CONFIG.workspace),
+                new WorkspaceService(releaseManager, releaseList, CONFIG.domain, CONFIG.workspace),
                 (request) -> getUserInfo(request, tokenValidator)
         );
 

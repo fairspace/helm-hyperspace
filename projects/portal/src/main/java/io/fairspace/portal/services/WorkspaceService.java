@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 import static hapi.release.StatusOuterClass.Status.Code;
 import static io.fairspace.portal.Config.WORKSPACE_CHART;
@@ -55,6 +56,7 @@ public class WorkspaceService {
             Code.PENDING_ROLLBACK);
 
     private final ReleaseManager releaseManager;
+    private CachedReleaseList releaseList;
     private final ChartOuterClass.Chart.Builder chart;
     private final String domain;
     private final Map<String, ?> workspaceValues;
@@ -63,50 +65,35 @@ public class WorkspaceService {
     private long lastUpdateTime;
     private final Executor worker = newSingleThreadExecutor();
 
-    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NotNull ChartOuterClass.Chart.Builder chart, @NonNull String domain, @NonNull Map<String, ?> workspaceValues) {
+    public WorkspaceService(
+            @NonNull ReleaseManager releaseManager,
+            @NonNull CachedReleaseList releaseList,
+            @NonNull ChartOuterClass.Chart.Builder chart,
+            @NonNull String domain,
+            @NonNull Map<String, ?> workspaceValues) {
         this.releaseManager = releaseManager;
+        this.releaseList = releaseList;
         this.chart = chart;
         this.domain = domain;
         this.workspaceValues = workspaceValues;
     }
 
-    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NonNull String domain, @NonNull Map<String, ?> workspaceValues) throws IOException {
-        this(releaseManager, loadChart(CONFIG.charts.get(WORKSPACE_CHART)), domain, workspaceValues);
-    }
-
-    private static ChartOuterClass.Chart.Builder loadChart(URL chartUrl) throws IOException {
-        try (var chartLoader = new URLChartLoader()) {
-            return chartLoader.load(CONFIG.charts.get(WORKSPACE_CHART));
-        } catch (Exception e) {
-            log.error("Error downloading the workspace chart.", e);
-            throw e;
-        }
+    public WorkspaceService(
+            @NonNull ReleaseManager releaseManager,
+            @NonNull CachedReleaseList releaseList,
+            @NonNull String domain,
+            @NonNull Map<String, ?> workspaceValues) throws IOException {
+        this(releaseManager, releaseList, loadChart(CONFIG.charts.get(WORKSPACE_CHART)), domain, workspaceValues);
     }
 
     public List<Workspace> listWorkspaces() {
-        synchronized (lock) {
-            if (currentTimeMillis() - lastUpdateTime > EXPIRATION_INTERVAL_MS) {
-                workspaces = fetchWorkspaces();
-                lastUpdateTime = currentTimeMillis();
-            }
-            return workspaces;
-        }
-    }
-
-    private List<Workspace> fetchWorkspaces() {
-        var result = new ArrayList<Workspace>();
-        var request = ListReleasesRequest.newBuilder()
-                .addAllStatusCodes(RELEVANT_STATUSES)
-                .setLimit(MAX_RELEASES_TO_RETURN)
-                .build();
-        var responseIterator = releaseManager.list(request);
-        while (responseIterator.hasNext()) {
-            var response = responseIterator.next();
-            response.getReleasesList().forEach(release -> {
-                if (release.getChart().getMetadata().getName().equals(chart.getMetadata().getName())) {
+        return releaseList.get()
+                .stream()
+                .filter(release -> release.getChart().getMetadata().getName().equals(chart.getMetadata().getName()))
+                .map(release -> {
                     try {
                         var config = objectMapper.readTree(release.getConfig().getRaw());
-                        result.add(Workspace.builder()
+                        return Workspace.builder()
                                 .id(release.getName())
                                 .name(config.at(WORKSPACE_NAME_YAML_PATH).asText())
                                 .description(config.at(WORKSPACE_DESCRIPTION_YAML_PATH).asText())
@@ -115,14 +102,12 @@ public class WorkspaceService {
                                 .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
                                 .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
                                 .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
-                                .build());
+                                .build();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }
-            });
-        }
-        return result;
+                })
+                .collect(Collectors.toList());
     }
 
     public void installWorkspace(Workspace workspace) throws IOException {
@@ -149,7 +134,7 @@ public class WorkspaceService {
         future.addListener(() -> {
             try {
                 future.get();
-                invalidateCache();
+                releaseList.invalidateCache();
             } catch (ExecutionException e) {
                 log.error("Error installing workspace {}", workspace.getName(), e);
             } catch (InterruptedException e) {
@@ -157,13 +142,7 @@ public class WorkspaceService {
             }
         }, worker);
 
-        invalidateCache();
-    }
-
-    private void invalidateCache() {
-        synchronized (lock) {
-            lastUpdateTime = 0;
-        }
+        releaseList.invalidateCache();
     }
 
     private static int getSize(String value) {
@@ -172,4 +151,14 @@ public class WorkspaceService {
                 .map(str -> parseInt(str.replace(GIGABYTE_SUFFIX, "")))
                 .orElse(-1);
     }
+
+    private static ChartOuterClass.Chart.Builder loadChart(URL chartUrl) throws IOException {
+        try (var chartLoader = new URLChartLoader()) {
+            return chartLoader.load(CONFIG.charts.get(WORKSPACE_CHART));
+        } catch (Exception e) {
+            log.error("Error downloading the workspace chart.", e);
+            throw e;
+        }
+    }
+
 }
