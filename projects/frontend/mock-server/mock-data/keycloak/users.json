@@ -1,0 +1,32 @@
+[
+  {
+    "id": "6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+    "username": "test-workspace-ci",
+    "firstName": "John",
+    "lastName": "Snow"
+  },
+  {
+    "id": "13300b41-b4a0-463f-95aa-764d9efdc5cc",
+    "username": "user2",
+    "firstName": "Ygritte",
+    "lastName": "Lopez"
+  },
+  {
+    "id": "ab161dae-e402-4fd2-9d86-130387dc25ef",
+    "username": "user3",
+    "firstName": "Daenarys",
+    "lastName": "Targaryen"
+  },
+  {
+    "id": "f12ff9c5-89f1-4f75-8530-cbd0ae1396c8",
+    "username": "coordinator",
+    "firstName": "Gregor",
+    "lastName": "Clegane"
+  },
+  {
+    "id": "05364a93-cd21-4c48-8b01-948512d63a8b",
+    "username": "coordinator2",
+    "firstName": "Cersei",
+    "lastName": "Lannister"
+  }
+]

@@ -9,6 +9,7 @@ import Layout from "./common/components/Layout/Layout";
 import LoadingInlay from './common/components/LoadingInlay';
 import {UserProvider} from './common/contexts/UserContext';
 import {VersionProvider} from "./common/contexts/VersionContext";
+import ErrorDialog from "./common/components/ErrorDialog";
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -28,9 +29,11 @@ const App = () => {
         <VersionProvider>
             <UserProvider>
                 <MuiThemeProvider theme={theme}>
-                    <Router>
-                        <Layout />
-                    </Router>
+                    <ErrorDialog>
+                        <Router>
+                            <Layout />
+                        </Router>
+                    </ErrorDialog>
                 </MuiThemeProvider>
             </UserProvider>
         </VersionProvider>

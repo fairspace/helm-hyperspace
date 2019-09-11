@@ -16,6 +16,10 @@ keycloak:
   postgresql:
     postgresPassword: "9FGwLKpEu$4w/knG"
 
+pluto:
+  image:
+    tag: 0.6.8-SNAPSHOT
+
 portal:
   image:
     pullPolicy: Always

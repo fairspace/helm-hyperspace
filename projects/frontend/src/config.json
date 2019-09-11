@@ -2,7 +2,12 @@
   "urls": {
     "logout": "/logout",
     "userInfo": "/api/v1/account",
-    "users": "/api/keycloak",
+    "keycloak": {
+      "userSearch": "/api/keycloak/users",
+      "usersForRole": "/api/keycloak/roles/{roleName}/users?max=1000",
+      "roleMappings": "/api/keycloak/users/{userId}/role-mappings/realm",
+      "role": "/api/keycloak/roles/{roleName}"
+    },
     "version": "/config/version.json",
     "workspaces": "/api/v1/workspaces"
   },
@@ -10,14 +15,7 @@
     "/config/config.json"
   ],
   "roles": {
-    "user": "",
-    "organisationAdmin": "",
-    "workspaceCoordinator": ""
+    "organisationAdmin": ""
   },
-  "rolesPrefixes": {
-    "user": "user-",
-    "coordinator": "coordinator-",
-    "datasteward": "datasteward-",
-    "sparql": "sparql-"
-  }
+  "workspaceRoles": [ "user", "coordinator", "datasteward", "sparqluser" ]
 }
