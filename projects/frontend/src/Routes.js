@@ -1,6 +1,6 @@
 import React from 'react';
 import {Route} from "react-router-dom";
-import {UsersProvider, logout} from '@fairspace/shared-frontend';
+import {logout} from '@fairspace/shared-frontend';
 
 import Config from "./common/services/Config/Config";
 import Home from "./home/Home";
@@ -15,9 +15,7 @@ const routes = () => (
             path="/workspaces/:workspace/roles"
             exact
             render={({match: {params: {workspace}}}) => (
-                <UsersProvider url={Config.get().urls.users} workspace={workspace}>
-                    <RolesContainer workspace={workspace} />
-                </UsersProvider>
+                <RolesContainer workspace={workspace} />
             )}
         />
         <Route path="/login" render={() => {window.location.href = '/login';}} />

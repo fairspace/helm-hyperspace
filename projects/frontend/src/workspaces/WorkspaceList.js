@@ -19,13 +19,13 @@ const columns = {
         valueExtractor: 'access',
         label: 'Access'
     },
+    id: {
+        valueExtractor: 'id',
+        label: 'Id'
+    },
     name: {
         valueExtractor: 'name',
         label: 'Name'
-    },
-    description: {
-        valueExtractor: 'description',
-        label: 'Description'
     },
     version: {
         valueExtractor: 'version',
@@ -58,11 +58,11 @@ const WorkspaceList = ({history}) => {
         setAnchorEl(null);
     };
 
-    const openWorkspaceRoles = (workspace) => {
-        history.push(`workspaces/${workspace}/roles`);
+    const openWorkspaceRoles = (workspaceId) => {
+        history.push(`workspaces/${workspaceId}/roles`);
     };
 
-    const canManageRoles = (workspace) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspace));
+    const canManageRoles = (workspaceId) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspaceId));
 
 
     if (loading) {
@@ -87,20 +87,20 @@ const WorkspaceList = ({history}) => {
                         </TableCell>
                         <TableCell>
                             <TableSortLabel
+                                active={orderBy === 'id'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('id')}
+                            >
+                                Id
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
                                 active={orderBy === 'name'}
                                 direction={orderAscending ? 'asc' : 'desc'}
                                 onClick={() => toggleSort('name')}
                             >
                                 Name
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                            <TableSortLabel
-                                active={orderBy === 'description'}
-                                direction={orderAscending ? 'asc' : 'desc'}
-                                onClick={() => toggleSort('description')}
-                            >
-                                Description
                             </TableSortLabel>
                         </TableCell>
                         <TableCell>
@@ -125,7 +125,7 @@ const WorkspaceList = ({history}) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({access, name, description, url, version, status}) => {
+                    {pagedItems.map(({access, id, name, url, version, status}) => {
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -140,10 +140,10 @@ const WorkspaceList = ({history}) => {
                                     {!access && <Icon>lock</Icon>}
                                 </TableCell>
                                 <TableCell>
-                                    {name}
+                                    {id}
                                 </TableCell>
                                 <TableCell>
-                                    {description}
+                                    {name}
                                 </TableCell>
                                 <TableCell>
                                     {version}
@@ -159,7 +159,7 @@ const WorkspaceList = ({history}) => {
                                             aria-owns={anchorEl ? 'actions-menu' : undefined}
                                             aria-haspopup="true"
                                             onClick={handleMenuClick}
-                                            disabled={canManageRoles(name)}
+                                            disabled={canManageRoles(id)}
                                         >
                                             <MoreVertIcon />
                                         </IconButton>
@@ -169,7 +169,7 @@ const WorkspaceList = ({history}) => {
                                             open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
                                             onClose={handleMenuClose}
                                         >
-                                            <MenuItem onClick={() => openWorkspaceRoles(name)}>
+                                            <MenuItem onClick={() => openWorkspaceRoles(id)}>
                                                 Manage Roles
                                             </MenuItem>
                                         </Menu>

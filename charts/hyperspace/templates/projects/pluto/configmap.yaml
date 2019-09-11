@@ -38,6 +38,9 @@ data:
 
     zuul:
       retryable: false
+      # This host-header setting is needed to access keycloak correctly
+      # It can be removed as soon as pluto > 0.6.8 is being used, which makes this setting the default
+      add-host-header: false
       host:
         connect-timeout-millis: {{ .Values.pluto.connectTimeoutMillis }}
         socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}
@@ -49,7 +52,7 @@ data:
           strip-prefix: false
         keycloak:
           path: /api/keycloak/**
-          url: {{ .Values.pluto.backends.keycloak | default (printf "http://%s-headless.%s.svc.cluster.local:8080/auth/admin/realms/%s" (include "keycloak.prefix" .) .Release.Namespace .Values.hyperspace.keycloak.realm)}}
+          url: {{ .Values.pluto.backends.keycloak | default (printf "%s/auth/admin/realms/%s" (include "keycloak.baseUrl" .) .Values.hyperspace.keycloak.realm)}}
           strip-prefix: true
         frontend:
           path: /**

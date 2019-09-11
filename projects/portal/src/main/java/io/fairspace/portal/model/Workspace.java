@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Workspace {
+    private String id;
     private String name;
     private String description;
     private String version;

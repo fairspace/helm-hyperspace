@@ -30,14 +30,14 @@ hyperspace:
     configurationScripts:
         dockerRepository: eu.gcr.io
         image: fairspace-207108/keycloak-configuration
-        configurationScriptsTag: 0.1.4
+        configurationScriptsTag: 0.1.5
         pullPolicy: IfNotPresent
         resources:
             requests:
                 cpu: "50m"
                 memory: "512Mi"
             limits:
-                cpu: "500m"
+                cpu: "1"
                 memory: "2048Mi"
     organisationadmin:
         username:
@@ -179,6 +179,7 @@ pluto:
     # Where to find the backends for this proxy
     backends:
       portal:
+      keycloak:
       frontend:
 
     # Zuul timeouts when connecting to upstream services

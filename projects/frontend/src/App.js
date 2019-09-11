@@ -7,6 +7,7 @@ import {LoadingInlay, UserProvider, VersionProvider} from '@fairspace/shared-fro
 import Config from "./common/services/Config/Config";
 import theme from './App.theme';
 import Layout from "./common/components/Layout/Layout";
+import ErrorDialog from "./common/components/ErrorDialog";
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -26,9 +27,11 @@ const App = () => {
         <VersionProvider url={Config.get().urls.version}>
             <UserProvider url={Config.get().urls.userInfo}>
                 <MuiThemeProvider theme={theme}>
-                    <Router>
-                        <Layout />
-                    </Router>
+                    <ErrorDialog>
+                        <Router>
+                            <Layout />
+                        </Router>
+                    </ErrorDialog>
                 </MuiThemeProvider>
             </UserProvider>
         </VersionProvider>

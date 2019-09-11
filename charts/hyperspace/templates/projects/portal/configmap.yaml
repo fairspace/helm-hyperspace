@@ -15,7 +15,7 @@ data:
       enabled: true
       jwksUrl: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/certs
       jwtAlgorithm: RS256
-      organisationAdminRole: admin-organisation
+      organisationAdminRole: organisation-admin
     charts:
       workspace: http://storage.googleapis.com/fairspace-helm/workspace-{{ .Values.portal.workspace.tag }}.tgz
     workspace:

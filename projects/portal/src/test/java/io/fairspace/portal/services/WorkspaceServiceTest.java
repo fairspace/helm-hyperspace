@@ -60,7 +60,7 @@ public class WorkspaceServiceTest {
     @Test
     public void cacheIsInvalidatedWhenDeploymentIsFinished() throws IOException, InterruptedException {
         workspaceService.listWorkspaces();
-        workspaceService.installWorkspace(Workspace.builder().name("test").build());
+        workspaceService.installWorkspace(Workspace.builder().id("test").build());
         Thread.sleep(100);
         workspaceService.listWorkspaces();
 
@@ -70,7 +70,8 @@ public class WorkspaceServiceTest {
     @Test
     public void itSetsConfiguration() throws IOException {
         var ws = Workspace.builder()
-                .name("test")
+                .id("test")
+                .name("Test")
                 .description("description")
                 .logAndFilesVolumeSize(1)
                 .databaseVolumeSize(2)
@@ -79,7 +80,7 @@ public class WorkspaceServiceTest {
         workspaceService.installWorkspace(ws);
 
         verify(releaseManager).install(argThat(request ->
-                request.getName().equals(ws.getName())
+                request.getName().equals(ws.getId())
                 && request.getValues().getRaw().equals(
                         "---\n" +
                         "saturn:\n" +
@@ -94,6 +95,7 @@ public class WorkspaceServiceTest {
                         "  elasticsearch:\n" +
                         "    indexName: \"test\"\n" +
                         "workspace:\n" +
+                        "  name: \"Test\"\n" +
                         "  description: \"description\"\n" +
                         "  ingress:\n" +
                         "    domain: \"test.example.com\"\n")),

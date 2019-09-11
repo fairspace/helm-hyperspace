@@ -13,11 +13,12 @@ const defaultDatabaseVolumeSize = 50;
 const releaseNamePattern = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
 export default ({onCreate, onClose}) => {
+    const [id, setId] = useState("");
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
     const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
-    const valid = !!(logAndFilesVolumeSize >= 1 && databaseVolumeSize >= 1 && releaseNamePattern.test(name));
+    const valid = !!(id && releaseNamePattern.test(id) && name && logAndFilesVolumeSize >= 1 && databaseVolumeSize >= 1);
 
     return (<Dialog
         open
@@ -34,6 +35,17 @@ export default ({onCreate, onClose}) => {
             <TextField
                 autoFocus
                 margin="dense"
+                id="id"
+                label="Id"
+                value={id}
+                name="id"
+                onChange={(event) => setId(event.target.value)}
+                fullWidth
+                required
+                helperText="Should use lower case letters, numbers and hyphens, and start with a letter."
+            />
+            <TextField
+                margin="dense"
                 id="name"
                 label="Name"
                 value={name}
@@ -41,7 +53,6 @@ export default ({onCreate, onClose}) => {
                 onChange={(event) => setName(event.target.value)}
                 fullWidth
                 required
-                helperText="Release names should use lower case letters, numbers and hyphens, and start with a letter."
             />
             <TextField
                 margin="dense"
@@ -50,6 +61,7 @@ export default ({onCreate, onClose}) => {
                 value={description}
                 name="description"
                 onChange={(event) => setDescription(event.target.value)}
+                multiline
                 fullWidth
             />
             <TextField
@@ -85,7 +97,7 @@ export default ({onCreate, onClose}) => {
                 Cancel
             </Button>
             <Button
-                onClick={() => onCreate({name, description, logAndFilesVolumeSize, databaseVolumeSize})}
+                onClick={() => onCreate({id, name, description, logAndFilesVolumeSize, databaseVolumeSize})}
                 disabled={!valid}
                 color="primary"
                 variant="contained"

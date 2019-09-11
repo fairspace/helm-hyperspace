@@ -11,14 +11,21 @@ import io.fairspace.portal.model.Workspace;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
+import org.microbean.helm.chart.URLChartLoader;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.*;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 import static hapi.release.StatusOuterClass.Status.Code;
+import static io.fairspace.portal.Config.WORKSPACE_CHART;
+import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static io.fairspace.portal.utils.JacksonUtils.merge;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.currentTimeMillis;
@@ -32,6 +39,7 @@ public class WorkspaceService {
     private static final long EXPIRATION_INTERVAL_MS = 300_000;
     private static final long INSTALLATION_TIMEOUT_SEC = 900;
     private static final long MAX_RELEASES_TO_RETURN = 100L;
+    private static final String WORKSPACE_NAME_YAML_PATH = "/workspace/name";
     private static final String WORKSPACE_DESCRIPTION_YAML_PATH = "/workspace/description";
     private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "/workspace/ingress/domain";
     private static final String FILE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/files/size";
@@ -62,6 +70,19 @@ public class WorkspaceService {
         this.workspaceValues = workspaceValues;
     }
 
+    public WorkspaceService(@NonNull ReleaseManager releaseManager, @NonNull String domain, @NonNull Map<String, ?> workspaceValues) throws IOException {
+        this(releaseManager, loadChart(CONFIG.charts.get(WORKSPACE_CHART)), domain, workspaceValues);
+    }
+
+    private static ChartOuterClass.Chart.Builder loadChart(URL chartUrl) throws IOException {
+        try (var chartLoader = new URLChartLoader()) {
+            return chartLoader.load(CONFIG.charts.get(WORKSPACE_CHART));
+        } catch (Exception e) {
+            log.error("Error downloading the workspace chart.", e);
+            throw e;
+        }
+    }
+
     public List<Workspace> listWorkspaces() {
         synchronized (lock) {
             if (currentTimeMillis() - lastUpdateTime > EXPIRATION_INTERVAL_MS) {
@@ -86,7 +107,8 @@ public class WorkspaceService {
                     try {
                         var config = objectMapper.readTree(release.getConfig().getRaw());
                         result.add(Workspace.builder()
-                                .name(release.getName())
+                                .id(release.getName())
+                                .name(config.at(WORKSPACE_NAME_YAML_PATH).asText())
                                 .description(config.at(WORKSPACE_DESCRIPTION_YAML_PATH).asText())
                                 .url("https://" + config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
                                 .version(release.getChart().getMetadata().getVersion())
@@ -106,9 +128,10 @@ public class WorkspaceService {
     public void installWorkspace(Workspace workspace) throws IOException {
         var customValues = objectMapper.createObjectNode();
         customValues.with("hyperspace").put("domain", domain);;
-        customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getName());
+        customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getId());
+        customValues.with("workspace").put("name", workspace.getName());
         customValues.with("workspace").put("description", workspace.getDescription());
-        customValues.with("workspace").with("ingress").put("domain", workspace.getName() + "." + domain);
+        customValues.with("workspace").with("ingress").put("domain", workspace.getId() + "." + domain);
         customValues.with("saturn").with("persistence").with("files").put("size", workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX);
         customValues.with("saturn").with("persistence").with("database").put("size", workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX);
 
@@ -116,8 +139,8 @@ public class WorkspaceService {
         var yaml = objectMapper.writeValueAsString(values);
 
         var requestBuilder = InstallReleaseRequest.newBuilder()
-                .setName(workspace.getName())
-                .setNamespace(workspace.getName())
+                .setName(workspace.getId())
+                .setNamespace(workspace.getId())
                 .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build())
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
