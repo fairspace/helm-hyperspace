@@ -119,7 +119,6 @@ export default ({onCreate, onClose}) => {
                 <Button
                     type="submit"
                     form="formId"
-                    onClick={() => createWorkspace()}
                     disabled={!formValid}
                     color="primary"
                     variant="contained"
