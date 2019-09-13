@@ -23,6 +23,11 @@ class WorkspaceAPI {
     }
 
     getAppsForWorkspace(workspaceId) {
+        if (!workspaceId) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            return Promise.reject("No workspace id specified");
+        }
+
         return axios.get(appsUrl(workspaceId), defaultConfig)
             .catch(handleHttpError("Failure when retrieving workspace info for workspace " + workspaceId))
             .then(extractJsonData);

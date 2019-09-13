@@ -16,6 +16,7 @@ import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import useRepeat from "../common/hooks/UseRepeat";
 import {isOrganisationAdmin, isWorkspaceCoordinator, isWorkspaceUser} from '../common/utils/userUtils';
 import JupyterIcon from "../common/components/apps/JupyterIcon";
+import {APP_TYPE_JUPYTER} from "../constants";
 
 const columns = {
     access: {
@@ -175,7 +176,7 @@ const WorkspaceList = ({history}) => {
                                     {status}
                                 </TableCell>
                                 <TableCell>
-                                    {apps.find(app => app.type === 'jupyter') && <JupyterIcon style={{height: 36}} />}
+                                    {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
                                 </TableCell>
                                 <TableCell>
                                     <>

@@ -12,17 +12,13 @@ import AppsList from "./AppsList";
  * @param {*} workspace
  */
 const AppsContainer = ({workspaceId}) => {
+    if (!workspaceId) throw Error("WorkspaceId should be provided to AppsContainer");
+
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {error, loading, data: apps, refresh} = useAsync(useCallback(() => WorkspaceAPI.getAppsForWorkspace(workspaceId), [workspaceId]));
 
-    // TODO: check that the workspace exists
-
     if (!isOrganisationAdmin(currentUser.authorizations)) {
         return <MessageDisplay message={`You do not have access to the apps in ${workspaceId}.`} />;
-    }
-
-    if (!workspaceId || workspaceId.trim().length === 0) {
-        return <MessageDisplay message="No workspace is provided." />;
     }
 
     if (loading || currentUserLoading) {

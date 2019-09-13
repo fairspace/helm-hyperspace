@@ -17,6 +17,8 @@ import {useRoles} from "./useRoles";
  * @param {*} workspaceId
  */
 const RolesContainer = ({workspaceId}) => {
+    if (!workspaceId) throw Error("WorkspaceId should be provided to RolesContainer");
+
     const {roles: {workspaceRoles}} = Config.get();
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {error: roleError, loading: roleLoading, roles} = useRoles(workspaceId, workspaceRoles, KeycloakAPI);
@@ -34,10 +36,6 @@ const RolesContainer = ({workspaceId}) => {
 
     if (!isCurrentUserWorkspaceCoordinator && !isCurrentUserAdmin) {
         return <MessageDisplay message={`You do not have access to the roles in ${workspaceId}.`} />;
-    }
-
-    if (!workspaceId || workspaceId.trim().length === 0) {
-        return <MessageDisplay message="No workspace is provided." />;
     }
 
     if (roleLoading || usersLoading || currentUserLoading) {

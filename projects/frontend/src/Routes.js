@@ -15,16 +15,16 @@ const routes = () => (
         <Route
             path="/workspaces/:workspaceId/roles"
             exact
-            render={({match: {params: {workspaceId}}}) => (
-                <RolesContainer workspaceId={workspaceId} />
-            )}
+            render={({match: {params: {workspaceId}}}) => {
+                return <RolesContainer workspaceId={workspaceId} />;
+            }}
         />
         <Route
             path="/workspaces/:workspaceId/apps"
             exact
-            render={({match: {params: {workspaceId}}}) => (
-                <AppsContainer workspaceId={workspaceId} />
-            )}
+            render={({match: {params: {workspaceId}}}) => {
+                return <AppsContainer workspaceId={workspaceId} />;
+            }}
         />
 
         <Route path="/login" render={() => {window.location.href = '/login';}} />

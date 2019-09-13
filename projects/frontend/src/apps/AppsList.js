@@ -9,6 +9,7 @@ import BreadCrumbs from "../common/components/BreadCrumbs";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 import AppsBreadcrumbsContextProvider from "./AppsBreadcrumbsContextProvider";
 import ErrorDialog from "../common/components/ErrorDialog";
+import {APP_TYPE_JUPYTER} from "../constants";
 
 const columns = {
     id: {
@@ -28,8 +29,6 @@ const columns = {
         label: 'Status'
     }
 };
-
-const APP_TYPE_JUPYTER = "jupyter";
 
 const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(apps, columns, 'type');
