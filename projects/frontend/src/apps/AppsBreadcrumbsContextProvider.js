@@ -14,8 +14,8 @@ export default ({workspaceId, children}) => (
                 href: '/workspaces/' + workspaceId
             },
             {
-                label: 'roles',
-                href: '/workspaces/' + workspaceId + '/roles'
+                label: 'apps',
+                href: '/workspaces/' + workspaceId + '/apps'
             },
         ]
     }}
