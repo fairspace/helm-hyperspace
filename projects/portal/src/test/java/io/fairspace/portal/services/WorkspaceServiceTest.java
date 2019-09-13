@@ -5,18 +5,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
+import hapi.chart.ConfigOuterClass;
+import hapi.chart.MetadataOuterClass;
+import hapi.release.ReleaseOuterClass;
 import hapi.services.tiller.Tiller;
+import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
+import io.fairspace.portal.model.WorkspaceApp;
+import io.fairspace.portal.services.releases.AppReleaseRequestBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.microbean.helm.ReleaseManager;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
 import static org.junit.Assert.assertEquals;
@@ -25,6 +32,9 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkspaceServiceTest {
+    public static final String APP_TYPE = "appType";
+    private static final String domain = "example.com";
+
     @Mock
     private ReleaseManager releaseManager;
     @Mock
@@ -32,12 +42,21 @@ public class WorkspaceServiceTest {
     @Mock
     private ChartRepo chartRepo;
 
-    ChartOuterClass.Chart.Builder chart;
+    @Mock
+    private AppReleaseRequestBuilder appReleaseRequestBuilder;
 
-    private static final String domain = "example.com";
+    ChartOuterClass.Chart.Builder workspaceChart = ChartOuterClass.Chart.newBuilder();
+    ChartOuterClass.Chart.Builder appChart = ChartOuterClass.Chart.newBuilder();
 
     @Mock
-    private ListenableFuture<Tiller.InstallReleaseResponse> future;
+    private ListenableFuture<Tiller.InstallReleaseResponse> installFuture;
+
+    @Mock
+    private ListenableFuture<Tiller.UpdateReleaseResponse> updateFuture;
+
+    @Mock
+    private ListenableFuture<Tiller.UninstallReleaseResponse> uninstallFuture;
+
 
     private WorkspaceService workspaceService;
 
@@ -46,20 +65,29 @@ public class WorkspaceServiceTest {
         var workspaceValues = Map.of("saturn", Map.of("persistence",  Map.of("key", "value")));
         Map<String, Map<String, ?>> defaultValues = Map.of("workspace", workspaceValues);
 
-        chart = ChartOuterClass.Chart.newBuilder();
-        when(chartRepo.get(any())).thenReturn(chart);
-        when(chartRepo.contains(any())).thenReturn(true);
+        when(chartRepo.get("workspace")).thenReturn(workspaceChart);
+        when(chartRepo.contains("workspace")).thenReturn(true);
+        when(chartRepo.get(APP_TYPE)).thenReturn(appChart);
+        when(chartRepo.contains(APP_TYPE)).thenReturn(true);
 
-        workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, domain, defaultValues);
+        Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(APP_TYPE, appReleaseRequestBuilder);
 
-        when(releaseManager.install(any(), eq(chart))).thenReturn(future);
+        workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, appRequestBuilders, domain, defaultValues);
 
-        doAnswer(invocation -> {
+        when(releaseManager.install(any(), any())).thenReturn(installFuture);
+        when(releaseManager.update(any(), any())).thenReturn(updateFuture);
+        when(releaseManager.uninstall(any())).thenReturn(uninstallFuture);
+
+        Answer runFuture = invocation -> {
             Runnable callback = invocation.getArgument(0);
             Executor executor = invocation.getArgument(1);
             executor.execute(callback);
             return null;
-        }).when(future).addListener(any(), any());
+        };
+
+        doAnswer(runFuture).when(installFuture).addListener(any(), any());
+        doAnswer(runFuture).when(updateFuture).addListener(any(), any());
+        doAnswer(runFuture).when(uninstallFuture).addListener(any(), any());
     }
 
     @Test
@@ -73,7 +101,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void itSetsConfiguration() throws IOException {
+    public void itSetsConfigurationOnWorkspaceInstallation() throws IOException {
         var ws = Workspace.builder()
                 .id("test")
                 .name("Test")
@@ -109,7 +137,129 @@ public class WorkspaceServiceTest {
 
                 return true;
             }),
-            eq(chart)
+            eq(workspaceChart)
         );
     }
+
+    @Test
+    public void installApp() throws NotFoundException, IOException {
+        var release = ReleaseOuterClass.Release.newBuilder().build();
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
+
+        workspaceService.installApp("workspaceId", app);
+
+        verify(releaseManager).install(installReleaseRequest, appChart);
+        verify(releaseManager, times(0)).update(any(), any());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void installAppFailsForUnknownAppType() throws NotFoundException, IOException {
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type("otherAppType")
+                .build();
+
+        workspaceService.installApp("workspaceId", app);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void installAppFailsForUnknownWorkspace() throws NotFoundException, IOException {
+        var release = ReleaseOuterClass.Release.newBuilder().build();
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.empty());
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        workspaceService.installApp("workspaceId", app);
+    }
+
+    @Test
+    public void installAppUpdatesWorkspace() throws NotFoundException, IOException {
+        var release = ReleaseOuterClass.Release.newBuilder().build();
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
+        var updateReleaseRequest = Tiller.UpdateReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
+        when(appReleaseRequestBuilder.shouldUpdateWorkspace()).thenReturn(true);
+        when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(updateReleaseRequest);
+
+        workspaceService.installApp("workspaceId", app);
+
+        verify(releaseManager).install(installReleaseRequest, appChart);
+        verify(releaseManager).update(updateReleaseRequest, workspaceChart);
+    }
+
+    @Test
+    public void uninstallApp() throws NotFoundException, IOException {
+        var release = ReleaseOuterClass.Release.newBuilder().build();
+
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease(APP_TYPE)));
+
+        var uninstallReleaseRequest = Tiller.UninstallReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
+
+        workspaceService.uninstallApp("app");
+
+        verify(releaseManager).uninstall(uninstallReleaseRequest.build());
+        verify(releaseManager, times(0)).update(any(), any());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void uninstallAppFailsForUnknownAppType() throws NotFoundException, IOException {
+        var release = ReleaseOuterClass.Release.newBuilder().build();
+
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease("unknownAppType")));
+
+        workspaceService.uninstallApp("app");
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void uninstallAppFailsForUnknownWorkspace() throws NotFoundException, IOException {
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.empty());
+        when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease(APP_TYPE)));
+
+        workspaceService.uninstallApp("app");
+    }
+
+    @Test
+    public void uninstallAppUpdatesWorkspace() throws NotFoundException, IOException {
+        var release = ReleaseOuterClass.Release.newBuilder().build();
+
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease(APP_TYPE)));
+
+        var uninstallReleaseRequest = Tiller.UninstallReleaseRequest.newBuilder();
+        var updateReleaseRequest = Tiller.UpdateReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
+        when(appReleaseRequestBuilder.shouldUpdateWorkspace()).thenReturn(true);
+        when(appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(eq(release), any())).thenReturn(updateReleaseRequest);
+
+        workspaceService.uninstallApp("app");
+
+        verify(releaseManager).uninstall(uninstallReleaseRequest.build());
+        verify(releaseManager).update(eq(updateReleaseRequest), any());
+    }
+
+    private ReleaseOuterClass.Release getAppRelease(String appType) {
+        var config = ConfigOuterClass.Config.newBuilder().setRaw("{\"workspace\": {\"id\": \"workspaceId\"}}").build();
+        MetadataOuterClass.Metadata chartMetadata = MetadataOuterClass.Metadata.newBuilder().setName(appType).build();
+        ChartOuterClass.Chart chart = ChartOuterClass.Chart.newBuilder().setMetadata(chartMetadata).build();
+        return ReleaseOuterClass.Release.newBuilder().setConfig(config).setChart(chart).build();
+    }
+
 }

@@ -71,7 +71,7 @@ public class WorkspacesApp implements RouteGroup {
         delete("/:workspaceId/apps/:appId", (request, response) -> {
             requireOrganisationAdmin(request);
 
-            workspaceService.deleteApp(request.params(":appId"));
+            workspaceService.uninstallApp(request.params(":appId"));
             return "";
         });
     }

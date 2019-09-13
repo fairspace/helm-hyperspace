@@ -8,16 +8,21 @@ import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.services.CachedReleaseList;
 import io.fairspace.portal.services.ChartRepo;
 import io.fairspace.portal.services.WorkspaceService;
+import io.fairspace.portal.services.releases.AppReleaseRequestBuilder;
+import io.fairspace.portal.services.releases.JupyterReleaseRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
+import org.microbean.helm.chart.URLChartLoader;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import static io.fairspace.portal.Authentication.getUserInfo;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static io.fairspace.portal.errors.ErrorHelper.errorBody;
 import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
+import static io.fairspace.portal.utils.HelmUtils.JUPYTER_CHART;
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
@@ -52,10 +57,17 @@ public class App {
 
         // Setup workspaces app
         ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager();
-        ChartRepo repo = new ChartRepo(CONFIG.charts);
         CachedReleaseList releaseList = new CachedReleaseList(releaseManager);
+
+        // Setup chart repo
+        ChartRepo repo = new ChartRepo(new URLChartLoader());
+        repo.init(CONFIG.charts);
+
+        // Define the available apps to install
+        Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(JUPYTER_CHART, new JupyterReleaseRequestBuilder(CONFIG.defaultConfig.get(JUPYTER_CHART)));
+
         WorkspacesApp workspacesApp = new WorkspacesApp(
-                new WorkspaceService(releaseManager, releaseList, repo, CONFIG.domain, CONFIG.defaultConfig),
+                new WorkspaceService(releaseManager, releaseList, repo, appRequestBuilders, CONFIG.domain, CONFIG.defaultConfig),
                 (request) -> getUserInfo(request, tokenValidator)
         );
 

@@ -13,8 +13,13 @@ import java.util.Map;
 @Slf4j
 public class ChartRepo {
     private final Map<String, ChartOuterClass.Chart.Builder> repo = new HashMap<>();
+    private URLChartLoader chartLoader;
 
-    public ChartRepo(@NonNull Map<String, URL> charts) throws IOException{
+    public ChartRepo(@NonNull URLChartLoader chartLoader) {
+        this.chartLoader = chartLoader;
+    }
+
+    public void init(@NonNull Map<String, URL> charts) throws IOException{
         for(String key: charts.keySet()) {
             add(key, charts.get(key));
         }
@@ -32,8 +37,8 @@ public class ChartRepo {
         repo.put(key, loadChart(url));
     }
 
-    private static ChartOuterClass.Chart.Builder loadChart(URL chartUrl) throws IOException {
-        try (var chartLoader = new URLChartLoader()) {
+    private ChartOuterClass.Chart.Builder loadChart(URL chartUrl) throws IOException {
+        try {
             log.info("Downloading chart from url {}", chartUrl);
             return chartLoader.load(chartUrl);
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package io.fairspace.portal.services;
 
+import hapi.release.ReleaseOuterClass;
 import hapi.services.tiller.Tiller;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +26,13 @@ public class CachedReleaseListTest {
     public void setUp() {
         releaseList = new CachedReleaseList(releaseManager);
 
-        when(releaseManager.list(any())).thenReturn(List.<Tiller.ListReleasesResponse>of().iterator());
+        Tiller.ListReleasesResponse listReleasesResponse = Tiller.ListReleasesResponse.newBuilder()
+                .addReleases(ReleaseOuterClass.Release.newBuilder().setName("workspace").build())
+                .addReleases(ReleaseOuterClass.Release.newBuilder().setName("jupyter").build())
+                .addReleases(ReleaseOuterClass.Release.newBuilder().setName("other").build())
+                .build();
+
+        when(releaseManager.list(any())).thenReturn(List.of(listReleasesResponse).iterator());
     }
 
     @Test
@@ -34,5 +41,11 @@ public class CachedReleaseListTest {
         releaseList.get();
 
         verify(releaseManager, times(1)).list(any());
+    }
+
+    @Test
+    public void getRelease() {
+        assertTrue(releaseList.getRelease("jupyter").isPresent());
+        assertFalse(releaseList.getRelease("something-else").isPresent());
     }
 }

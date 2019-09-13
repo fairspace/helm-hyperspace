@@ -44,32 +44,35 @@ public class WorkspaceService {
     private final ReleaseManager releaseManager;
     private CachedReleaseList releaseList;
     private ChartRepo repo;
-    private List<String> supportedApps;
     private final Executor worker = newSingleThreadExecutor();
     private final WorkspaceReleaseRequestBuilder workspaceReleaseRequestBuilder;
-    private final Map<String, AppReleaseRequestBuilder> releaseRequestBuilders = new HashMap<>();
+    private final Map<String, AppReleaseRequestBuilder> releaseRequestBuilders;
 
     public WorkspaceService(
             @NonNull ReleaseManager releaseManager,
             @NonNull CachedReleaseList releaseList,
             @NonNull ChartRepo repo,
+            @NonNull Map<String, AppReleaseRequestBuilder> releaseRequestBuilders,
             @NonNull String domain,
             @NonNull Map<String, Map<String, ?>> defaultConfig
             ) {
         this.releaseManager = releaseManager;
         this.releaseList = releaseList;
+        this.releaseRequestBuilders = releaseRequestBuilders;
         this.repo = repo;
 
-        // Setup release request builders
+        // Add a release builder for workspaces
         workspaceReleaseRequestBuilder = new WorkspaceReleaseRequestBuilder(domain, defaultConfig.get(WORKSPACE_CHART));
-        releaseRequestBuilders.put(JUPYTER_CHART, new JupyterReleaseRequestBuilder(defaultConfig.get(JUPYTER_CHART)));
-
-        // Store list of supported Apps
-        this.supportedApps = releaseRequestBuilders.keySet().stream().filter(key -> !key.equals(WORKSPACE_CHART)).collect(Collectors.toList());
 
         if(!repo.contains(WORKSPACE_CHART)) {
             throw new IllegalStateException("No workspace chart is available in repo");
         }
+
+        releaseRequestBuilders.keySet().forEach(key -> {
+            if(!repo.contains(key)) {
+                throw new IllegalStateException("No chart is available for the given app type: " + key);
+            }
+        });
     }
 
     public List<Workspace> listWorkspaces() {
@@ -106,7 +109,7 @@ public class WorkspaceService {
     public List<WorkspaceApp> listInstalledApps() {
         return releaseList.get()
                 .stream()
-                .filter(release -> supportedApps.contains(release.getChart().getMetadata().getName()))
+                .filter(release -> releaseRequestBuilders.keySet().contains(release.getChart().getMetadata().getName()))
                 .map(this::convertReleaseToWorkspaceApp)
                 .collect(Collectors.toList());
     }
@@ -159,7 +162,7 @@ public class WorkspaceService {
      * @throws NotFoundException
      * @throws IOException
      */
-    public void deleteApp(@NonNull String appId) throws NotFoundException, IOException {
+    public void uninstallApp(@NonNull String appId) throws NotFoundException, IOException {
         // Lookup releases
         ReleaseOuterClass.Release appRelease = releaseList.getRelease(appId).orElseThrow(() -> new NotFoundException("App with given id could not be found"));
         WorkspaceApp workspaceApp = convertReleaseToWorkspaceApp(appRelease);
