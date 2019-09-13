@@ -1,29 +1,21 @@
-import React, {useState} from "react";
+import React from "react";
 
 import {
     Dialog, DialogTitle, Typography,
     DialogActions, Button, DialogContent, TextField,
 } from "@material-ui/core";
+import {useFormField} from "../common/hooks/UseFormField";
 
 const DEFAULT_LOG_AND_FILES_SIZE = 100;
 const DEFAULT_DATABASE_VOLUME_SIZE = 50;
 const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
 export default ({onCreate, onClose}) => {
-    const [id, setId] = useState('');
-    const [idDirty, setIdDirty] = useState(false);
-
-    const [name, setName] = useState("");
-    const [nameDirty, setNameDirty] = useState(false);
-
-    const [description, setDescription] = useState("");
-
-    const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(DEFAULT_LOG_AND_FILES_SIZE);
-    const [logAndFilesVolumeSizeDirty, setLogAndFilesVolumeSizeDirty] = useState(false);
-
-    const [databaseVolumeSize, setDatabaseVolumeSize] = useState(DEFAULT_DATABASE_VOLUME_SIZE);
-    const [databaseVolumeSizeDirty, setDatabaseVolumeSizeDirty] = useState(false);
-
+    const [id, setId, idTouched, setIdTouched] = useFormField('');
+    const [name, setName, nameTouched, setNameTouched] = useFormField('');
+    const [description, setDescription] = useFormField('');
+    const [logAndFilesVolumeSize, setLogAndFilesVolumeSize, logAndFilesVolumeSizeTouched, setLogAndFilesVolumeSizeTouched] = useFormField(DEFAULT_LOG_AND_FILES_SIZE);
+    const [databaseVolumeSize, setDatabaseVolumeSize, databaseVolumeSizeTouched, setDatabaseVolumeSizeTouched] = useFormField(DEFAULT_DATABASE_VOLUME_SIZE);
 
     const idValid = !!id && ID_PATTERN.test(id);
     const nameValid = !!name;
@@ -57,10 +49,10 @@ export default ({onCreate, onClose}) => {
                         id="id"
                         label="Id"
                         value={id}
-                        error={idDirty && !idValid}
+                        error={idTouched && !idValid}
                         name="id"
                         onChange={(event) => setId(event.target.value)}
-                        onBlur={() => setIdDirty(true)}
+                        onBlur={setIdTouched}
                         fullWidth
                         required
                         helperText="Only lower case letters, numbers, hyphens and should start with a letter."
@@ -70,10 +62,10 @@ export default ({onCreate, onClose}) => {
                         id="name"
                         label="Name"
                         value={name}
-                        error={nameDirty && !nameValid}
+                        error={nameTouched && !nameValid}
                         name="name"
                         onChange={(event) => setName(event.target.value)}
-                        onBlur={() => setNameDirty(true)}
+                        onBlur={setNameTouched}
                         fullWidth
                         required
                     />
@@ -92,8 +84,8 @@ export default ({onCreate, onClose}) => {
                         id="logAndFilesVolumeSize"
                         label="Log and files volume size in gigabytes"
                         value={logAndFilesVolumeSize}
-                        error={logAndFilesVolumeSizeDirty && !logAndFilesVolumeSizeValid}
-                        onBlur={() => setLogAndFilesVolumeSizeDirty(true)}
+                        error={logAndFilesVolumeSizeTouched && !logAndFilesVolumeSizeValid}
+                        onBlur={setLogAndFilesVolumeSizeTouched}
                         name="logAndFilesVolumeSize"
                         type="number"
                         inputProps={{min: 1}}
@@ -106,12 +98,12 @@ export default ({onCreate, onClose}) => {
                         id="databaseVolumeSize"
                         label="Database volume size in gigabytes"
                         value={databaseVolumeSize}
-                        error={databaseVolumeSizeDirty && !databaseVolumeSizeValid}
+                        error={databaseVolumeSizeTouched && !databaseVolumeSizeValid}
                         name="databaseVolumeSize"
                         type="number"
                         inputProps={{min: 1}}
                         onChange={(event) => setDatabaseVolumeSize(event.target.value)}
-                        onBlur={() => setDatabaseVolumeSizeDirty(true)}
+                        onBlur={setDatabaseVolumeSizeTouched}
                         fullWidth
                         required
                     />
