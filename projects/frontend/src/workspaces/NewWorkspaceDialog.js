@@ -41,7 +41,11 @@ export default ({onCreate, onClose}) => {
                 <form
                     id="formId"
                     noValidate
-                    onSubmit={() => createWorkspace()}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        createWorkspace();
+                    }}
                 >
                     <TextField
                         autoFocus
@@ -111,6 +115,7 @@ export default ({onCreate, onClose}) => {
             </DialogContent>
             <DialogActions>
                 <Button
+                    type="button"
                     onClick={onClose}
                     color="secondary"
                 >
