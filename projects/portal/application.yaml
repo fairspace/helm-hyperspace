@@ -9,26 +9,44 @@ auth:
   # Organisation admin role
   organisationAdminRole: organisation-admin
 charts:
-  workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7-SNAPSHOT.tgz
-workspace:
-  hyperspace:
+  workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7.tgz
+  jupyter: http://storage.googleapis.com/fairspace-helm/jupyter-0.7.1.tgz
+defaultConfig:
+  workspace:
+    hyperspace:
+      keycloak:
+        username: keycloak
+        password: keycloak-ci-123
+        realm: ci
+        clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
+      elasticsearch:
+        transport:
+          host: localhost
+        rest:
+          host: localhost
+    saturn:
+      mail:
+        mail.from: info@fairspace.io
+        mail.user: user
+        mail.password: password
+        mail.transport.protocol: smtp
+        mail.smtp.auth: true
+        mail.smtp.host: host
+        mail.smtp.port: 587
+        mail.smtp.starttls.enable: true
+  jupyter:
     keycloak:
+      baseUrl: https://keycloak.ci.fairway.app/auth
       username: keycloak
       password: keycloak-ci-123
       realm: ci
-      clientSecret: 4c4e5e3b-a6ed-45fd-a394-46c4f5eea510
-    elasticsearch:
-      transport:
-        host: localhost
-      rest:
-        host: localhost
-  saturn:
-    mail:
-      mail.from: info@fairspace.io
-      mail.user: user
-      mail.password: password
-      mail.transport.protocol: smtp
-      mail.smtp.auth: true
-      mail.smtp.host: host
-      mail.smtp.port: 587
-      mail.smtp.starttls.enable: true
+
+    # Specific settings for JupyterHub subchart
+    jupyterhub:
+      rbac:
+        enabled: true
+      auth:
+        custom:
+          config:
+            openid_url: https://keycloak.ci.fairway.app/auth/realms/ci/protocol/openid-connect/
+

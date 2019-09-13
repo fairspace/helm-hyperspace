@@ -5,20 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Workspace {
+public class WorkspaceApp {
     private String id;
-    private String name;
-    private String description;
+    private String workspaceId;
+    private String type;
     private String version;
     private String url;
     private String status;
-    private int logAndFilesVolumeSize;
-    private int databaseVolumeSize;
-    private List<WorkspaceApp> apps;
 }

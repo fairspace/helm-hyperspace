@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.portal.apps.WorkspacesApp;
+import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.services.CachedReleaseList;
+import io.fairspace.portal.services.ChartRepo;
 import io.fairspace.portal.services.WorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
@@ -50,9 +52,10 @@ public class App {
 
         // Setup workspaces app
         ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager();
+        ChartRepo repo = new ChartRepo(CONFIG.charts);
         CachedReleaseList releaseList = new CachedReleaseList(releaseManager);
         WorkspacesApp workspacesApp = new WorkspacesApp(
-                new WorkspaceService(releaseManager, releaseList, CONFIG.domain, CONFIG.workspace),
+                new WorkspaceService(releaseManager, releaseList, repo, CONFIG.domain, CONFIG.defaultConfig),
                 (request) -> getUserInfo(request, tokenValidator)
         );
 
@@ -70,6 +73,7 @@ public class App {
         notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
         exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
         exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
+        exception(NotFoundException.class, exceptionHandler(SC_NOT_FOUND, "Not found"));
         exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
 
