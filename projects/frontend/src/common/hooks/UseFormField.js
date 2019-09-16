@@ -4,14 +4,14 @@ export const useFormField = (initialValue) => {
     const [value, setValue] = useState(initialValue);
     const [touched, setTouched] = useState(false);
 
-    const declareToched = () => {
+    const declareTouched = () => {
         setTouched(true);
     };
 
-    return [
+    return {
         value,
         setValue,
         touched,
-        declareToched,
-    ];
+        declareTouched,
+    };
 };

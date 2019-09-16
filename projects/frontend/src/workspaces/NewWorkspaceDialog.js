@@ -5,26 +5,35 @@ import {
     DialogActions, Button, DialogContent, TextField,
 } from "@material-ui/core";
 import {useFormField} from "../common/hooks/UseFormField";
+import ControlledField from "../common/components/ControlledField";
 
 const DEFAULT_LOG_AND_FILES_SIZE = 100;
 const DEFAULT_DATABASE_VOLUME_SIZE = 50;
 const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
 export default ({onCreate, onClose}) => {
-    const [id, setId, idTouched, setIdTouched] = useFormField('');
-    const [name, setName, nameTouched, setNameTouched] = useFormField('');
-    const [description, setDescription] = useFormField('');
-    const [logAndFilesVolumeSize, setLogAndFilesVolumeSize, logAndFilesVolumeSizeTouched, setLogAndFilesVolumeSizeTouched] = useFormField(DEFAULT_LOG_AND_FILES_SIZE);
-    const [databaseVolumeSize, setDatabaseVolumeSize, databaseVolumeSizeTouched, setDatabaseVolumeSizeTouched] = useFormField(DEFAULT_DATABASE_VOLUME_SIZE);
+    const idControl = useFormField('');
+    const nameControl = useFormField('');
+    const descriptionControl = useFormField('');
+    const logAndFilesVolumeSizeControl = useFormField(DEFAULT_LOG_AND_FILES_SIZE);
+    const databaseVolumeSizeControl = useFormField(DEFAULT_DATABASE_VOLUME_SIZE);
 
-    const idValid = !!id && ID_PATTERN.test(id);
-    const nameValid = !!name;
-    const logAndFilesVolumeSizeValid = logAndFilesVolumeSize >= 1;
-    const databaseVolumeSizeValid = databaseVolumeSize >= 1;
+    const idValid = !!idControl.value && ID_PATTERN.test(idControl.value);
+    const nameValid = !!nameControl.value;
+    const logAndFilesVolumeSizeValid = logAndFilesVolumeSizeControl.value >= 1;
+    const databaseVolumeSizeValid = databaseVolumeSizeControl.value >= 1;
 
     const formValid = idValid && nameValid && logAndFilesVolumeSizeValid && databaseVolumeSizeValid;
 
-    const createWorkspace = () => onCreate({id, name, description, logAndFilesVolumeSize, databaseVolumeSize});
+    const createWorkspace = () => onCreate(
+        {
+            id: idControl.value,
+            name: nameControl.value,
+            description: descriptionControl.value,
+            logAndFilesVolumeSize: logAndFilesVolumeSizeControl.value,
+            databaseVolumeSize: databaseVolumeSizeValid.value
+        }
+    );
 
     return (
         <Dialog
@@ -47,67 +56,64 @@ export default ({onCreate, onClose}) => {
                         createWorkspace();
                     }}
                 >
-                    <TextField
+                    <ControlledField
+                        component={TextField}
+                        control={idControl}
+                        valid={idValid}
                         autoFocus
                         margin="dense"
                         id="id"
                         label="Id"
-                        value={id}
-                        error={idTouched && !idValid}
                         name="id"
-                        onChange={(event) => setId(event.target.value)}
-                        onBlur={setIdTouched}
                         fullWidth
                         required
                         helperText="Only lower case letters, numbers, hyphens and should start with a letter."
                     />
-                    <TextField
+                    <ControlledField
+                        component={TextField}
+                        control={nameControl}
+                        valid={nameValid}
                         margin="dense"
                         id="name"
                         label="Name"
-                        value={name}
-                        error={nameTouched && !nameValid}
                         name="name"
-                        onChange={(event) => setName(event.target.value)}
-                        onBlur={setNameTouched}
                         fullWidth
                         required
                     />
-                    <TextField
+                    <ControlledField
+                        component={TextField}
+                        control={descriptionControl}
+                        valid
                         margin="dense"
                         id="description"
                         label="Description"
-                        value={description}
                         name="description"
-                        onChange={(event) => setDescription(event.target.value)}
                         multiline
                         fullWidth
                     />
-                    <TextField
+                    <ControlledField
+                        component={TextField}
+                        control={logAndFilesVolumeSizeControl}
+                        valid={logAndFilesVolumeSizeValid}
                         margin="dense"
                         id="logAndFilesVolumeSize"
                         label="Log and files volume size in gigabytes"
-                        value={logAndFilesVolumeSize}
-                        error={logAndFilesVolumeSizeTouched && !logAndFilesVolumeSizeValid}
-                        onBlur={setLogAndFilesVolumeSizeTouched}
                         name="logAndFilesVolumeSize"
                         type="number"
                         inputProps={{min: 1}}
-                        onChange={(event) => setLogAndFilesVolumeSize(event.target.value)}
                         fullWidth
                         required
                     />
-                    <TextField
+                    <ControlledField
+                        component={TextField}
+                        control={databaseVolumeSizeControl}
+                        valid={databaseVolumeSizeValid}
                         margin="dense"
                         id="databaseVolumeSize"
                         label="Database volume size in gigabytes"
-                        value={databaseVolumeSize}
-                        error={databaseVolumeSizeTouched && !databaseVolumeSizeValid}
                         name="databaseVolumeSize"
                         type="number"
                         inputProps={{min: 1}}
-                        onChange={(event) => setDatabaseVolumeSize(event.target.value)}
-                        onBlur={setDatabaseVolumeSizeTouched}
                         fullWidth
                         required
                     />
