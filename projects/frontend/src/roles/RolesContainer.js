@@ -14,16 +14,18 @@ import {useRoles} from "./useRoles";
 /**
  * This container will gaurd the access to the users fetching and user's access to the roles of the given workspace
  *
- * @param {*} workspace
+ * @param {*} workspaceId
  */
-const RolesContainer = ({workspace}) => {
+const RolesContainer = ({workspaceId}) => {
+    if (!workspaceId) throw Error("WorkspaceId should be provided to RolesContainer");
+
     const {roles: {workspaceRoles}} = Config.get();
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
-    const {error: roleError, loading: roleLoading, roles} = useRoles(workspace, workspaceRoles, KeycloakAPI);
-    const {error: usersError, loading: usersLoading, users, refresh} = useWorkspaceUsers(workspace, workspaceRoles, KeycloakAPI);
+    const {error: roleError, loading: roleLoading, roles} = useRoles(workspaceId, workspaceRoles, KeycloakAPI);
+    const {error: usersError, loading: usersLoading, users, refresh} = useWorkspaceUsers(workspaceId, workspaceRoles, KeycloakAPI);
 
     const isCurrentUserAdmin = isOrganisationAdmin(currentUser.authorizations);
-    const isCurrentUserWorkspaceCoordinator = isWorkspaceCoordinator(currentUser.authorizations, workspace);
+    const isCurrentUserWorkspaceCoordinator = isWorkspaceCoordinator(currentUser.authorizations, workspaceId);
 
     const updateRole = (userId, role, hasRole) => KeycloakAPI
         .setRoleForUser(userId, roles[role].id, roles[role].name, hasRole)
@@ -33,11 +35,7 @@ const RolesContainer = ({workspace}) => {
     // TODO: check that the workspace exists
 
     if (!isCurrentUserWorkspaceCoordinator && !isCurrentUserAdmin) {
-        return <MessageDisplay message={`You do not have access to the roles in ${workspace}.`} />;
-    }
-
-    if (!workspace || workspace.trim().length === 0) {
-        return <MessageDisplay message="No workspace is provided." />;
+        return <MessageDisplay message={`You do not have access to the roles in ${workspaceId}.`} />;
     }
 
     if (roleLoading || usersLoading || currentUserLoading) {
@@ -50,7 +48,7 @@ const RolesContainer = ({workspace}) => {
 
     return (
         <RolesList
-            workspace={workspace}
+            workspaceId={workspaceId}
             users={users}
             currentUser={currentUser}
             roles={roles}
@@ -61,7 +59,7 @@ const RolesContainer = ({workspace}) => {
 };
 
 RolesContainer.propTypes = {
-    workspace: PropTypes.string.isRequired
+    workspaceId: PropTypes.string.isRequired
 };
 
 export default withRouter(RolesContainer);

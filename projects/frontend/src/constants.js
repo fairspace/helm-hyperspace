@@ -8,3 +8,6 @@ export const SIDE_PANEL_WIDTH = '45%';
 // Supported roles
 export const ROLE_USER = 'user';
 export const ROLE_COORDINATOR = 'coordinator';
+
+// Supported app types
+export const APP_TYPE_JUPYTER = "jupyter";

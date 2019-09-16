@@ -7,7 +7,7 @@ import BreadCrumbs from "../common/components/BreadCrumbs";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import WorkspaceList from "./WorkspaceList";
 import NewWorkspaceDialog from "./NewWorkspaceDialog";
-import WorkspaceAPI from "./WorkspaceAPI";
+import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import {isOrganisationAdmin} from "../common/utils/userUtils";
 
 export default () => {
