@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
-import {ErrorDialog, LoadingInlay, MessageDisplay, UserContext} from '@fairspace/shared-frontend';
+import {ErrorDialog, LoadingInlay, MessageDisplay, usePageTitleUpdater, UserContext} from '@fairspace/shared-frontend';
 
 import Config from "../common/services/Config";
 import {isWorkspaceCoordinator, isOrganisationAdmin} from '../common/utils/userUtils';
@@ -22,6 +22,8 @@ const RolesContainer = ({workspaceId}) => {
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {error: roleError, loading: roleLoading, roles} = useRoles(workspaceId, workspaceRoles, KeycloakAPI);
     const {error: usersError, loading: usersLoading, users, refresh} = useWorkspaceUsers(workspaceId, workspaceRoles, KeycloakAPI);
+
+    usePageTitleUpdater(`${workspaceId} roles`);
 
     const isCurrentUserAdmin = isOrganisationAdmin(currentUser.authorizations);
     const isCurrentUserWorkspaceCoordinator = isWorkspaceCoordinator(currentUser.authorizations, workspaceId);

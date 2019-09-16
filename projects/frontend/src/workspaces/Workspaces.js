@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 import Button from "@material-ui/core/Button";
-import {UserContext, BreadcrumbsContext, BreadCrumbs} from '@fairspace/shared-frontend';
+import {UserContext, BreadcrumbsContext, BreadCrumbs, usePageTitleUpdater} from '@fairspace/shared-frontend';
 
 import WorkspaceList from "./WorkspaceList";
 import NewWorkspaceDialog from "./NewWorkspaceDialog";
@@ -11,6 +11,8 @@ import {isOrganisationAdmin} from "../common/utils/userUtils";
 export default () => {
     const [showNewWorkspaceDialog, setShowNewWorkspaceDialog] = useState(false);
     const [addingWorkspace, setAddingWorkspace] = useState(false);
+
+    usePageTitleUpdater("Workspaces");
 
     const createWorkspace = (workspace) => {
         setShowNewWorkspaceDialog(false);
