@@ -6,14 +6,17 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static io.fairspace.portal.utils.HelmUtils.WORKSPACE_CHART;
 
 public class Config {
-    public static final String WORKSPACE_CHART = "workspace";
     public String domain = "ci.fairway.app";
     public final Auth auth = new Auth();
     public final Map<String, URL> charts = new HashMap<>();
-    public final Map<String, Object> workspace = new HashMap<>();
+    public final Map<String, Map<String, ?>> defaultConfig = new HashMap<>();
     public String elasticSearchUrlTemplate = "http://hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local:9200/%s/_search";
 
     public static class Auth {
