@@ -6,7 +6,7 @@ import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import WorkspaceList from "./WorkspaceList";
 import Button from "@material-ui/core/Button";
 import NewWorkspaceDialog from "./NewWorkspaceDialog";
-import WorkspaceAPI from "./WorkspaceAPI";
+import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import AddingWorkspaceDialog from "./AddingWorkspaceDialog";
 import {isOrganisationAdmin} from "../common/utils/userUtils";
 

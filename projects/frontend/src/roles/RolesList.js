@@ -29,7 +29,7 @@ const styles = theme => ({
     },
 });
 
-const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, update = () => {}, canManageCoordinators = false}) => {
+const RolesList = ({classes, workspaceId, currentUser, users = [], roles = {}, update = () => {}, canManageCoordinators = false}) => {
     const rolesToShow = Object.keys(roles).filter(role => role !== ROLE_USER);
 
     // Define the columns to sort on. Users can sort on the name
@@ -66,7 +66,7 @@ const RolesList = ({classes, workspace, currentUser, users = [], roles = {}, upd
         .map(role => update(id, role, false));
 
     return (
-        <RolesBreadcrumbsContextProvider workspace={workspace}>
+        <RolesBreadcrumbsContextProvider workspaceId={workspaceId}>
             <BreadCrumbs />
             <Paper className={classes.tableRoot}>
                 <Table style={{tableLayout: 'fixed'}}>
@@ -173,7 +173,7 @@ RolesList.propTypes = {
         roles: PropTypes.arrayOf(PropTypes.string)
     })).isRequired,
     roles: PropTypes.object,
-    workspace: PropTypes.string.isRequired,
+    workspaceId: PropTypes.string.isRequired,
     canManageCoordinators: PropTypes.bool,
     update: PropTypes.func
 };

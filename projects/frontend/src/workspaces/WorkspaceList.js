@@ -12,9 +12,11 @@ import {
     usePagination, useAsync,
 } from '@fairspace/shared-frontend';
 
-import WorkspaceAPI from "./WorkspaceAPI";
+import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import useRepeat from "../common/hooks/UseRepeat";
 import {isOrganisationAdmin, isWorkspaceCoordinator, isWorkspaceUser} from '../common/utils/userUtils';
+import JupyterIcon from "../common/components/apps/JupyterIcon";
+import {APP_TYPE_JUPYTER} from "../constants";
 
 const columns = {
     access: {
@@ -63,8 +65,12 @@ const WorkspaceList = ({history}) => {
         history.push(`workspaces/${workspaceId}/roles`);
     };
 
-    const canManageRoles = (workspaceId) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspaceId));
+    const manageApps = (workspaceId) => {
+        history.push(`workspaces/${workspaceId}/apps`);
+    };
 
+    const canManageRoles = (workspaceId) => isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspaceId);
+    const canManageApps = () => isOrganisationAdmin(authorizations);
 
     if (loading) {
         return <LoadingInlay />;
@@ -122,11 +128,14 @@ const WorkspaceList = ({history}) => {
                                 Status
                             </TableSortLabel>
                         </TableCell>
+                        <TableCell>
+                            Apps
+                        </TableCell>
                         <TableCell />
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({access, id, name, url, version, status}) => {
+                    {pagedItems.map(({access, id, name, url, version, status, apps = []}) => {
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -167,6 +176,9 @@ const WorkspaceList = ({history}) => {
                                     {status}
                                 </TableCell>
                                 <TableCell>
+                                    {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
+                                </TableCell>
+                                <TableCell>
                                     <>
                                         <IconButton
                                             id={actionsButtonId}
@@ -174,7 +186,6 @@ const WorkspaceList = ({history}) => {
                                             aria-owns={anchorEl ? 'actions-menu' : undefined}
                                             aria-haspopup="true"
                                             onClick={handleMenuClick}
-                                            disabled={canManageRoles(id)}
                                         >
                                             <MoreVertIcon />
                                         </IconButton>
@@ -184,8 +195,11 @@ const WorkspaceList = ({history}) => {
                                             open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
                                             onClose={handleMenuClose}
                                         >
-                                            <MenuItem onClick={() => openWorkspaceRoles(id)}>
-                                                Manage Roles
+                                            <MenuItem onClick={() => openWorkspaceRoles(id)} disabled={!canManageRoles(id)}>
+                                                Manage roles
+                                            </MenuItem>
+                                            <MenuItem onClick={() => manageApps(id)} disabled={!canManageApps(id)}>
+                                                Manage apps
                                             </MenuItem>
                                         </Menu>
                                     </>
