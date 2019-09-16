@@ -17,7 +17,9 @@ data:
       jwtAlgorithm: RS256
       organisationAdminRole: organisation-admin
     charts:
-      workspace: http://storage.googleapis.com/fairspace-helm/workspace-{{ .Values.portal.workspace.tag }}.tgz
+      {{- range $key, $chartInfo := .Values.portal.charts }}
+      {{ $key }}: {{ $chartInfo.repo }}{{ $chartInfo.file }}
+      {{- end }}
     defaultConfig:
       workspace:
         hyperspace:

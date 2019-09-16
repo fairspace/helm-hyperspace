@@ -220,8 +220,13 @@ portal:
         successThreshold: 1
         timeoutSeconds: 1
     terminationGracePeriodSeconds: 10
-    workspace:
-      tag: 0.6.7
+    charts:
+      workspace:
+        repo: http://storage.googleapis.com/fairspace-helm/
+        file: workspace-0.6.7.tgz
+      jupyter:
+        repo: http://storage.googleapis.com/fairspace-helm/
+        file: jupyter-0.7.1.tgz
     mail:
         mail.from: info@fairspace.io
         mail.user: user
