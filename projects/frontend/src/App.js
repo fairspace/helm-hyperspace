@@ -2,12 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import useIsMounted from 'react-is-mounted-hook';
-import {LoadingInlay, UserProvider, VersionProvider} from '@fairspace/shared-frontend';
+import {ErrorDialog, LoadingInlay, UserProvider, VersionProvider} from '@fairspace/shared-frontend';
 
-import Config from "./common/services/Config/Config";
 import theme from './App.theme';
 import Layout from "./common/components/Layout/Layout";
-import ErrorDialog from "./common/components/ErrorDialog";
+import Config from "./common/services/Config";
 
 const App = () => {
     const isMounted = useIsMounted();

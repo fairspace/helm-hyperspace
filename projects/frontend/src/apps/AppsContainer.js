@@ -1,7 +1,7 @@
 import React, {useCallback, useContext} from 'react';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
-import {LoadingInlay, MessageDisplay, useAsync, UserContext} from "@fairspace/shared-frontend";
+import {LoadingInlay, MessageDisplay, useAsync, usePageTitleUpdater, UserContext} from "@fairspace/shared-frontend";
 import {isOrganisationAdmin} from "../common/utils/userUtils";
 import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import AppsList from "./AppsList";
@@ -13,6 +13,8 @@ import AppsList from "./AppsList";
  */
 const AppsContainer = ({workspaceId}) => {
     if (!workspaceId) throw Error("WorkspaceId should be provided to AppsContainer");
+
+    usePageTitleUpdater(`${workspaceId} apps`);
 
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {error, loading, data: apps, refresh} = useAsync(useCallback(() => WorkspaceAPI.getAppsForWorkspace(workspaceId), [workspaceId]));

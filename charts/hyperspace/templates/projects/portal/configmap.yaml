@@ -18,18 +18,33 @@ data:
       organisationAdminRole: organisation-admin
     charts:
       workspace: http://storage.googleapis.com/fairspace-helm/workspace-{{ .Values.portal.workspace.tag }}.tgz
-    workspace:
-      hyperspace:
+    defaultConfig:
+      workspace:
+        hyperspace:
+          keycloak:
+            username: {{ .Values.keycloak.keycloak.username }}
+            password: {{ .Values.keycloak.keycloak.password }}
+            realm: {{ .Values.hyperspace.keycloak.realm }}
+            clientSecret: {{ .Values.hyperspace.keycloak.clientSecret }}
+          elasticsearch:
+            transport:
+              host: {{ .Release.Name }}-elasticsearch-discovery.{{ .Release.Namespace }}.svc.cluster.local
+            rest:
+              host: {{ .Release.Name }}-elasticsearch-client.{{ .Release.Namespace }}.svc.cluster.local
+        saturn:
+          mail:
+{{ toYaml .Values.portal.mail | indent 12 }}
+      jupyter:
         keycloak:
+          baseUrl: {{ template "keycloak.baseUrl" . }}/auth
           username: {{ .Values.keycloak.keycloak.username }}
           password: {{ .Values.keycloak.keycloak.password }}
           realm: {{ .Values.hyperspace.keycloak.realm }}
-          clientSecret: {{ .Values.hyperspace.keycloak.clientSecret }}
-        elasticsearch:
-          transport:
-            host: {{ .Release.Name }}-elasticsearch-discovery.{{ .Release.Namespace }}.svc.cluster.local
-          rest:
-            host: {{ .Release.Name }}-elasticsearch-client.{{ .Release.Namespace }}.svc.cluster.local
-      saturn:
-        mail:
-{{ toYaml .Values.portal.mail | indent 10 }}
+        jupyterhub:
+          rbac:
+            enabled: true
+          auth:
+            custom:
+              config:
+                openid_url: {{ template "keycloak.baseUrl" . }}/auth/realms/{{ .Values.hyperspace.keycloak.realm }}/protocol/openid-connect/
+

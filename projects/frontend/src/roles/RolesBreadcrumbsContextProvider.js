@@ -1,5 +1,5 @@
 import React from "react";
-import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
+import {BreadcrumbsContext} from "@fairspace/shared-frontend";
 
 export default ({workspaceId, children}) => (
     <BreadcrumbsContext.Provider value={{
