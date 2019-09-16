@@ -1,109 +1,142 @@
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import React, {useState} from "react";
-import Typography from "@material-ui/core/Typography";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
-import DialogContent from "@material-ui/core/DialogContent";
-import TextField from "@material-ui/core/TextField";
+import React from "react";
 
-const defaultLogAndFilesVolumeSize = 100;
-const defaultDatabaseVolumeSize = 50;
+import {
+    Dialog, DialogTitle, Typography,
+    DialogActions, Button, DialogContent, TextField,
+} from "@material-ui/core";
+import {useFormField} from "../common/hooks/UseFormField";
+import ControlledField from "../common/components/ControlledField";
 
-const releaseNamePattern = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
+const DEFAULT_LOG_AND_FILES_SIZE = 100;
+const DEFAULT_DATABASE_VOLUME_SIZE = 50;
+const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
 export default ({onCreate, onClose}) => {
-    const [id, setId] = useState("");
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const [logAndFilesVolumeSize, setLogAndFilesVolumeSize] = useState(defaultLogAndFilesVolumeSize);
-    const [databaseVolumeSize, setDatabaseVolumeSize] = useState(defaultDatabaseVolumeSize);
-    const valid = !!(id && releaseNamePattern.test(id) && name && logAndFilesVolumeSize >= 1 && databaseVolumeSize >= 1);
+    const idControl = useFormField('');
+    const nameControl = useFormField('');
+    const descriptionControl = useFormField('');
+    const logAndFilesVolumeSizeControl = useFormField(DEFAULT_LOG_AND_FILES_SIZE);
+    const databaseVolumeSizeControl = useFormField(DEFAULT_DATABASE_VOLUME_SIZE);
 
-    return (<Dialog
-        open
-        onClose={onClose}
-        aria-labelledby="form-dialog-title"
-        fullWidth
-        maxWidth="md"
-    >
-        <DialogTitle disableTypography id="form-dialog-title">
-            <Typography variant="h5">Add a new Workspace</Typography>
-            <Typography variant="subtitle1">Specify parameters for the new Workspace</Typography>
-        </DialogTitle>
-        <DialogContent style={{overflowX: 'hidden'}}>
-            <TextField
-                autoFocus
-                margin="dense"
-                id="id"
-                label="Id"
-                value={id}
-                name="id"
-                onChange={(event) => setId(event.target.value)}
-                fullWidth
-                required
-                helperText="Should use lower case letters, numbers and hyphens, and start with a letter."
-            />
-            <TextField
-                margin="dense"
-                id="name"
-                label="Name"
-                value={name}
-                name="name"
-                onChange={(event) => setName(event.target.value)}
-                fullWidth
-                required
-            />
-            <TextField
-                margin="dense"
-                id="description"
-                label="Description"
-                value={description}
-                name="description"
-                onChange={(event) => setDescription(event.target.value)}
-                multiline
-                fullWidth
-            />
-            <TextField
-                margin="dense"
-                id="logAndFilesVolumeSize"
-                label="Log and files volume size in gigabytes"
-                value={logAndFilesVolumeSize}
-                name="logAndFilesVolumeSize"
-                type="number"
-                inputProps={{min: 1}}
-                onChange={(event) => setLogAndFilesVolumeSize(event.target.value)}
-                fullWidth
-                required
-            />
-            <TextField
-                margin="dense"
-                id="databaseVolumeSize"
-                label="Database volume size in gigabytes"
-                value={databaseVolumeSize}
-                name="databaseVolumeSize"
-                type="number"
-                inputProps={{min: 1}}
-                onChange={(event) => setDatabaseVolumeSize(event.target.value)}
-                fullWidth
-                required
-            />
-        </DialogContent>
-        <DialogActions>
-            <Button
-                onClick={onClose}
-                color="secondary"
-            >
-                Cancel
-            </Button>
-            <Button
-                onClick={() => onCreate({id, name, description, logAndFilesVolumeSize, databaseVolumeSize})}
-                disabled={!valid}
-                color="primary"
-                variant="contained"
-            >
-                Create
-            </Button>
-        </DialogActions>
-    </Dialog>)
+    const idValid = !!idControl.value && ID_PATTERN.test(idControl.value);
+    const nameValid = !!nameControl.value;
+    const logAndFilesVolumeSizeValid = logAndFilesVolumeSizeControl.value >= 1;
+    const databaseVolumeSizeValid = databaseVolumeSizeControl.value >= 1;
+
+    const formValid = idValid && nameValid && logAndFilesVolumeSizeValid && databaseVolumeSizeValid;
+
+    const createWorkspace = () => onCreate(
+        {
+            id: idControl.value,
+            name: nameControl.value,
+            description: descriptionControl.value,
+            logAndFilesVolumeSize: logAndFilesVolumeSizeControl.value,
+            databaseVolumeSize: databaseVolumeSizeValid.value
+        }
+    );
+
+    return (
+        <Dialog
+            open
+            onClose={onClose}
+            aria-labelledby="form-dialog-title"
+            fullWidth
+            maxWidth="sm"
+        >
+            <DialogTitle disableTypography id="form-dialog-title">
+                <Typography variant="h5">New Workspace</Typography>
+            </DialogTitle>
+            <DialogContent style={{overflowX: 'hidden'}}>
+                <form
+                    id="formId"
+                    noValidate
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        createWorkspace();
+                    }}
+                >
+                    <ControlledField
+                        component={TextField}
+                        control={idControl}
+                        valid={idValid}
+                        autoFocus
+                        margin="dense"
+                        id="id"
+                        label="Id"
+                        name="id"
+                        fullWidth
+                        required
+                        helperText="Only lower case letters, numbers, hyphens and should start with a letter."
+                    />
+                    <ControlledField
+                        component={TextField}
+                        control={nameControl}
+                        valid={nameValid}
+                        margin="dense"
+                        id="name"
+                        label="Name"
+                        name="name"
+                        fullWidth
+                        required
+                    />
+                    <ControlledField
+                        component={TextField}
+                        control={descriptionControl}
+                        valid
+                        margin="dense"
+                        id="description"
+                        label="Description"
+                        name="description"
+                        multiline
+                        fullWidth
+                    />
+                    <ControlledField
+                        component={TextField}
+                        control={logAndFilesVolumeSizeControl}
+                        valid={logAndFilesVolumeSizeValid}
+                        margin="dense"
+                        id="logAndFilesVolumeSize"
+                        label="Log and files volume size in gigabytes"
+                        name="logAndFilesVolumeSize"
+                        type="number"
+                        inputProps={{min: 1}}
+                        fullWidth
+                        required
+                    />
+                    <ControlledField
+                        component={TextField}
+                        control={databaseVolumeSizeControl}
+                        valid={databaseVolumeSizeValid}
+                        margin="dense"
+                        id="databaseVolumeSize"
+                        label="Database volume size in gigabytes"
+                        name="databaseVolumeSize"
+                        type="number"
+                        inputProps={{min: 1}}
+                        fullWidth
+                        required
+                    />
+                </form>
+            </DialogContent>
+            <DialogActions>
+                <Button
+                    type="button"
+                    onClick={onClose}
+                    color="secondary"
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    form="formId"
+                    disabled={!formValid}
+                    color="primary"
+                    variant="contained"
+                >
+                    Create Workspace
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
 };
