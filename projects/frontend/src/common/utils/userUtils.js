@@ -1,4 +1,4 @@
-import Config from "../services/Config/Config";
+import Config from "../services/Config";
 
 export const getDisplayName = (user) => (user && user.name) || '';
 

@@ -45,7 +45,7 @@ app.get('/api/v1/workspaces/:workspaceId/apps', (req, res) => {
     }
 });
 app.put('/api/v1/workspaces/:workspaceId/apps', (req, res) => res.sendStatus(200));
-app.delete('/api/v1/workspaces/:workspaceId/apps/:appId', (req, res) => res.sendStatus(403));
+app.delete('/api/v1/workspaces/:workspaceId/apps/:appId', (req, res) => res.sendStatus(204));
 
 app.get('/api/keycloak/roles/:roleName', (req, res) => res.sendFile(`${mockDataDir}/keycloak/role.json`));
 app.get('/api/keycloak/roles/:roleName/users', (req, res) => {

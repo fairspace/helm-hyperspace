@@ -4,11 +4,8 @@ import {
     Button, IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel
 } from '@material-ui/core';
 import {Delete} from "@material-ui/icons";
-import {useSorting} from "@fairspace/shared-frontend";
-import BreadCrumbs from "../common/components/BreadCrumbs";
-import ConfirmationButton from "../common/components/ConfirmationButton";
+import {BreadCrumbs, ConfirmationButton, ErrorDialog, useSorting} from "@fairspace/shared-frontend";
 import AppsBreadcrumbsContextProvider from "./AppsBreadcrumbsContextProvider";
-import ErrorDialog from "../common/components/ErrorDialog";
 import {APP_TYPE_JUPYTER} from "../constants";
 
 const columns = {

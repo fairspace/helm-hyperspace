@@ -2,7 +2,7 @@ import React from 'react';
 import {Route} from "react-router-dom";
 import {logout} from '@fairspace/shared-frontend';
 
-import Config from "./common/services/Config/Config";
+import Config from "./common/services/Config";
 import Home from "./home/Home";
 import Workspaces from "./workspaces/Workspaces";
 import RolesContainer from './roles/RolesContainer';
