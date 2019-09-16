@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from "@fairspace/shared-frontend";
-import Config from "./Config/Config";
+import Config from "./Config";
 
 const baseUrl = () => Config.get().urls.workspaces;
 const workspaceUrl = workspaceId => baseUrl() + '/' + workspaceId;

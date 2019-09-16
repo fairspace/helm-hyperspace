@@ -1,6 +1,6 @@
 import React from 'react';
-import BreadCrumbs from "../common/components/BreadCrumbs";
+import {BreadCrumbs} from "@fairspace/shared-frontend";
 
 export default () => (
-     <BreadCrumbs />
+    <BreadCrumbs />
 );

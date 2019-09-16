@@ -1,5 +1,5 @@
+import {DebouncedSelect} from "@fairspace/shared-frontend";
 import KeycloakAPI from "../common/services/KeycloakAPI";
-import DebouncedSelect from "./DebouncedSelect";
 
 export default props => {
     const fetchItems = ({size, query}) => KeycloakAPI.searchUsers({size, query})

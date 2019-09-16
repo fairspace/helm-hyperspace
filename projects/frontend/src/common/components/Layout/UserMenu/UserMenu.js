@@ -6,7 +6,7 @@ import {
 import {withStyles} from '@material-ui/core/styles';
 import {MessageDisplay, UserContext} from '@fairspace/shared-frontend';
 
-import Config from "../../../services/Config/Config";
+import Config from "../../../services/Config";
 
 const styles = {
     row: {
