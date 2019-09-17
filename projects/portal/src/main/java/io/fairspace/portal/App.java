@@ -2,8 +2,9 @@ package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import io.fairspace.oidc_auth.JwtTokenValidator;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.portal.apps.SearchApp;
 import io.fairspace.portal.apps.WorkspacesApp;
+import io.fairspace.portal.errors.ForbiddenException;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.services.CachedReleaseList;
 import io.fairspace.portal.services.ChartRepo;
@@ -15,7 +16,6 @@ import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.chart.URLChartLoader;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import static io.fairspace.portal.Authentication.getUserInfo;
@@ -23,16 +23,12 @@ import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static io.fairspace.portal.errors.ErrorHelper.errorBody;
 import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
 import static io.fairspace.portal.utils.HelmUtils.JUPYTER_CHART;
-import static java.lang.String.format;
-import static java.lang.String.join;
-import static java.util.stream.Collectors.toList;
 import static javax.servlet.http.HttpServletResponse.*;
 import static spark.Spark.*;
 
 @Slf4j
 public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
-    private static final String USER_ROLE_PREFIX = "user-";
 
     public static void main(String[] args) throws IOException {
         initSpark();
@@ -71,29 +67,23 @@ public class App {
                 (request) -> getUserInfo(request, tokenValidator)
         );
 
+        SearchApp searchApp = new SearchApp(
+                (request) -> getUserInfo(request, tokenValidator)
+        );
+
         path("/api/v1", () -> {
             path("/workspaces", workspacesApp);
             get("/health", (request, response) -> "OK");
-            post("/search/hyperspace/_search", (request, response) -> {
-                var token = getUserInfo(request, tokenValidator);
-                var indices = getAvailableWorkspaces(token);
-                response.redirect(format(CONFIG.elasticSearchUrlTemplate, join(",", indices)));
-                return "";
-            });
+            post("/search/hyperspace/_search", searchApp);
         });
 
         notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
         exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
         exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
         exception(NotFoundException.class, exceptionHandler(SC_NOT_FOUND, "Not found"));
+        exception(ForbiddenException.class, exceptionHandler(SC_FORBIDDEN, "Forbidden"));
         exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
 
-    private static  List<String> getAvailableWorkspaces(OAuthAuthenticationToken authToken) {
-        return authToken.getAuthorities()
-                .stream()
-                .filter(role -> role.startsWith(USER_ROLE_PREFIX))
-                .map(role -> role.substring(USER_ROLE_PREFIX.length()))
-                .collect(toList());
-    }
+
 }
