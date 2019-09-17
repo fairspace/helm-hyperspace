@@ -2,6 +2,7 @@ package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import io.fairspace.oidc_auth.JwtTokenValidator;
+import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.portal.apps.SearchApp;
 import io.fairspace.portal.apps.WorkspacesApp;
 import io.fairspace.portal.errors.ForbiddenException;
@@ -14,9 +15,12 @@ import io.fairspace.portal.services.releases.JupyterReleaseRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 import org.microbean.helm.chart.URLChartLoader;
+import spark.Request;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static io.fairspace.portal.Authentication.getUserInfo;
 import static io.fairspace.portal.ConfigLoader.CONFIG;
@@ -29,8 +33,18 @@ import static spark.Spark.*;
 @Slf4j
 public class App {
     private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
+    private static Function<Request, OAuthAuthenticationToken> tokenProvider;
 
     public static void main(String[] args) throws IOException {
+        if(CONFIG.auth.enabled) {
+            tokenProvider = (request) -> getUserInfo(request, tokenValidator);
+        } else {
+            tokenProvider = (request) -> new OAuthAuthenticationToken("", Map.of(
+                    "sub", "subject-identifier",
+                    "authorities", List.of("user-fairspace", "organisation-admin")
+            ));
+        }
+
         initSpark();
     }
 
@@ -43,7 +57,7 @@ public class App {
                     return;
                 }
 
-                var token = getUserInfo(request, tokenValidator);
+                var token = tokenProvider.apply(request);
 
                 if (token == null) {
                     halt(SC_UNAUTHORIZED);
@@ -62,19 +76,12 @@ public class App {
         // Define the available apps to install
         Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(JUPYTER_CHART, new JupyterReleaseRequestBuilder(CONFIG.defaultConfig.get(JUPYTER_CHART)));
 
-        WorkspacesApp workspacesApp = new WorkspacesApp(
-                new WorkspaceService(releaseManager, releaseList, repo, appRequestBuilders, CONFIG.domain, CONFIG.defaultConfig),
-                (request) -> getUserInfo(request, tokenValidator)
-        );
-
-        SearchApp searchApp = new SearchApp(
-                (request) -> getUserInfo(request, tokenValidator)
-        );
+        WorkspaceService workspaceService = new WorkspaceService(releaseManager, releaseList, repo, appRequestBuilders, CONFIG.domain, CONFIG.defaultConfig);
 
         path("/api/v1", () -> {
-            path("/workspaces", workspacesApp);
+            path("/workspaces", new WorkspacesApp(workspaceService, tokenProvider));
             get("/health", (request, response) -> "OK");
-            post("/search/hyperspace/_search", searchApp);
+            post("/search/hyperspace/_search", new SearchApp(tokenProvider));
         });
 
         notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
