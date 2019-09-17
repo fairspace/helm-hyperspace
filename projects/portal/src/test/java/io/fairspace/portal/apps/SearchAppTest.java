@@ -4,9 +4,7 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
 import okio.Buffer;
-import okio.BufferedSink;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -110,10 +108,10 @@ public class SearchAppTest {
         when(esResponse.header("Content-type")).thenReturn(responseContentType);
         when(esResponseBody.string()).thenReturn(responseBody);
 
-        app.handle(request, response);
+        assertEquals(responseBody, app.handle(request, response));
 
         verify(response).header("Content-type", responseContentType);
-        verify(response).body(responseBody);
+
 
     }
 

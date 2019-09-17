@@ -67,13 +67,11 @@ public class SearchApp implements Route {
         try (okhttp3.Response esResponse = httpClient.newCall(esRequest).execute()) {
             response.status(esResponse.code());
             response.header("Content-type", esResponse.header("Content-type"));
-            response.body(esResponse.body().string());
+            return esResponse.body().string();
         } catch (IOException e) {
             log.error("Exception while forwarding request to Elasticsearch", e);
             throw e;
         }
-
-        return "";
     }
 
     private static List<String> getAvailableWorkspaces(OAuthAuthenticationToken authToken) {
