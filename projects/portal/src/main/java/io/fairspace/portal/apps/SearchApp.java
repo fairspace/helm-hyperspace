@@ -45,6 +45,10 @@ public class SearchApp implements Route {
             throw new ForbiddenException("Current user does not have access to any workspace");
         }
 
+        if (request.contentType() == null) {
+            throw new IllegalArgumentException("No content-type specified for search query");
+        }
+
         String elasticSearchUrl = format(CONFIG.elasticSearchUrlTemplate, join(",", indices));
         log.trace("Search ES with indices: {} on upstream url", indices.toString(), elasticSearchUrl);
 
@@ -61,6 +65,7 @@ public class SearchApp implements Route {
                 .build();
 
         try (okhttp3.Response esResponse = httpClient.newCall(esRequest).execute()) {
+            response.status(esResponse.code());
             response.header("Content-type", esResponse.header("Content-type"));
             response.body(esResponse.body().string());
         } catch (IOException e) {
