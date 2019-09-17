@@ -2,11 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {BrowserRouter as Router} from "react-router-dom";
 import {MuiThemeProvider} from '@material-ui/core/styles';
 import useIsMounted from 'react-is-mounted-hook';
-import {ErrorDialog, LoadingInlay, UserProvider, VersionProvider} from '@fairspace/shared-frontend';
+import {
+    Layout, ErrorDialog, LoadingInlay, UserProvider, VersionProvider, LogoutContextProvider
+} from '@fairspace/shared-frontend';
 
 import theme from './App.theme';
-import Layout from "./common/components/Layout/Layout";
 import Config from "./common/services/Config";
+import Menu from "./Menu";
+import Routes from "./Routes";
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -25,13 +28,21 @@ const App = () => {
     return (
         <VersionProvider url={Config.get().urls.version}>
             <UserProvider url={Config.get().urls.userInfo}>
-                <MuiThemeProvider theme={theme}>
-                    <ErrorDialog>
-                        <Router>
-                            <Layout />
-                        </Router>
-                    </ErrorDialog>
-                </MuiThemeProvider>
+                <LogoutContextProvider
+                    logoutUrl={Config.get().urls.logout}
+                    jupyterhubUrl={Config.get().urls.jupyterhub}
+                >
+                    <MuiThemeProvider theme={theme}>
+                        <ErrorDialog>
+                            <Router>
+                                <Layout
+                                    renderMenu={() => <Menu />}
+                                    renderMain={() => <Routes />}
+                                />
+                            </Router>
+                        </ErrorDialog>
+                    </MuiThemeProvider>
+                </LogoutContextProvider>
             </UserProvider>
         </VersionProvider>
     );

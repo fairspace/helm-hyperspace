@@ -982,9 +982,9 @@
   integrity sha512-zVgvPwGK7c1aVdUVc9Qv7SqepOGRDrqCw7KZPSZziWGxSlbII3gmvGLPzLX4d0n0BMbamBacUrN22zOMyFFEkQ==
 
 "@fairspace/shared-frontend@^0.1.34":
-  version "0.1.35"
-  resolved "https://dl.bintray.com//thehyve/fairspace-npm/fairspace-shared-frontend-v0.1.35.tgz#ccce0191f780c1f20f9e692ecf41fc72a4787bff"
-  integrity sha1-zM4BkfeAwfIPnmkuz0H8cqR4e/8=
+  version "0.1.36"
+  resolved "https://dl.bintray.com//thehyve/fairspace-npm/fairspace-shared-frontend-v0.1.36.tgz#9b319ad709fc9850031d2cf8c343fd7ec6ea0c5f"
+  integrity sha1-mzGa1wn8mFADHSz4w0P9fsbqDF8=
   dependencies:
     "@material-ui/core" "^3.9.3"
     "@material-ui/icons" "^3.0.2"
@@ -993,6 +993,7 @@
     classnames "^2.2.6"
     copy-webpack-plugin "^5.0.4"
     date-fns "^2.0.1"
+    deepmerge "^4.0.0"
     prop-types "^15.7.2"
     query-string "^6.8.3"
     react "^16.9.0"
@@ -3544,6 +3545,11 @@ deepmerge@^3.0.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-3.3.0.tgz#d3c47fd6f3a93d517b14426b0628a17b0125f5f7"
   integrity sha512-GRQOafGHwMHpjPx9iCvTgpu9NojZ49q794EEL94JVEw6VaeA8XTUyBKvAkOOjBX9oJNiV6G3P+T+tihFjo2TqA==
+
+deepmerge@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-4.0.0.tgz#3e3110ca29205f120d7cb064960a39c3d2087c09"
+  integrity sha512-YZ1rOP5+kHor4hMAH+HRQnBQHg+wvS1un1hAOuIcxcBy0hzcUf6Jg2a1w65kpoOUnurOfZbERwjI1TfZxNjcww==
 
 default-gateway@^4.2.0:
   version "4.2.0"
