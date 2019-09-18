@@ -73,6 +73,19 @@ keycloak:
                 cpu: "500m"
                 memory: "512Mi"
 
+#################################################
+# RabbitMQ configuration
+#################################################
+rabbitmq:
+    enabled: true
+    expose: true
+    ingress:
+        enabled: false
+    persistence:
+        enabled: true
+    rabbitmq:
+        username: rabbitmq
+
 #####################################################################
 # Specific settings for ElasticSearch
 #####################################################################
