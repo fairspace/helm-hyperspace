@@ -26,6 +26,8 @@ app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`
 app.get('/api/v1/workspaces', (req, res) => res.sendFile(`${mockDataDir}/workspaces.json`));
 app.put('/api/v1/workspaces', (req, res) => res.sendStatus(200));
 
+app.post('/api/v1/search/*', (req, res) => res.sendFile(`${mockDataDir}/search.json`));
+
 app.get('/api/v1/workspaces/:workspaceId', (req, res) => {
     const workspace = workspaces.find(w => w.id === req.params.workspaceId);
 

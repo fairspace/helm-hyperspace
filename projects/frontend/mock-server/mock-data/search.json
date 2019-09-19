@@ -1,0 +1,190 @@
+{
+  "took": 27,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 4,
+    "max_score": null,
+    "hits": [
+      {
+        "_index": "workspace-ci",
+        "_type": "iri",
+        "_id": "http://workspace.ci.fairway.app/vocabulary/patientIdentifierShape",
+        "_score": 4.3339853,
+        "_source": {
+          "iri": "http://workspace.ci.fairway.app/vocabulary/patientIdentifierShape",
+          "type": [
+            "http://fairspace.io/ontology#DatatypePropertyShape"
+          ],
+          "name": [
+            "Patient Identifier"
+          ],
+          "description": [
+            "The identifier of the patient"
+          ],
+          "datatype": [
+            "http://www.w3.org/2001/XMLSchema#string"
+          ],
+          "maxCount": [
+            "1"
+          ],
+          "singleLine": [
+            "true"
+          ],
+          "path": [
+            "http://workspace.ci.fairway.app/vocabulary/patientIdentifier"
+          ],
+          "domainIncludes": [
+            "http://workspace.ci.fairway.app/vocabulary/PersonShape"
+          ]
+        },
+        "highlight": {
+          "type.keyword": [
+            "<em>http://fairspace.io/ontology#DatatypePropertyShape</em>"
+          ],
+          "name": [
+            "<em>Patient</em> Identifier"
+          ],
+          "description": [
+            "The identifier of the <em>patient</em>"
+          ]
+        },
+        "sort": [
+          4.3339853,
+          -9223372036854775808
+        ]
+      },
+      {
+        "_index": "workspace-ci",
+        "_type": "iri",
+        "_id": "http://workspace.ci.fairway.app/vocabulary/AdministrativeGenderShape",
+        "_score": 3.0370739,
+        "_source": {
+          "iri": "http://workspace.ci.fairway.app/vocabulary/AdministrativeGenderShape",
+          "type": [
+            "http://fairspace.io/ontology#ControlledVocabularyPropertyShape"
+          ],
+          "name": [
+            "Gender"
+          ],
+          "description": [
+            "The gender of the patient"
+          ],
+          "maxCount": [
+            "1"
+          ],
+          "path": [
+            "http://hl7.org/fhir/STU3/AdministrativeGender"
+          ],
+          "domainIncludes": [
+            "http://workspace.ci.fairway.app/vocabulary/PersonShape"
+          ]
+        },
+        "highlight": {
+          "type.keyword": [
+            "<em>http://fairspace.io/ontology#ControlledVocabularyPropertyShape</em>"
+          ],
+          "description": [
+            "The gender of the <em>patient</em>"
+          ]
+        },
+        "sort": [
+          3.0370739,
+          -9223372036854775808
+        ]
+      },
+      {
+        "_index": "workspace-ci",
+        "_type": "iri",
+        "_id": "http://workspace.ci.fairway.app/vocabulary/hasEventShape",
+        "_score": 2.8352458,
+        "_source": {
+          "iri": "http://workspace.ci.fairway.app/vocabulary/hasEventShape",
+          "type": [
+            "http://fairspace.io/ontology#RelationShape"
+          ],
+          "name": [
+            "Event"
+          ],
+          "description": [
+            "Tumor pathology events for this patient"
+          ],
+          "class": [
+            "http://osiris.fairspace.io/ontology#TumorPathologyEvent"
+          ],
+          "inverseRelation": [
+            "http://workspace.ci.fairway.app/vocabulary/eventSubjectShape"
+          ],
+          "path": [
+            "http://workspace.ci.fairway.app/vocabulary/hasEvent"
+          ],
+          "domainIncludes": [
+            "http://workspace.ci.fairway.app/vocabulary/PersonShape"
+          ]
+        },
+        "highlight": {
+          "type.keyword": [
+            "<em>http://fairspace.io/ontology#RelationShape</em>"
+          ],
+          "description": [
+            "Tumor pathology events for this <em>patient</em>"
+          ]
+        },
+        "sort": [
+          2.8352458,
+          -9223372036854775808
+        ]
+      },
+      {
+        "_index": "workspace-ci",
+        "_type": "iri",
+        "_id": "http://workspace.ci.fairway.app/vocabulary/eventSubjectShape",
+        "_score": 2.8352458,
+        "_source": {
+          "iri": "http://workspace.ci.fairway.app/vocabulary/eventSubjectShape",
+          "type": [
+            "http://fairspace.io/ontology#RelationShape"
+          ],
+          "name": [
+            "Event subject"
+          ],
+          "description": [
+            "The patient associated with this event"
+          ],
+          "class": [
+            "http://xmlns.com/foaf/0.1/Person"
+          ],
+          "maxCount": [
+            "1"
+          ],
+          "inverseRelation": [
+            "http://workspace.ci.fairway.app/vocabulary/hasEventShape"
+          ],
+          "path": [
+            "http://workspace.ci.fairway.app/vocabulary/eventSubject"
+          ],
+          "domainIncludes": [
+            "http://workspace.ci.fairway.app/vocabulary/TumorPathologyEventShape"
+          ]
+        },
+        "highlight": {
+          "type.keyword": [
+            "<em>http://fairspace.io/ontology#RelationShape</em>"
+          ],
+          "description": [
+            "The <em>patient</em> associated with this event"
+          ]
+        },
+        "sort": [
+          2.8352458,
+          -9223372036854775808
+        ]
+      }
+    ]
+  }
+}
