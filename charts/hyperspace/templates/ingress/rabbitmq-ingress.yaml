@@ -1,0 +1,31 @@
+{{- $ingress := .Values.hyperspace.ingress -}}
+{{- if and $ingress.enabled .Values.rabbitmq.expose -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "rabbitmq.prefix" . }}-ingress
+{{- with $ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ template "hyperspace.name" . }}
+    chart: {{ template "hyperspace.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+{{- if $ingress.tls.enabled }}
+  tls:
+    - hosts:
+      - rabbitmq.{{ $ingress.domain }}
+      secretName: {{ template "hyperspace.tlsSecretName" $ }}
+{{- end }}
+  rules:
+    - host: rabbitmq.{{ $ingress.domain }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ template "rabbitmq.prefix" . }}
+              servicePort: {{ .Values.rabbitmq.rabbitmq.managerPort }}
+{{- end -}}

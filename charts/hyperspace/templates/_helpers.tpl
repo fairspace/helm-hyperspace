@@ -87,3 +87,7 @@ https://{{ template "portal.hostname" . }}
 {{- define "frontend.fullname" -}}
 {{- .Values.frontend.nameOverride | default (printf "%s-frontend" .Release.Name) -}}
 {{- end -}}
+
+{{- define "rabbitmq.prefix" -}}
+{{- printf "%s-%s" .Release.Name "rabbitmq" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
