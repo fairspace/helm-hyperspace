@@ -83,6 +83,8 @@ rabbitmq:
         enabled: false
     persistence:
         enabled: true
+    service:
+        managerPort: 15672
     rabbitmq:
         username: rabbitmq
 
