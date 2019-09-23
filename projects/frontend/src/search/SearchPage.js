@@ -37,28 +37,31 @@ const SearchPage = ({location: {search}, query = getSearchQueryFromString(search
                 <TableHead>
                     <TableRow>
                         <TableCell>Entity</TableCell>
-                        <TableCell>Type</TableCell>
+                        <TableCell>Workspace</TableCell>
                         <TableCell>Match</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {data.items
-                        .map(({id, iri, label, name, type, comment, description, highlights}) => (
+                        .map(({id, iri, label, name, type, comment, description, index, highlights}) => (
                             <TableRow
                                 hover
                                 key={id}
                                 onDoubleClick={() => handleResultDoubleClick(iri || id)}
                             >
                                 <TableCell>
-                                    <Typography variant="subtitle1">
+                                    <Typography variant="subtitle1" gutterBottom>
                                         {label || name}
+                                    </Typography>
+                                    <Typography variant="caption" gutterBottom>
+                                        {type}
                                     </Typography>
                                     <Typography variant="body2" color="textSecondary">
                                         {comment || description}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
-                                    {type}
+                                    {index}
                                 </TableCell>
                                 <TableCell>
                                     <SearchResultHighlights highlights={highlights} />

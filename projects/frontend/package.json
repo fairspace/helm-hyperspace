@@ -13,7 +13,7 @@
     "lint": "./node_modules/.bin/eslint ./src"
   },
   "dependencies": {
-    "@fairspace/shared-frontend": "^0.1.40",
+    "@fairspace/shared-frontend": "^0.1.41",
     "@material-ui/core": "^3.9.3",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "3.0.0-alpha.30",
