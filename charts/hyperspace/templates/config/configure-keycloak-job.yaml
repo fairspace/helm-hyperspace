@@ -1,5 +1,5 @@
 {{ if .Values.keycloak.enabled -}}
-{{- $scripts := .Values.hyperspace.configurationScripts -}}
+{{- $scripts := .Values.hyperspace.configurationScripts.keycloak -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
