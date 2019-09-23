@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+import static io.fairspace.portal.utils.HelmUtils.createRandomString;
 import static io.fairspace.portal.utils.HelmUtils.getReleaseConfig;
 import static io.fairspace.portal.utils.JacksonUtils.merge;
 
@@ -61,7 +62,7 @@ public class JupyterReleaseRequestBuilder extends BaseAppReleaseRequestBuilder {
     }
 
     @Override
-    public Tiller.UninstallReleaseRequest.Builder appUninstall(WorkspaceApp workspaceApp) throws IOException {
+    public Tiller.UninstallReleaseRequest.Builder appUninstall(WorkspaceApp workspaceApp) {
         return Tiller.UninstallReleaseRequest.newBuilder()
                 .setName(workspaceApp.getId())
                 .setPurge(true);
@@ -118,12 +119,4 @@ public class JupyterReleaseRequestBuilder extends BaseAppReleaseRequestBuilder {
         );
     }
 
-    private String createRandomString(int length) {
-        Random random = new Random();
-        StringBuilder sb = new StringBuilder();
-        while (sb.length() < length) {
-            sb.append(String.format("%04x", random.nextInt(65536)));
-        }
-        return sb.toString().substring(0, length);
-    }
 }

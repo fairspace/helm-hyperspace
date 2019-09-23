@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.Executor;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -130,6 +131,11 @@ public class WorkspaceServiceTest {
 
                     // Check whether the domain is correctly set
                     assertEquals("test.example.com", releaseConfig.with("workspace").with("ingress").get("domain").asText());
+
+                    // Check whether rabbitmq parameters are given
+                    assertEquals(ws.getId(), releaseConfig.with("rabbitmq").get("username").asText());
+                    assertNotNull(releaseConfig.with("rabbitmq").get("password"));
+
                 } catch (IOException e) {
                     System.err.println("Error parsing release configuration");
                     return false;
