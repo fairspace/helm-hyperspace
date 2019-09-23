@@ -10,6 +10,7 @@ metadata:
 data:
   application.yaml: |-
     app:
+      containedId: hyperspace
       domains:
         - {{ template "hyperspace.url" . }}
       oauth2:
@@ -57,3 +58,10 @@ data:
         frontend:
           path: /**
           url: {{ .Values.pluto.backends.frontend | default (printf "http://%s-frontend.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
+
+    rabbitmq:
+      enabled: true
+      required: true
+      host: {{ template "rabbitmq.host" . }}
+      username: {{ .Values.rabbitmq.user.username }}
+      password: {{ .Values.rabbitmq.user.password }}

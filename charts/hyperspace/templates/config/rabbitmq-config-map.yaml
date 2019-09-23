@@ -10,7 +10,7 @@ metadata:
 data:
   rabbitmq.conf: |-
     [default]
-    hostname = {{ printf "%s-rabbitmq.%s.svc.cluster.local" .Release.Name .Release.Namespace }}
+    hostname = {{ template "rabbitmq.host" . }}
     username = {{ .Values.rabbitmq.rabbitmq.username }}
     password = {{ .Values.rabbitmq.rabbitmq.password }}
   commands.txt: |-
