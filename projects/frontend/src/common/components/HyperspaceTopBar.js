@@ -2,7 +2,7 @@ import React from 'react';
 import {withRouter} from "react-router-dom";
 import {TopBar, SearchBar, buildSearchUrl, getSearchQueryFromString} from "@fairspace/shared-frontend";
 
-const HyprespaceTopBar = ({name, location, history}) => {
+const HyperspaceTopBar = ({name, location, history}) => {
     const searchQuery = getSearchQueryFromString(location.search);
 
     const handleSearch = (value) => {
@@ -17,4 +17,4 @@ const HyprespaceTopBar = ({name, location, history}) => {
     );
 };
 
-export default withRouter(HyprespaceTopBar);
+export default withRouter(HyperspaceTopBar);

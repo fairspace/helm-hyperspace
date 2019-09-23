@@ -7,11 +7,12 @@ import {
 } from '@fairspace/shared-frontend';
 
 import Config from "../common/services/Config";
-import {ES_INDEX} from '../constants';
 
 const SearchPage = ({location: {search}, query = getSearchQueryFromString(search)}) => {
+    const config = Config.get();
     const {error, loading, data} = useAsync(
-        useCallback(() => SearchAPI(Config.get(), ES_INDEX)
+        useCallback(() => SearchAPI(config, config.searchIndex)
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             .search({query, sort: SORT_DATE_CREATED}), [query])
     );
 

@@ -11,6 +11,3 @@ export const ROLE_COORDINATOR = 'coordinator';
 
 // Supported app types
 export const APP_TYPE_JUPYTER = "jupyter";
-
-// Search
-export const ES_INDEX = 'hyperspace';

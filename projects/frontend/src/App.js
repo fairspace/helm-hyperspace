@@ -10,7 +10,7 @@ import theme from './App.theme';
 import Config from "./common/services/Config";
 import Menu from "./Menu";
 import Routes from "./Routes";
-import HyprespaceTopBar from './common/components/HyprespaceTopBar';
+import HyperspaceTopBar from './common/components/HyperspaceTopBar';
 
 const App = () => {
     const isMounted = useIsMounted();
@@ -39,7 +39,7 @@ const App = () => {
                                 <Layout
                                     renderMenu={() => <Menu />}
                                     renderMain={() => <Routes />}
-                                    renderTopbar={({name}) => <HyprespaceTopBar name={name} />}
+                                    renderTopbar={({name}) => <HyperspaceTopBar name={name} />}
                                 />
                             </Router>
                         </ErrorDialog>
