@@ -1,35 +1,22 @@
 import React, {useCallback} from 'react';
 import PropTypes from "prop-types";
-import {
-    Paper, Table, TableBody,
-    TableCell, TableHead, TableRow
-} from '@material-ui/core';
+import {Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography} from '@material-ui/core';
 import {
     LoadingInlay, MessageDisplay, SearchResultHighlights,
     getSearchQueryFromString, SearchAPI, SORT_DATE_CREATED, useAsync
 } from '@fairspace/shared-frontend';
 
 import Config from "../common/services/Config";
+import {ES_INDEX} from '../constants';
 
-// Exporting here to be able to test the component outside of Redux
-export const SearchPage = ({
-    location: {search}, query = getSearchQueryFromString(search)
-}) => {
+const SearchPage = ({location: {search}, query = getSearchQueryFromString(search)}) => {
     const {error, loading, data} = useAsync(
-        useCallback(() => SearchAPI(Config.get(), "hyperspace")
+        useCallback(() => SearchAPI(Config.get(), ES_INDEX)
             .search({query, sort: SORT_DATE_CREATED}), [query])
     );
 
-    /**
-     * Handles a click on a search result.
-     * @param result   The clicked search result. For the format, see the ES api
-     */
-    const handleResultDoubleClick = (result) => {
-        // const navigationPath = getCollectionAbsolutePath(getPathOfResult(result));
-
-        // history.push(navigationPath);
-        // deselectAllPaths();
-        // selectPath('/' + result.filePath);
+    const handleResultDoubleClick = (url) => {
+        window.open(url, '_blank');
     };
 
     if (loading) {
@@ -49,28 +36,29 @@ export const SearchPage = ({
             <Table padding="dense">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Label</TableCell>
+                        <TableCell>Entity</TableCell>
                         <TableCell>Type</TableCell>
-                        <TableCell>Description</TableCell>
                         <TableCell>Match</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {data.items
-                        .map(({id, label, name, type, comment, highlights}) => (
+                        .map(({id, iri, label, name, type, comment, description, highlights}) => (
                             <TableRow
                                 hover
                                 key={id}
-                                onDoubleClick={() => handleResultDoubleClick(id)}
+                                onDoubleClick={() => handleResultDoubleClick(iri || id)}
                             >
                                 <TableCell>
-                                    {label || name}
+                                    <Typography variant="subtitle1">
+                                        {label || name}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        {comment || description}
+                                    </Typography>
                                 </TableCell>
                                 <TableCell>
                                     {type}
-                                </TableCell>
-                                <TableCell>
-                                    {comment}
                                 </TableCell>
                                 <TableCell>
                                     <SearchResultHighlights highlights={highlights} />
@@ -86,7 +74,8 @@ export const SearchPage = ({
 SearchPage.propTypes = {
     location: PropTypes.shape({
         search: PropTypes.string.isRequired
-    })
+    }),
+    query: PropTypes.string
 };
 
 export default SearchPage;
