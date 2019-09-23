@@ -1,0 +1,84 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "logaggregator.fullname" . }}
+  labels:
+    app: portal
+    chart: {{ template "hyperspace.chart" . }}
+    draft: {{ default "draft-app" .Values.draft }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.portal.replicaCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.portal.rollingUpdate.maxSurge | default "25%" }}
+      maxUnavailable: {{ .Values.portal.rollingUpdate.maxUnavailable | default "25%" }}
+  selector:
+    matchLabels:
+      app: portal
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        draft: {{ default "draft-app" .Values.draft }}
+        app: portal
+        release: {{ .Release.Name }}
+{{- if .Values.podAnnotations.portal }}
+      annotations:
+{{ toYaml .Values.podAnnotations.portal | indent 8 }}
+{{- end }}
+    spec:
+      {{- if .Values.hyperspace.rbac.enabled }}
+      serviceAccountName: {{ .Release.Name }}-portal
+      {{- end }}
+      containers:
+      - name: {{ template "logaggregator.fullname" . }}
+        image: "{{ .Values.logaggregator.image.image }}:{{ .Values.portal.image.tag }}"
+        imagePullPolicy: {{ .Values.portal.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.portal.service.internalPort }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/config
+        - name: logs
+          mountPath: /logs
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.portal.probePath }}
+            port: {{ .Values.portal.service.internalPort }}
+          initialDelaySeconds: {{ .Values.portal.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.portal.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.portal.livenessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.portal.livenessProbe.timeoutSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.portal.probePath }}
+            port: {{ .Values.portal.service.internalPort }}
+          periodSeconds: {{ .Values.portal.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.portal.readinessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.portal.readinessProbe.timeoutSeconds }}
+        resources:
+{{ toYaml .Values.portal.resources | indent 12 }}
+        env:
+        - name: SECURITY_OIDC_CLIENTID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-oauth-client
+              key: clientId
+        - name: SECURITY_OIDC_CLIENTSECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-oauth-client
+              key: clientSecret
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ template "logaggregator.fullname" . }}
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ .Values.logaggregator.persistence.logs.existingClaim | default (printf "%s-logs" (include "logaggregator.fullname" .)) }}

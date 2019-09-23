@@ -95,3 +95,7 @@ https://{{ template "portal.hostname" . }}
 {{- define "rabbitmq.host" -}}
 {{- printf "%s-rabbitmq.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
 {{- end -}}
+
+{{- define "logaggregator.fullname" -}}
+{{- .Values.logaggregator.nameOverride | default (printf "%s-logaggregator" .Release.Name) -}}
+{{- end -}}
