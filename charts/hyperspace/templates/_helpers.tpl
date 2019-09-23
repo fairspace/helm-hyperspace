@@ -91,3 +91,7 @@ https://{{ template "portal.hostname" . }}
 {{- define "rabbitmq.prefix" -}}
 {{- printf "%s-%s" .Release.Name "rabbitmq" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+{{- define "rabbitmq.host" -}}
+{{- printf "%s-rabbitmq.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
+{{- end -}}

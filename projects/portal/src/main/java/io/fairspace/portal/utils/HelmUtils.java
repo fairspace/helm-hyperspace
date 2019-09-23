@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import hapi.release.ReleaseOuterClass;
 
 import java.io.IOException;
+import java.util.Random;
 
 import static java.lang.Integer.parseInt;
 import static java.util.Optional.ofNullable;
@@ -31,5 +32,14 @@ public class HelmUtils {
      */
     public static JsonNode getReleaseConfig(ReleaseOuterClass.Release release) throws IOException {
         return objectMapper.readTree(release.getConfig().getRaw());
+    }
+
+    public static String createRandomString(int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        while (sb.length() < length) {
+            sb.append(String.format("%04x", random.nextInt(65536)));
+        }
+        return sb.toString().substring(0, length);
     }
 }

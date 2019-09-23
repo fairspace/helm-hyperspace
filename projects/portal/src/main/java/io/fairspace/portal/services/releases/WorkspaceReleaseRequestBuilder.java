@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static io.fairspace.portal.utils.HelmUtils.GIGABYTE_SUFFIX;
+import static io.fairspace.portal.utils.HelmUtils.createRandomString;
 import static io.fairspace.portal.utils.JacksonUtils.merge;
 
 public class WorkspaceReleaseRequestBuilder{
@@ -35,7 +36,8 @@ public class WorkspaceReleaseRequestBuilder{
         customValues.with("workspace").with("ingress").put("domain", workspace.getId() + "." + domain);
         customValues.with("saturn").with("persistence").with("files").put("size", workspace.getLogAndFilesVolumeSize() + GIGABYTE_SUFFIX);
         customValues.with("saturn").with("persistence").with("database").put("size", workspace.getDatabaseVolumeSize() + GIGABYTE_SUFFIX);
-
+        customValues.with("rabbitmq").put("username", workspace.getId());
+        customValues.with("rabbitmq").put("password", createRandomString(16));
 
         var values = merge(objectMapper.valueToTree(defaultValues), customValues);
         var yaml = objectMapper.writeValueAsString(values);

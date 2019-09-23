@@ -21,6 +21,8 @@ rabbitmq:
     password: "gtzb28355LFqxbar"
     erlangCookie: "fLbZs6ncGzp9Q2R35V3zv9uQyDEjgyDy"
     diskFreeLimit: '"1GiB"'
+  user:
+    password: "z3fC4kPfysMEkYm2"
 
 portal:
   mail:

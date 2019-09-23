@@ -28,6 +28,10 @@ data:
             password: {{ .Values.keycloak.keycloak.password }}
             realm: {{ .Values.hyperspace.keycloak.realm }}
             clientSecret: {{ .Values.hyperspace.keycloak.clientSecret }}
+          rabbitmq:
+            host: {{ template "rabbitmq.host" . }}
+            username: {{ .Values.rabbitmq.rabbitmq.username }}
+            password: {{ .Values.rabbitmq.rabbitmq.password }}
           elasticsearch:
             transport:
               host: {{ .Release.Name }}-elasticsearch-discovery.{{ .Release.Namespace }}.svc.cluster.local
