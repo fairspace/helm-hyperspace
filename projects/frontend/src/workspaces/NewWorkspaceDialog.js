@@ -25,13 +25,13 @@ export default ({onCreate, onClose}) => {
 
     const formValid = idValid && nameValid && logAndFilesVolumeSizeValid && databaseVolumeSizeValid;
 
-    const createWorkspace = () => onCreate(
+    const createWorkspace = () => formValid && onCreate(
         {
             id: idControl.value,
             name: nameControl.value,
             description: descriptionControl.value,
             logAndFilesVolumeSize: logAndFilesVolumeSizeControl.value,
-            databaseVolumeSize: databaseVolumeSizeValid.value
+            databaseVolumeSize: databaseVolumeSizeControl.value
         }
     );
 
