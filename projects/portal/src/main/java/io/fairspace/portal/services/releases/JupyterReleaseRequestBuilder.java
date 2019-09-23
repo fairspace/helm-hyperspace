@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 import static io.fairspace.portal.utils.HelmUtils.getReleaseConfig;
@@ -67,12 +68,7 @@ public class JupyterReleaseRequestBuilder extends BaseAppReleaseRequestBuilder {
     }
 
     @Override
-    public boolean shouldUpdateWorkspace() {
-        return true;
-    }
-
-    @Override
-    public Tiller.UpdateReleaseRequest.Builder workspaceUpdateAfterAppInstall(ReleaseOuterClass.Release workspaceRelease, WorkspaceApp workspaceApp) throws IOException {
+    public Optional<Tiller.UpdateReleaseRequest.Builder> workspaceUpdateAfterAppInstall(ReleaseOuterClass.Release workspaceRelease, WorkspaceApp workspaceApp) throws IOException {
         // Lookup information on the workspace
         JsonNode workspaceConfig = getReleaseConfig(workspaceRelease);
         var workspaceDomain = getWorkspaceDomain(workspaceConfig);
@@ -87,27 +83,39 @@ public class JupyterReleaseRequestBuilder extends BaseAppReleaseRequestBuilder {
 
         var yaml = objectMapper.writeValueAsString(customValues);
 
-        return Tiller.UpdateReleaseRequest.newBuilder()
-                .setName(workspaceRelease.getName())
-                .setReuseValues(true)
-                .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build());
+        return Optional.of(
+                Tiller.UpdateReleaseRequest.newBuilder()
+                        .setName(workspaceRelease.getName())
+                        .setReuseValues(true)
+                        .setValues(
+                                ConfigOuterClass.Config.newBuilder()
+                                        .setRaw(yaml)
+                                        .build()
+                        )
+        );
     }
 
     @Override
-    public Tiller.UpdateReleaseRequest.Builder workspaceUpdateAfterAppUninstall(ReleaseOuterClass.Release workspaceRelease, WorkspaceApp workspaceApp) throws IOException {
-        // Add the url for jupyter to the workspace configuration
+    public Optional<Tiller.UpdateReleaseRequest.Builder> workspaceUpdateAfterAppUninstall(ReleaseOuterClass.Release workspaceRelease, WorkspaceApp workspaceApp) throws IOException {
+        // Remove the url for jupyter from the workspace configuration
         var customValues = objectMapper.createObjectNode();
-        customValues.with("services").put("jupyterhub",  String.format(""));
+        customValues.with("services").put("jupyterhub", "");
 
         // Add pod annotation for mercury to ensure it will restart
         customValues.with("podAnnotations").with("mercury").put("commit",  "uninstall-jupyter-" + createRandomString(5));
 
         var yaml = objectMapper.writeValueAsString(customValues);
 
-        return Tiller.UpdateReleaseRequest.newBuilder()
-                .setName(workspaceRelease.getName())
-                .setReuseValues(true)
-                .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build());
+        return Optional.of(
+                Tiller.UpdateReleaseRequest.newBuilder()
+                        .setName(workspaceRelease.getName())
+                        .setReuseValues(true)
+                        .setValues(
+                                ConfigOuterClass.Config.newBuilder()
+                                        .setRaw(yaml)
+                                        .build()
+                        )
+        );
     }
 
     private String createRandomString(int length) {
@@ -116,6 +124,6 @@ public class JupyterReleaseRequestBuilder extends BaseAppReleaseRequestBuilder {
         while (sb.length() < length) {
             sb.append(String.format("%04x", random.nextInt(65536)));
         }
-        return sb.toString();
+        return sb.toString().substring(0, length);
     }
 }
