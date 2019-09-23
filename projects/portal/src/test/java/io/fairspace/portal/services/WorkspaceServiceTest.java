@@ -193,13 +193,31 @@ public class WorkspaceServiceTest {
         var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
         var updateReleaseRequest = Tiller.UpdateReleaseRequest.newBuilder();
         when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
-        when(appReleaseRequestBuilder.shouldUpdateWorkspace()).thenReturn(true);
-        when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(updateReleaseRequest);
+        when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(Optional.of(updateReleaseRequest));
 
         workspaceService.installApp("workspaceId", app);
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verify(releaseManager).update(updateReleaseRequest, workspaceChart);
+    }
+
+    @Test
+    public void installAppCanSkipUpdatingWorkspace() throws NotFoundException, IOException {
+        var release = ReleaseOuterClass.Release.newBuilder().build();
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
+        when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(Optional.empty());
+
+        workspaceService.installApp("workspaceId", app);
+
+        verify(releaseManager).install(installReleaseRequest, appChart);
+        verifyNoMoreInteractions(releaseManager);
     }
 
     @Test
@@ -246,8 +264,7 @@ public class WorkspaceServiceTest {
         var uninstallReleaseRequest = Tiller.UninstallReleaseRequest.newBuilder();
         var updateReleaseRequest = Tiller.UpdateReleaseRequest.newBuilder();
         when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
-        when(appReleaseRequestBuilder.shouldUpdateWorkspace()).thenReturn(true);
-        when(appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(eq(release), any())).thenReturn(updateReleaseRequest);
+        when(appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(eq(release), any())).thenReturn(Optional.of(updateReleaseRequest));
 
         workspaceService.uninstallApp("app");
 

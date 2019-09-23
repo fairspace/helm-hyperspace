@@ -148,10 +148,10 @@ public class WorkspaceService {
         InstallReleaseRequest.Builder installRequestBuilder = appReleaseRequestBuilder.appInstall(workspaceRelease, workspaceApp);
         installRelease(installRequestBuilder, repo.get(workspaceApp.getType()));
 
-        // Update workspace release
-        if(appReleaseRequestBuilder.shouldUpdateWorkspace()) {
-            Tiller.UpdateReleaseRequest.Builder updateRequestBuilder = appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(workspaceRelease, workspaceApp);
-            updateRelease(updateRequestBuilder, repo.get(WORKSPACE_CHART));
+        // Update workspace release, if needed
+        Optional<Tiller.UpdateReleaseRequest.Builder> builder = appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(workspaceRelease, workspaceApp);
+        if(builder.isPresent()) {
+            updateRelease(builder.get(), repo.get(WORKSPACE_CHART));
         }
     }
 
@@ -178,10 +178,10 @@ public class WorkspaceService {
         Tiller.UninstallReleaseRequest.Builder uninstallRequestBuilder = appReleaseRequestBuilder.appUninstall(workspaceApp);
         uninstallRelease(uninstallRequestBuilder);
 
-        // Update workspace release
-        if(appReleaseRequestBuilder.shouldUpdateWorkspace()) {
-            Tiller.UpdateReleaseRequest.Builder updateRequestBuilder = appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(workspaceRelease, workspaceApp);
-            updateRelease(updateRequestBuilder, repo.get(WORKSPACE_CHART));
+        // Update workspace release, if needed
+        Optional<Tiller.UpdateReleaseRequest.Builder> builder = appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(workspaceRelease, workspaceApp);
+        if(builder.isPresent()) {
+            updateRelease(builder.get(), repo.get(WORKSPACE_CHART));
         }
     }
 

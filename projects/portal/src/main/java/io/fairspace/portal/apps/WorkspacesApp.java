@@ -2,7 +2,6 @@ package io.fairspace.portal.apps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
-import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
 import io.fairspace.portal.services.WorkspaceService;
@@ -38,7 +37,7 @@ public class WorkspacesApp implements RouteGroup {
             response.type(APPLICATION_JSON.asString());
             return workspaceService
                     .getWorkspace(request.params(":workspaceId"))
-                    .orElseThrow(NotFoundException::new);
+                    .orElse(null);
         }, mapper::writeValueAsString);
 
         put("", (request, response) -> {
@@ -52,7 +51,7 @@ public class WorkspacesApp implements RouteGroup {
             return workspaceService
                     .getWorkspace(request.params(":workspaceId"))
                     .map(Workspace::getApps)
-                    .orElseThrow(NotFoundException::new);
+                    .orElse(null);
         }, mapper::writeValueAsString);
 
         put("/:workspaceId/apps", (request, response) -> {
