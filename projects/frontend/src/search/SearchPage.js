@@ -8,14 +8,7 @@ import {
 
 import Config from "../common/services/Config";
 
-const SearchPage = ({location: {search}, query = getSearchQueryFromString(search)}) => {
-    const config = Config.get();
-    const {error, loading, data} = useAsync(
-        useCallback(() => SearchAPI(config, config.searchIndex)
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            .search({query, sort: SORT_DATE_CREATED}), [query])
-    );
-
+export const SearchPage = ({loading, error, results}) => {
     const handleResultDoubleClick = (url) => {
         window.open(url, '_blank');
     };
@@ -28,7 +21,7 @@ const SearchPage = ({location: {search}, query = getSearchQueryFromString(search
         return <MessageDisplay message={error.message} />;
     }
 
-    if (!data || data.total === 0) {
+    if (!results || results.total === 0) {
         return <MessageDisplay message="No results found!" isError={false} />;
     }
 
@@ -43,7 +36,7 @@ const SearchPage = ({location: {search}, query = getSearchQueryFromString(search
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {data.items
+                    {results.items
                         .map(({id, iri, label, name, type, comment, description, index, highlights}) => (
                             <TableRow
                                 hover
@@ -75,11 +68,28 @@ const SearchPage = ({location: {search}, query = getSearchQueryFromString(search
     );
 };
 
-SearchPage.propTypes = {
+const SearchPageContainer = ({
+    location: {search},
+    query = getSearchQueryFromString(search),
+    searchApi = SearchAPI(Config.get(), Config.get().searchIndex)
+}) => {
+    const {error, loading, data} = useAsync(
+        useCallback(() => searchApi
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            .search({query, sort: SORT_DATE_CREATED}), [query])
+    );
+
+    return <SearchPage error={error} loading={loading} results={data} />;
+};
+
+SearchPageContainer.propTypes = {
     location: PropTypes.shape({
         search: PropTypes.string.isRequired
     }),
-    query: PropTypes.string
+    query: PropTypes.string,
+    searchApi: PropTypes.shape({
+        search: PropTypes.func.isRequired
+    })
 };
 
-export default SearchPage;
+export default SearchPageContainer;
