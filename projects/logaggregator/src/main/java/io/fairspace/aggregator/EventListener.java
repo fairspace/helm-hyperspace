@@ -19,22 +19,22 @@ public class EventListener {
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final String ROUTING_KEY_WILDCARD = "*.*.*";
 
-    public EventListener(Config.RabbitMQ rabbitMQConfig, EventLogger logger) {
+    public EventListener(Config.RabbitMQ config, EventLogger logger) {
         try {
             var factory = new ConnectionFactory();
-            factory.setHost(rabbitMQConfig.host);
-            factory.setPort(rabbitMQConfig.port);
-//            factory.setUsername(rabbitMQConfig.username);
-//            factory.setPassword(rabbitMQConfig.password);
-            factory.setVirtualHost(rabbitMQConfig.virtualHost);
+            factory.setHost(config.host);
+            factory.setPort(config.port);
+            factory.setUsername(config.username);
+            factory.setPassword(config.password);
+            factory.setVirtualHost(config.virtualHost);
 
             var connection = factory.newConnection();
             var channel = connection.createChannel();
 
-            channel.queueDeclare(rabbitMQConfig.queueName, true, false, false, null);
-            channel.queueBind(rabbitMQConfig.queueName, rabbitMQConfig.exchangeName, ROUTING_KEY_WILDCARD);
+            channel.queueDeclare(config.queueName, true, false, false, null);
+            channel.queueBind(config.queueName, config.exchangeName, ROUTING_KEY_WILDCARD);
 
-            channel.basicConsume(rabbitMQConfig.queueName,
+            channel.basicConsume(config.queueName,
                     new DefaultConsumer(channel) {
                         @Override
                         public void handleDelivery(String consumerTag,
