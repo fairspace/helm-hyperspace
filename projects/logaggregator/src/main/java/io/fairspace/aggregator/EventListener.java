@@ -24,8 +24,8 @@ public class EventListener {
             var factory = new ConnectionFactory();
             factory.setHost(rabbitMQConfig.host);
             factory.setPort(rabbitMQConfig.port);
-            factory.setUsername(rabbitMQConfig.username);
-            factory.setPassword(rabbitMQConfig.password);
+//            factory.setUsername(rabbitMQConfig.username);
+//            factory.setPassword(rabbitMQConfig.password);
             factory.setVirtualHost(rabbitMQConfig.virtualHost);
 
             var connection = factory.newConnection();

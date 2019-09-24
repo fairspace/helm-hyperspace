@@ -13,3 +13,43 @@ data:
       host: {{ template "rabbitmq.host" . }}
       username: {{ .Values.rabbitmq.user.username }}
       password: {{ .Values.rabbitmq.user.password }}
+  log4j.properties: |-
+    # All non-audit logs will be sent to stdout
+    log4j.rootLogger = INFO, stdout
+
+    # Direct log messages to stdout
+    log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.Target=System.out
+    log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+
+    # Define the audit logger with appender file
+    log4j.logger.audit = INFO, FILE
+
+    # Logging can be configured per category, event type and workspace:
+    # log4j.logger.audit.METADATA.PUT.Workspace1 = NONE
+
+    # Define the file appender
+    log4j.appender.FILE=org.apache.log4j.RollingFileAppender
+
+    # Set the name of the files
+    log4j.appender.FILE.File=/logs/audit.log
+
+    # Set the immediate flush to true (default)
+    log4j.appender.FILE.ImmediateFlush=true
+
+    # Set the threshold to debug mode
+    log4j.appender.FILE.Threshold=debug
+
+    # Set the append to false, should not overwrite
+    log4j.appender.FILE.Append=true
+
+    # Set the maximum file size before rollover
+    log4j.appender.FILE.MaxFileSize=5MB
+
+    # Set the the backup index
+    log4j.appender.FILE.MaxBackupIndex=1000000
+
+    # Define the layout for file appender
+    log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+    log4j.appender.FILE.layout.conversionPattern=%m%n
