@@ -18,7 +18,6 @@ public class EventListener {
     private static final String CONTENT_TYPE_JSON = "application/json";
     private static final ObjectMapper mapper = new ObjectMapper()
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
-    private static final String ROUTING_KEY_WILDCARD = "#";
 
     public EventListener(Config.RabbitMQ config, EventLogger logger) {
         try {
@@ -33,7 +32,10 @@ public class EventListener {
             var channel = connection.createChannel();
 
             channel.queueDeclare(config.queueName, true, false, false, null);
-            channel.queueBind(config.queueName, config.exchangeName, ROUTING_KEY_WILDCARD);
+
+            for (var wildcard: config.routingKeyWildcards) {
+                channel.queueBind(config.queueName, config.exchangeName, wildcard);
+            }
 
             channel.basicConsume(config.queueName,
                     new DefaultConsumer(channel) {

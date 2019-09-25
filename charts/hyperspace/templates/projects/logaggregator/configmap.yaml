@@ -13,6 +13,8 @@ data:
       host: {{ template "rabbitmq.host" . }}
       username: {{ .Values.rabbitmq.user.username }}
       password: {{ .Values.rabbitmq.user.password }}
+      routingKeyWildcards:
+        {{ toYaml .Values.logaggregator.events.routingKeyWildcards | indent 8 }}
   log4j.properties: |-
     # All non-audit logs will be sent to stdout
     log4j.rootLogger = INFO, stdout

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Config {
 
@@ -19,6 +21,7 @@ public class Config {
         public String virtualHost = "/";
         public String exchangeName = "fairspace";
         public String queueName = "fs-events";
+        public Set<String> routingKeyWildcards = new HashSet<>();
     }
 
     public static Config load() {

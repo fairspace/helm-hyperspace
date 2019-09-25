@@ -340,4 +340,8 @@ logaggregator:
             accessMode: ReadWriteOnce
             size: 50Gi
             mountPath: /data
+    events:
+        ## workspace.category.eventType
+        routingKeyWildcards:
+            - "*.*.*"
 podAnnotations: {}
