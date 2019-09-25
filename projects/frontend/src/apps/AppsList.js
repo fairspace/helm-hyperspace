@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {
     Button, IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel
@@ -7,6 +7,7 @@ import {Delete} from "@material-ui/icons";
 import {BreadCrumbs, ConfirmationButton, ErrorDialog, useSorting} from "@fairspace/shared-frontend";
 import AppsBreadcrumbsContextProvider from "./AppsBreadcrumbsContextProvider";
 import {APP_TYPE_JUPYTER} from "../constants";
+import NotificationSnackbar from "../common/components/NotificationSnackbar";
 
 const columns = {
     id: {
@@ -28,11 +29,27 @@ const columns = {
 };
 
 const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
+    const [addingApp, setAddingApp] = useState(false);
+    const [removingApp, setRemovingApp] = useState(false);
+
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(apps, columns, 'type');
     const isAppInstalled = appType => apps.some(app => app.type === appType);
 
-    const addApp = appType => onAddApp(appType).catch(e => ErrorDialog.showError(e, "Error adding a " + appType + " app to this workspace"));
-    const removeApp = appId => onRemoveApp(appId).catch(e => ErrorDialog.showError(e, "Error removing app " + appId + " from the workspace"));
+    const addApp = appType => {
+        setAddingApp(true);
+        onAddApp(appType).catch(e => {
+            setAddingApp(false)
+            ErrorDialog.showError(e, "Error adding a " + appType + " app to this workspace");
+        });
+    };
+
+    const removeApp = appId => {
+        setRemovingApp(true);
+        onRemoveApp(appId).catch(e => {
+            setRemovingApp(false);
+            ErrorDialog.showError(e, "Error removing app " + appId + " from the workspace")
+        });
+    }
 
     return (
         <AppsBreadcrumbsContextProvider workspaceId={workspaceId}>
@@ -133,6 +150,17 @@ const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
                     Add jupyter
                 </Button>
             </ConfirmationButton>
+
+            <NotificationSnackbar
+                open={addingApp}
+                onClose={() => setAddingApp(false)}
+                message="The app is being added to your workspace, this might take a while"
+            />
+            <NotificationSnackbar
+                open={removingApp}
+                onClose={() => setRemovingApp(false)}
+                message="The app is being removed from your workspace, this might take a while"
+            />
         </AppsBreadcrumbsContextProvider>
     );
 };
