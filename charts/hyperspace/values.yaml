@@ -323,12 +323,6 @@ logaggregator:
         requests:
             cpu: 50m
             memory: 300Mi
-    livenessProbe:
-        exec:
-            command:
-                - ps -ef | grep java | grep io.fairspace.aggregator.App
-        initialDelaySeconds: 10
-        periodSeconds: 5
     persistence:
         logs:
             ## A manually managed Persistent Volume and Claim

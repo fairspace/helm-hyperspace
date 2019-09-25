@@ -44,20 +44,11 @@ spec:
         - name: logs
           mountPath: /logs
         livenessProbe:
-          httpGet:
-            path: {{ .Values.logaggregator.probePath }}
-            port: {{ .Values.logaggregator.service.internalPort }}
-          initialDelaySeconds: {{ .Values.logaggregator.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.logaggregator.livenessProbe.periodSeconds }}
-          successThreshold: {{ .Values.logaggregator.livenessProbe.successThreshold }}
-          timeoutSeconds: {{ .Values.logaggregator.livenessProbe.timeoutSeconds }}
-        readinessProbe:
-          httpGet:
-            path: {{ .Values.logaggregator.probePath }}
-            port: {{ .Values.logaggregator.service.internalPort }}
-          periodSeconds: {{ .Values.logaggregator.readinessProbe.periodSeconds }}
-          successThreshold: {{ .Values.logaggregator.readinessProbe.successThreshold }}
-          timeoutSeconds: {{ .Values.logaggregator.readinessProbe.timeoutSeconds }}
+          exec:
+            command:
+              - ps -ef | grep java | grep io.fairspace.aggregator.App
+          initialDelaySeconds: 10
+          periodSeconds: 5
         resources:
 {{ toYaml .Values.logaggregator.resources | indent 12 }}
         env:
