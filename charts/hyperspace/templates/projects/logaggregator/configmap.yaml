@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "logaggregator.fullname" . }}
   labels:
-    app: portal
+    app: logaggregator
     chart: {{ template "hyperspace.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}

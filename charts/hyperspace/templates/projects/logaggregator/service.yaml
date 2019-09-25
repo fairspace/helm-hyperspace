@@ -3,13 +3,13 @@ kind: Service
 metadata:
   name: {{ template "logaggregator.fullname" . }}
   labels:
-    app: portal
+    app: logaggregator
     chart: {{ template "hyperspace.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  type: {{ .Values.portal.service.type }}
+  type: {{ .Values.logaggregator.service.type }}
   ports: []
   selector:
-    app: portal
+    app: logaggregator
     release: {{ .Release.Name }}

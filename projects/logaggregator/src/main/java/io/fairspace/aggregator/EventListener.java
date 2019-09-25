@@ -15,6 +15,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class EventListener {
+    private static final String CONTENT_TYPE_JSON = "application/json";
     private static final ObjectMapper mapper = new ObjectMapper()
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final String ROUTING_KEY_WILDCARD = "*.*.*";
@@ -42,11 +43,13 @@ public class EventListener {
                                                    AMQP.BasicProperties properties,
                                                    byte[] body)
                                 throws IOException {
-                            var encoding = Optional.ofNullable(properties.getContentEncoding()).orElse(UTF_8.displayName());
-                            var payload = new String(body, encoding);
-                            var eventContainer = mapper.readValue(payload, EventContainer.class);
+                            if (CONTENT_TYPE_JSON.equals(properties.getContentType())) {
+                                var encoding = Optional.ofNullable(properties.getContentEncoding()).orElse(UTF_8.displayName());
+                                var payload = new String(body, encoding);
+                                var eventContainer = mapper.readValue(payload, EventContainer.class);
 
-                            logger.log(properties.getTimestamp(), eventContainer, payload);
+                                logger.log(properties.getTimestamp(), eventContainer, payload);
+                            }
                         }
                     });
         } catch ( IOException | TimeoutException e) {
