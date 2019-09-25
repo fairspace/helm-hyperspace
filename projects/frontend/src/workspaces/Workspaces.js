@@ -1,12 +1,12 @@
 import React, {useContext, useState} from 'react';
-import {Button, Snackbar, IconButton} from "@material-ui/core";
-import CloseIcon from '@material-ui/icons/Close';
-import {UserContext, BreadcrumbsContext, BreadCrumbs, usePageTitleUpdater} from '@fairspace/shared-frontend';
+import {Button} from "@material-ui/core";
+import {BreadCrumbs, BreadcrumbsContext, usePageTitleUpdater, UserContext} from '@fairspace/shared-frontend';
 
 import WorkspaceList from "./WorkspaceList";
 import NewWorkspaceDialog from "./NewWorkspaceDialog";
 import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import {isOrganisationAdmin} from "../common/utils/userUtils";
+import NotificationSnackbar from "../common/components/NotificationSnackbar";
 
 export default () => {
     const [showNewWorkspaceDialog, setShowNewWorkspaceDialog] = useState(false);
@@ -50,27 +50,11 @@ export default () => {
                     onClose={() => setShowNewWorkspaceDialog(false)}
                 />
             )}
-            {addingWorkspace && (
-                <Snackbar
-                    open
-                    onClose={() => setAddingWorkspace(false)}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                    }}
-                    message={<span>The workspace is being created, this might take a while</span>}
-                    autoHideDuration={6000}
-                    action={(
-                        <IconButton
-                            aria-label="Close"
-                            color="inherit"
-                            onClick={() => setAddingWorkspace(false)}
-                        >
-                            <CloseIcon />
-                        </IconButton>
-                    )}
-                />
-            )}
+            <NotificationSnackbar
+                open={addingWorkspace}
+                onClose={() => setAddingWorkspace(false)}
+                message="The workspace is being created, this might take a while"
+            />
         </BreadcrumbsContext.Provider>
     );
 };
