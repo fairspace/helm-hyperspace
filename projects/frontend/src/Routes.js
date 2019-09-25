@@ -7,6 +7,7 @@ import Home from "./home/Home";
 import Workspaces from "./workspaces/Workspaces";
 import RolesContainer from './roles/RolesContainer';
 import AppsContainer from "./apps/AppsContainer";
+import SearchPage from './search/SearchPage';
 
 const routes = () => (
     <>
@@ -15,16 +16,12 @@ const routes = () => (
         <Route
             path="/workspaces/:workspaceId/roles"
             exact
-            render={({match: {params: {workspaceId}}}) => {
-                return <RolesContainer workspaceId={workspaceId} />;
-            }}
+            render={({match: {params: {workspaceId}}}) => <RolesContainer workspaceId={workspaceId} />}
         />
         <Route
             path="/workspaces/:workspaceId/apps"
             exact
-            render={({match: {params: {workspaceId}}}) => {
-                return <AppsContainer workspaceId={workspaceId} />;
-            }}
+            render={({match: {params: {workspaceId}}}) => <AppsContainer workspaceId={workspaceId} />}
         />
 
         <Route path="/login" render={() => {window.location.href = '/login';}} />
@@ -34,6 +31,10 @@ const routes = () => (
                 logoutUrl: Config.get().urls.logout,
                 jupyterhubUrl: Config.get().urls.jupyterhub
             })}
+        />
+        <Route
+            path="/search"
+            render={({location, history}) => <SearchPage location={location} history={history} />}
         />
     </>
 );

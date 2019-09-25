@@ -11,12 +11,22 @@
     "version": "/config/version.json",
     "workspaces": "/api/v1/workspaces"
   },
+  "elasticsearch": {
+    "host": "/api/v1/search",
+    "log": "error"
+  },
+  "searchIndex": "hyperspace",
   "externalConfigurationFiles": [
     "/config/config.json"
   ],
   "roles": {
     "organisationAdmin": "",
-    "workspaceRoles": [ "user", "coordinator", "datasteward", "sparqluser" ],
+    "workspaceRoles": [
+      "user",
+      "coordinator",
+      "datasteward",
+      "sparqluser"
+    ],
     "prefixes": {
       "user": "user",
       "coordinator": "coordinator"
