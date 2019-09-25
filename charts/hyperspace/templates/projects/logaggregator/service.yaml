@@ -9,6 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   type: {{ .Values.portal.service.type }}
+  ports: []
   selector:
     app: portal
     release: {{ .Release.Name }}
