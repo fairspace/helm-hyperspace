@@ -1,6 +1,7 @@
 FROM openjdk:11-jre
 
-RUN apt-get update & apt-get install -y procps
+RUN apt-get update
+RUN apt-get install -y procps
 
 ADD build/distributions/*.tar /opt/
 
