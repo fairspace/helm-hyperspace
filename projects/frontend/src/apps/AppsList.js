@@ -29,25 +29,24 @@ const columns = {
 };
 
 const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
-    const [addingApp, setAddingApp] = useState(false);
-    const [removingApp, setRemovingApp] = useState(false);
+    const [updatingApp, setUpdatingApp] = useState(false);
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(apps, columns, 'type');
     const isAppInstalled = appType => apps.some(app => app.type === appType);
 
     const addApp = appType => {
-        setAddingApp(true);
+        setUpdatingApp(true);
         onAddApp(appType).catch(e => {
-            setAddingApp(false)
+            setUpdatingApp(false)
             ErrorDialog.showError(e, "Error adding a " + appType + " app to this workspace");
         });
     };
 
     const removeApp = appId => {
-        setRemovingApp(true);
+        setUpdatingApp(true);
         onRemoveApp(appId).catch(e => {
-            setRemovingApp(false);
-            ErrorDialog.showError(e, "Error removing app " + appId + " from the workspace")
+            setUpdatingApp(false);
+            ErrorDialog.showError(e, "Error removing app " + appId + " from the workspace");
         });
     }
 
@@ -152,14 +151,9 @@ const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
             </ConfirmationButton>
 
             <NotificationSnackbar
-                open={addingApp}
-                onClose={() => setAddingApp(false)}
-                message="The app is being added to your workspace, this might take a while"
-            />
-            <NotificationSnackbar
-                open={removingApp}
-                onClose={() => setRemovingApp(false)}
-                message="The app is being removed from your workspace, this might take a while"
+                open={updatingApp}
+                onClose={() => setUpdatingApp(false)}
+                message="The app state is being updated, this might take a while"
             />
         </AppsBreadcrumbsContextProvider>
     );
