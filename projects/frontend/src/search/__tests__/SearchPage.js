@@ -1,5 +1,6 @@
 import React from 'react';
 import {render, cleanup, getByText} from '@testing-library/react';
+import {act} from 'react-dom/test-utils';
 
 import SearchPageContainer, {SearchPage} from '../SearchPage';
 import Config from "../../common/services/Config";
@@ -43,8 +44,7 @@ describe('<SearchPage />', () => {
         expect(getByText(container, 'An error')).toBeTruthy();
     });
 
-    // TODO: this test causes "...test was not wrapped in act" warning, it would be good if it's avoided
-    it('should perform search on component first mount', () => {
+    it('should perform search on component first mount', async () => {
         const searchApi = {
             search: jest.fn(() => Promise.resolve({
                 total: 1,
@@ -52,14 +52,14 @@ describe('<SearchPage />', () => {
             }))
         };
 
-        render(
-            <SearchPageContainer
+        await act(async () => {
+            render(<SearchPageContainer
                 location={{
                     search: 'query'
                 }}
                 searchApi={searchApi}
-            />
-        );
+            />);
+        });
 
         expect(searchApi.search.mock.calls.length).toEqual(1);
     });
