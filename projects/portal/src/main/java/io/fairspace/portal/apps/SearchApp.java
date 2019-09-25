@@ -40,7 +40,7 @@ public class SearchApp implements Route {
         var token = tokenProvider.apply(request);
         var indices = getAvailableWorkspaces(token);
 
-        if (indices.size() == 0) {
+        if (indices.isEmpty()) {
             log.debug("Search ES without access to any workspace");
             throw new ForbiddenException("Current user does not have access to any workspace");
         }
@@ -50,7 +50,7 @@ public class SearchApp implements Route {
         }
 
         String elasticSearchUrl = format(CONFIG.elasticSearchUrlTemplate, join(",", indices));
-        log.trace("Search ES with indices: {} on upstream url", indices.toString(), elasticSearchUrl);
+        log.trace("Search ES with indices: {} on upstream url {}", indices.toString(), elasticSearchUrl);
 
         // Proxy ES response, as ES itself is not accessible from
         // outside the cluster
