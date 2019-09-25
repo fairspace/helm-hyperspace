@@ -35,17 +35,8 @@ data:
     # Set the name of the files
     log4j.appender.FILE.File=/logs/audit.log
 
-    # Set the immediate flush to true (default)
-    log4j.appender.FILE.ImmediateFlush=true
-
-    # Set the threshold to debug mode
-    log4j.appender.FILE.Threshold=debug
-
     # Set the append to false, should not overwrite
     log4j.appender.FILE.Append=true
-
-    # Set the maximum file size before rollover
-    log4j.appender.FILE.MaxFileSize=5MB
 
     # Set the the backup index
     log4j.appender.FILE.MaxBackupIndex=1000000
