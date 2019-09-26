@@ -3,7 +3,6 @@ package io.fairspace.portal.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.chart.ConfigOuterClass;
 import hapi.chart.MetadataOuterClass;
@@ -19,12 +18,11 @@ import org.junit.runner.RunWith;
 import org.microbean.helm.ReleaseManager;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,13 +48,13 @@ public class WorkspaceServiceTest {
     ChartOuterClass.Chart.Builder appChart = ChartOuterClass.Chart.newBuilder();
 
     @Mock
-    private ListenableFuture<Tiller.InstallReleaseResponse> installFuture;
+    private Future<Tiller.InstallReleaseResponse> installFuture;
 
     @Mock
-    private ListenableFuture<Tiller.UpdateReleaseResponse> updateFuture;
+    private Future<Tiller.UpdateReleaseResponse> updateFuture;
 
     @Mock
-    private ListenableFuture<Tiller.UninstallReleaseResponse> uninstallFuture;
+    private Future<Tiller.UninstallReleaseResponse> uninstallFuture;
 
 
     private WorkspaceService workspaceService;
@@ -78,17 +76,6 @@ public class WorkspaceServiceTest {
         when(releaseManager.install(any(), any())).thenReturn(installFuture);
         when(releaseManager.update(any(), any())).thenReturn(updateFuture);
         when(releaseManager.uninstall(any())).thenReturn(uninstallFuture);
-
-        Answer runFuture = invocation -> {
-            Runnable callback = invocation.getArgument(0);
-            Executor executor = invocation.getArgument(1);
-            executor.execute(callback);
-            return null;
-        };
-
-        doAnswer(runFuture).when(installFuture).addListener(any(), any());
-        doAnswer(runFuture).when(updateFuture).addListener(any(), any());
-        doAnswer(runFuture).when(uninstallFuture).addListener(any(), any());
     }
 
     @Test
@@ -148,7 +135,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void installApp() throws NotFoundException, IOException {
+    public void installApp() throws NotFoundException, IOException, InterruptedException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
         var app = WorkspaceApp.builder()
@@ -160,6 +147,7 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
 
         workspaceService.installApp("workspaceId", app);
+        Thread.sleep(100);
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verify(releaseManager, times(0)).update(any(), any());
@@ -188,7 +176,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void installAppUpdatesWorkspace() throws NotFoundException, IOException {
+    public void installAppUpdatesWorkspace() throws NotFoundException, IOException, InterruptedException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
         var app = WorkspaceApp.builder()
@@ -202,13 +190,14 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(Optional.of(updateReleaseRequest));
 
         workspaceService.installApp("workspaceId", app);
+        Thread.sleep(100);
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verify(releaseManager).update(updateReleaseRequest, workspaceChart);
     }
 
     @Test
-    public void installAppCanSkipUpdatingWorkspace() throws NotFoundException, IOException {
+    public void installAppCanSkipUpdatingWorkspace() throws NotFoundException, IOException, InterruptedException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
         var app = WorkspaceApp.builder()
@@ -221,13 +210,14 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(Optional.empty());
 
         workspaceService.installApp("workspaceId", app);
+        Thread.sleep(100);
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verifyNoMoreInteractions(releaseManager);
     }
 
     @Test
-    public void uninstallApp() throws NotFoundException, IOException {
+    public void uninstallApp() throws NotFoundException, IOException, InterruptedException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
 
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
@@ -237,6 +227,7 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
 
         workspaceService.uninstallApp("app");
+        Thread.sleep(100);
 
         verify(releaseManager).uninstall(uninstallReleaseRequest.build());
         verify(releaseManager, times(0)).update(any(), any());
@@ -261,7 +252,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void uninstallAppUpdatesWorkspace() throws NotFoundException, IOException {
+    public void uninstallAppUpdatesWorkspace() throws NotFoundException, IOException, InterruptedException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
 
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
@@ -273,6 +264,7 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(eq(release), any())).thenReturn(Optional.of(updateReleaseRequest));
 
         workspaceService.uninstallApp("app");
+        Thread.sleep(100);
 
         verify(releaseManager).uninstall(uninstallReleaseRequest.build());
         verify(releaseManager).update(eq(updateReleaseRequest), any());
