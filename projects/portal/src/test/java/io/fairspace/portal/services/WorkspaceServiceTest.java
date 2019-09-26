@@ -71,7 +71,7 @@ public class WorkspaceServiceTest {
 
         Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(APP_TYPE, appReleaseRequestBuilder);
 
-        workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, appRequestBuilders, domain, defaultValues);
+        workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, appRequestBuilders, domain, defaultValues, Runnable::run);
 
         when(releaseManager.install(any(), any())).thenReturn(installFuture);
         when(releaseManager.update(any(), any())).thenReturn(updateFuture);
@@ -79,9 +79,8 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void cacheIsInvalidatedAfterInstallation() throws IOException, InterruptedException {
+    public void cacheIsInvalidatedAfterInstallation() throws IOException {
         workspaceService.installWorkspace(Workspace.builder().id("test").build());
-        Thread.sleep(100);
 
         // The cache is supposed to be invalidated immediately after installation starts,
         // and again when the installation finishes
@@ -89,7 +88,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void itSetsConfigurationOnWorkspaceInstallation() throws IOException, InterruptedException {
+    public void itSetsConfigurationOnWorkspaceInstallation() throws IOException {
         var ws = Workspace.builder()
                 .id("test")
                 .name("Test")
@@ -99,7 +98,6 @@ public class WorkspaceServiceTest {
                 .build();
 
         workspaceService.installWorkspace(ws);
-        Thread.sleep(100);
 
         verify(releaseManager).install(
             argThat(request -> {
@@ -136,7 +134,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void installApp() throws NotFoundException, IOException, InterruptedException {
+    public void installApp() throws NotFoundException, IOException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
         var app = WorkspaceApp.builder()
@@ -148,7 +146,6 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
 
         workspaceService.installApp("workspaceId", app);
-        Thread.sleep(100);
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verify(releaseManager, times(0)).update(any(), any());
@@ -177,7 +174,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void installAppUpdatesWorkspace() throws NotFoundException, IOException, InterruptedException {
+    public void installAppUpdatesWorkspace() throws NotFoundException, IOException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
         var app = WorkspaceApp.builder()
@@ -191,14 +188,13 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(Optional.of(updateReleaseRequest));
 
         workspaceService.installApp("workspaceId", app);
-        Thread.sleep(100);
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verify(releaseManager).update(updateReleaseRequest, workspaceChart);
     }
 
     @Test
-    public void installAppCanSkipUpdatingWorkspace() throws NotFoundException, IOException, InterruptedException {
+    public void installAppCanSkipUpdatingWorkspace() throws NotFoundException, IOException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
         var app = WorkspaceApp.builder()
@@ -211,14 +207,13 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(Optional.empty());
 
         workspaceService.installApp("workspaceId", app);
-        Thread.sleep(100);
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verifyNoMoreInteractions(releaseManager);
     }
 
     @Test
-    public void uninstallApp() throws NotFoundException, IOException, InterruptedException {
+    public void uninstallApp() throws NotFoundException, IOException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
 
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
@@ -228,7 +223,6 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
 
         workspaceService.uninstallApp("app");
-        Thread.sleep(100);
 
         verify(releaseManager).uninstall(uninstallReleaseRequest.build());
         verify(releaseManager, times(0)).update(any(), any());
@@ -253,7 +247,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void uninstallAppUpdatesWorkspace() throws NotFoundException, IOException, InterruptedException {
+    public void uninstallAppUpdatesWorkspace() throws NotFoundException, IOException {
         var release = ReleaseOuterClass.Release.newBuilder().build();
 
         when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
@@ -264,8 +258,7 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
         when(appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(eq(release), any())).thenReturn(Optional.of(updateReleaseRequest));
 
-        workspaceService.uninstallApp("app");
-        Thread.sleep(100);
+        workspaceService.uninstallApp("app");;
 
         verify(releaseManager).uninstall(uninstallReleaseRequest.build());
         verify(releaseManager).update(eq(updateReleaseRequest), any());

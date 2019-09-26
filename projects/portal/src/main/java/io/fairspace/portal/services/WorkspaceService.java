@@ -26,7 +26,6 @@ import static hapi.release.StatusOuterClass.Status.Code;
 import static io.fairspace.portal.utils.HelmUtils.*;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @Slf4j
 public class WorkspaceService {
@@ -43,7 +42,7 @@ public class WorkspaceService {
     private final ReleaseManager releaseManager;
     private CachedReleaseList releaseList;
     private ChartRepo repo;
-    private final Executor worker = newSingleThreadExecutor();
+    private final Executor worker;
     private final WorkspaceReleaseRequestBuilder workspaceReleaseRequestBuilder;
     private final Map<String, AppReleaseRequestBuilder> releaseRequestBuilders;
 
@@ -53,12 +52,13 @@ public class WorkspaceService {
             @NonNull ChartRepo repo,
             @NonNull Map<String, AppReleaseRequestBuilder> releaseRequestBuilders,
             @NonNull String domain,
-            @NonNull Map<String, Map<String, ?>> defaultConfig
-            ) {
+            @NonNull Map<String, Map<String, ?>> defaultConfig,
+            @NonNull Executor worker) {
         this.releaseManager = releaseManager;
         this.releaseList = releaseList;
         this.releaseRequestBuilders = releaseRequestBuilders;
         this.repo = repo;
+        this.worker = worker;
 
         // Add a release builder for workspaces
         workspaceReleaseRequestBuilder = new WorkspaceReleaseRequestBuilder(domain, defaultConfig.get(WORKSPACE_CHART));
