@@ -258,7 +258,7 @@ public class WorkspaceServiceTest {
         when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
         when(appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(eq(release), any())).thenReturn(Optional.of(updateReleaseRequest));
 
-        workspaceService.uninstallApp("app");;
+        workspaceService.uninstallApp("app");
 
         verify(releaseManager).uninstall(uninstallReleaseRequest.build());
         verify(releaseManager).update(eq(updateReleaseRequest), any());
