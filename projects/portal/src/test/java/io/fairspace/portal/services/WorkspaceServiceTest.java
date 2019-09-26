@@ -89,7 +89,7 @@ public class WorkspaceServiceTest {
     }
 
     @Test
-    public void itSetsConfigurationOnWorkspaceInstallation() throws IOException {
+    public void itSetsConfigurationOnWorkspaceInstallation() throws IOException, InterruptedException {
         var ws = Workspace.builder()
                 .id("test")
                 .name("Test")
@@ -99,6 +99,7 @@ public class WorkspaceServiceTest {
                 .build();
 
         workspaceService.installWorkspace(ws);
+        Thread.sleep(100);
 
         verify(releaseManager).install(
             argThat(request -> {
