@@ -3,6 +3,7 @@ package io.fairspace.portal.services;
 import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
+import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import io.fairspace.portal.errors.NotFoundException;
@@ -143,6 +144,7 @@ public class WorkspaceService {
 
         AppReleaseRequestBuilder appReleaseRequestBuilder = releaseRequestBuilders.get(workspaceApp.getType());
         ReleaseOuterClass.Release workspaceRelease = releaseList.getRelease(workspaceId).orElseThrow(() -> new NotFoundException("Workspace with given id could not be found"));
+        ensureWorkspaceIsReady(workspaceRelease);
 
         // Set configuration and perform the actual installation
         InstallReleaseRequest.Builder installRequestBuilder = appReleaseRequestBuilder.appInstall(workspaceRelease, workspaceApp);
@@ -167,6 +169,7 @@ public class WorkspaceService {
         ReleaseOuterClass.Release appRelease = releaseList.getRelease(appId).orElseThrow(() -> new NotFoundException("App with given id could not be found"));
         WorkspaceApp workspaceApp = convertReleaseToWorkspaceApp(appRelease);
         ReleaseOuterClass.Release workspaceRelease = releaseList.getRelease(workspaceApp.getWorkspaceId()).orElseThrow(() -> new NotFoundException("Workspace for the given app could not be found"));
+        ensureWorkspaceIsReady(workspaceRelease);
 
         if(!releaseRequestBuilders.containsKey(workspaceApp.getType())) {
             throw new NotFoundException("App type " + workspaceApp.getType() + " not found");
@@ -182,6 +185,12 @@ public class WorkspaceService {
         Optional<Tiller.UpdateReleaseRequest.Builder> builder = appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(workspaceRelease, workspaceApp);
         if(builder.isPresent()) {
             updateRelease(builder.get(), repo.get(WORKSPACE_CHART));
+        }
+    }
+
+    private void ensureWorkspaceIsReady(ReleaseOuterClass.Release workspaceRelease) {
+        if (workspaceRelease.getInfo().getStatus().getCode() != Code.DEPLOYED) {
+            throw new IllegalStateException("Workspace " + workspaceRelease.getName() + " is not ready yet");
         }
     }
 
@@ -261,6 +270,7 @@ public class WorkspaceService {
                     .url("https://" + config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
                     .version(release.getChart().getMetadata().getVersion())
                     .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
+                    .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
                     .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
                     .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
                     .apps(listInstalledApps(release.getName()))
@@ -280,6 +290,7 @@ public class WorkspaceService {
                     .type(release.getChart().getMetadata().getName())
                     .version(release.getChart().getMetadata().getVersion())
                     .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
+                    .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
                     .url("https://" + config.at(WORKSPACE_APP_INGRESS_DOMAIN_YAML_PATH).asText())
                     .build();
         } catch (IOException e) {

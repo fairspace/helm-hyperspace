@@ -7,7 +7,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.chart.ConfigOuterClass;
 import hapi.chart.MetadataOuterClass;
+import hapi.release.InfoOuterClass;
 import hapi.release.ReleaseOuterClass;
+import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
@@ -35,6 +37,14 @@ import static org.mockito.Mockito.*;
 public class WorkspaceServiceTest {
     public static final String APP_TYPE = "appType";
     private static final String domain = "example.com";
+    private static final ReleaseOuterClass.Release READY_WORKSPACE = ReleaseOuterClass.Release.newBuilder()
+            .setInfo(InfoOuterClass.Info.newBuilder().setStatus(
+                    StatusOuterClass.Status.newBuilder().setCode(StatusOuterClass.Status.Code.DEPLOYED).build()))
+            .build();
+    private static final ReleaseOuterClass.Release UNREADY_WORKSPACE = ReleaseOuterClass.Release.newBuilder()
+            .setInfo(InfoOuterClass.Info.newBuilder().setStatus(
+                    StatusOuterClass.Status.newBuilder().setCode(StatusOuterClass.Status.Code.PENDING_INSTALL).build()))
+            .build();
 
     @Mock
     private ReleaseManager releaseManager;
@@ -149,20 +159,30 @@ public class WorkspaceServiceTest {
 
     @Test
     public void installApp() throws NotFoundException, IOException {
-        var release = ReleaseOuterClass.Release.newBuilder().build();
-        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
         var app = WorkspaceApp.builder()
                 .id("app")
                 .type(APP_TYPE)
                 .build();
 
         var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
-        when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
+        when(appReleaseRequestBuilder.appInstall(READY_WORKSPACE, app)).thenReturn(installReleaseRequest);
 
         workspaceService.installApp("workspaceId", app);
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verify(releaseManager, times(0)).update(any(), any());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void installAppFailsUnreadyWorkspace() throws NotFoundException, IOException {
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(UNREADY_WORKSPACE));
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        workspaceService.installApp("workspaceId", app);
     }
 
     @Test(expected = NotFoundException.class)
@@ -189,8 +209,7 @@ public class WorkspaceServiceTest {
 
     @Test
     public void installAppUpdatesWorkspace() throws NotFoundException, IOException {
-        var release = ReleaseOuterClass.Release.newBuilder().build();
-        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
         var app = WorkspaceApp.builder()
                 .id("app")
                 .type(APP_TYPE)
@@ -198,8 +217,8 @@ public class WorkspaceServiceTest {
 
         var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
         var updateReleaseRequest = Tiller.UpdateReleaseRequest.newBuilder();
-        when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
-        when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(Optional.of(updateReleaseRequest));
+        when(appReleaseRequestBuilder.appInstall(READY_WORKSPACE, app)).thenReturn(installReleaseRequest);
+        when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(READY_WORKSPACE, app)).thenReturn(Optional.of(updateReleaseRequest));
 
         workspaceService.installApp("workspaceId", app);
 
@@ -209,16 +228,15 @@ public class WorkspaceServiceTest {
 
     @Test
     public void installAppCanSkipUpdatingWorkspace() throws NotFoundException, IOException {
-        var release = ReleaseOuterClass.Release.newBuilder().build();
-        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
         var app = WorkspaceApp.builder()
                 .id("app")
                 .type(APP_TYPE)
                 .build();
 
         var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
-        when(appReleaseRequestBuilder.appInstall(release, app)).thenReturn(installReleaseRequest);
-        when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(release, app)).thenReturn(Optional.empty());
+        when(appReleaseRequestBuilder.appInstall(READY_WORKSPACE, app)).thenReturn(installReleaseRequest);
+        when(appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(READY_WORKSPACE, app)).thenReturn(Optional.empty());
 
         workspaceService.installApp("workspaceId", app);
 
@@ -228,9 +246,7 @@ public class WorkspaceServiceTest {
 
     @Test
     public void uninstallApp() throws NotFoundException, IOException {
-        var release = ReleaseOuterClass.Release.newBuilder().build();
-
-        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
         when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease(APP_TYPE)));
 
         var uninstallReleaseRequest = Tiller.UninstallReleaseRequest.newBuilder();
@@ -244,9 +260,7 @@ public class WorkspaceServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void uninstallAppFailsForUnknownAppType() throws NotFoundException, IOException {
-        var release = ReleaseOuterClass.Release.newBuilder().build();
-
-        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
         when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease("unknownAppType")));
 
         workspaceService.uninstallApp("app");
@@ -260,17 +274,24 @@ public class WorkspaceServiceTest {
         workspaceService.uninstallApp("app");
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void uninstallAppFailsForUnreadyWorkspace() throws NotFoundException, IOException {
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(UNREADY_WORKSPACE));
+        when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease(APP_TYPE)));
+
+        workspaceService.uninstallApp("app");
+    }
+
     @Test
     public void uninstallAppUpdatesWorkspace() throws NotFoundException, IOException {
-        var release = ReleaseOuterClass.Release.newBuilder().build();
 
-        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(release));
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
         when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease(APP_TYPE)));
 
         var uninstallReleaseRequest = Tiller.UninstallReleaseRequest.newBuilder();
         var updateReleaseRequest = Tiller.UpdateReleaseRequest.newBuilder();
         when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
-        when(appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(eq(release), any())).thenReturn(Optional.of(updateReleaseRequest));
+        when(appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(eq(READY_WORKSPACE), any())).thenReturn(Optional.of(updateReleaseRequest));
 
         workspaceService.uninstallApp("app");
 
