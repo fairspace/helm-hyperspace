@@ -1,0 +1,27 @@
+@startuml Hyperspace
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Component.puml
+
+title Component diagram for Organisation Portal backend
+
+LAYOUT_WITH_LEGEND()
+
+Person(admin, "Administrator", "An organisation wide administrator for fairspace")
+Person(user, "Regular user", "User without additional privileges")
+
+System_Boundary(portal, "Organisation portal") {
+    Component(searchApp, "Search App", "Spark app", "Proxies search queries to the right indices")
+    Component(workspacesApp, "Workspaces App", "Spark app", "Manages workspaces and apps")
+}
+
+Container(elasticsearch, "ElasticSearch", "Java", "Search index for information from all connected workspaces")
+Container(rabbitmq, "Message Bus", "RabbitMQ", "Transport for business events")
+
+System_Ext(tiller, "Tiller", "Server side component managing helm releases")
+
+Rel(admin, workspacesApp, "Manages workspaces and apps")
+Rel(user, searchApp, "Logs in at ")
+
+Rel(workspacesApp, tiller, "Manages releases with")
+Rel(searchApp, elasticsearch, "Queries appropriate indices")
+Rel(workspacesApp, rabbitmq, "Sends workspace and app events to", "AMQP")
+@enduml
