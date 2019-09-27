@@ -61,4 +61,4 @@ spec:
             name: {{ template "logaggregator.fullname" . }}
         - name: logs
           persistentVolumeClaim:
-            claimName: {{ .Values.logaggregator.persistence.logs.existingClaim | default (printf "%s-logs" (include "logaggregator.fullname" .)) }}
+            claimName: {{ .Values.logaggregator.persistence.logs.existingClaim | default (printf "%s-logs" (include "hyperspace.fullname" .)) }}

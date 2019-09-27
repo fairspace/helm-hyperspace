@@ -2,7 +2,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-    name: {{ template "hyperspace.fullname" . }}-files
+    name: {{ template "hyperspace.fullname" . }}-logs
     labels:
         app: logaggregator
         chart: {{ template "hyperspace.chart" . }}
