@@ -90,6 +90,7 @@ public class App {
         exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
         exception(NotFoundException.class, exceptionHandler(SC_NOT_FOUND, "Not found"));
         exception(ForbiddenException.class, exceptionHandler(SC_FORBIDDEN, "Forbidden"));
+        exception(IllegalStateException.class, exceptionHandler(SC_CONFLICT, null));
         exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
 
