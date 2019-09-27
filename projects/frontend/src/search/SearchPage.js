@@ -74,9 +74,16 @@ const SearchPageContainer = ({
     searchApi = SearchAPI(Config.get(), Config.get().searchIndex)
 }) => {
     const {error, loading, data} = useAsync(
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         useCallback(() => searchApi
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            .search({query, sort: SORT_DATE_CREATED}), [query])
+            .search({query, sort: SORT_DATE_CREATED})
+            .catch((e) => {
+                switch (e.status) {
+                    case 403: throw new Error("No workspaces available to search in");
+                    default: return handleSearchError(e);
+                }
+            }),
+        [query])
     );
 
     return <SearchPage error={error} loading={loading} results={data} />;
