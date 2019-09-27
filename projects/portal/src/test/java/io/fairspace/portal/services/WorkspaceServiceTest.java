@@ -3,7 +3,6 @@ package io.fairspace.portal.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.chart.ConfigOuterClass;
 import hapi.chart.MetadataOuterClass;
@@ -21,12 +20,12 @@ import org.junit.runner.RunWith;
 import org.microbean.helm.ReleaseManager;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -60,51 +59,39 @@ public class WorkspaceServiceTest {
     ChartOuterClass.Chart.Builder appChart = ChartOuterClass.Chart.newBuilder();
 
     @Mock
-    private ListenableFuture<Tiller.InstallReleaseResponse> installFuture;
+    private Future<Tiller.InstallReleaseResponse> installFuture;
 
     @Mock
-    private ListenableFuture<Tiller.UpdateReleaseResponse> updateFuture;
+    private Future<Tiller.UpdateReleaseResponse> updateFuture;
 
     @Mock
-    private ListenableFuture<Tiller.UninstallReleaseResponse> uninstallFuture;
+    private Future<Tiller.UninstallReleaseResponse> uninstallFuture;
 
+    private Map<String, AppReleaseRequestBuilder> appRequestBuilders;
 
     private WorkspaceService workspaceService;
 
+    private Map<String, Map<String, ?>> defaultValues  = Map.of("workspace", Map.of("saturn", Map.of("persistence",  Map.of("key", "value"))));
+
     @Before
     public void setUp() throws IOException {
-        var workspaceValues = Map.of("saturn", Map.of("persistence",  Map.of("key", "value")));
-        Map<String, Map<String, ?>> defaultValues = Map.of("workspace", workspaceValues);
-
         when(chartRepo.get("workspace")).thenReturn(workspaceChart);
         when(chartRepo.contains("workspace")).thenReturn(true);
         when(chartRepo.get(APP_TYPE)).thenReturn(appChart);
         when(chartRepo.contains(APP_TYPE)).thenReturn(true);
 
-        Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(APP_TYPE, appReleaseRequestBuilder);
+        appRequestBuilders = Map.of(APP_TYPE, appReleaseRequestBuilder);
 
-        workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, appRequestBuilders, domain, defaultValues);
+        workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, appRequestBuilders, domain, defaultValues, Runnable::run);
 
         when(releaseManager.install(any(), any())).thenReturn(installFuture);
         when(releaseManager.update(any(), any())).thenReturn(updateFuture);
         when(releaseManager.uninstall(any())).thenReturn(uninstallFuture);
-
-        Answer runFuture = invocation -> {
-            Runnable callback = invocation.getArgument(0);
-            Executor executor = invocation.getArgument(1);
-            executor.execute(callback);
-            return null;
-        };
-
-        doAnswer(runFuture).when(installFuture).addListener(any(), any());
-        doAnswer(runFuture).when(updateFuture).addListener(any(), any());
-        doAnswer(runFuture).when(uninstallFuture).addListener(any(), any());
     }
 
     @Test
-    public void cacheIsInvalidatedAfterInstallation() throws IOException, InterruptedException {
+    public void cacheIsInvalidatedAfterInstallation() throws IOException {
         workspaceService.installWorkspace(Workspace.builder().id("test").build());
-        Thread.sleep(100);
 
         // The cache is supposed to be invalidated immediately after installation starts,
         // and again when the installation finishes
@@ -297,6 +284,29 @@ public class WorkspaceServiceTest {
 
         verify(releaseManager).uninstall(uninstallReleaseRequest.build());
         verify(releaseManager).update(eq(updateReleaseRequest), any());
+    }
+
+    @Test
+    public void callsToReleaseManagerHappenOnTheWorkerExecutor() throws NotFoundException, IOException {
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appInstall(READY_WORKSPACE, app)).thenReturn(installReleaseRequest);
+        var asyncTasks = new ArrayList<Runnable>();
+        var workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, appRequestBuilders, domain, defaultValues, asyncTasks::add);
+
+        workspaceService.installApp("workspaceId", app);
+        workspaceService.installApp("workspaceId", app);
+
+        assertEquals(2, asyncTasks.size());
+        verifyZeroInteractions(releaseManager);
+
+        asyncTasks.forEach(Runnable::run);
+        verify(releaseManager, times(2)).install(any(), any());
     }
 
     private ReleaseOuterClass.Release getAppRelease(String appType) {

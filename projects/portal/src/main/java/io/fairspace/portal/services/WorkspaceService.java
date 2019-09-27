@@ -1,6 +1,5 @@
 package io.fairspace.portal.services;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
 import hapi.release.StatusOuterClass;
@@ -10,25 +9,24 @@ import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
 import io.fairspace.portal.services.releases.AppReleaseRequestBuilder;
-import io.fairspace.portal.services.releases.JupyterReleaseRequestBuilder;
 import io.fairspace.portal.services.releases.WorkspaceReleaseRequestBuilder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static hapi.release.StatusOuterClass.Status.Code;
 import static io.fairspace.portal.utils.HelmUtils.*;
+import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @Slf4j
 public class WorkspaceService {
@@ -45,7 +43,7 @@ public class WorkspaceService {
     private final ReleaseManager releaseManager;
     private CachedReleaseList releaseList;
     private ChartRepo repo;
-    private final Executor worker = newSingleThreadExecutor();
+    private final Executor worker;
     private final WorkspaceReleaseRequestBuilder workspaceReleaseRequestBuilder;
     private final Map<String, AppReleaseRequestBuilder> releaseRequestBuilders;
 
@@ -55,12 +53,13 @@ public class WorkspaceService {
             @NonNull ChartRepo repo,
             @NonNull Map<String, AppReleaseRequestBuilder> releaseRequestBuilders,
             @NonNull String domain,
-            @NonNull Map<String, Map<String, ?>> defaultConfig
-            ) {
+            @NonNull Map<String, Map<String, ?>> defaultConfig,
+            @NonNull Executor worker) {
         this.releaseManager = releaseManager;
         this.releaseList = releaseList;
         this.releaseRequestBuilders = releaseRequestBuilders;
         this.repo = repo;
+        this.worker = worker;
 
         // Add a release builder for workspaces
         workspaceReleaseRequestBuilder = new WorkspaceReleaseRequestBuilder(domain, defaultConfig.get(WORKSPACE_CHART));
@@ -110,7 +109,7 @@ public class WorkspaceService {
     public List<WorkspaceApp> listInstalledApps() {
         return releaseList.get()
                 .stream()
-                .filter(release -> releaseRequestBuilders.keySet().contains(release.getChart().getMetadata().getName()))
+                .filter(release -> releaseRequestBuilders.containsKey(release.getChart().getMetadata().getName()))
                 .map(this::convertReleaseToWorkspaceApp)
                 .collect(Collectors.toList());
     }
@@ -183,9 +182,7 @@ public class WorkspaceService {
 
         // Update workspace release, if needed
         Optional<Tiller.UpdateReleaseRequest.Builder> builder = appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(workspaceRelease, workspaceApp);
-        if(builder.isPresent()) {
-            updateRelease(builder.get(), repo.get(WORKSPACE_CHART));
-        }
+        builder.ifPresent(update -> updateRelease(update, repo.get(WORKSPACE_CHART)));
     }
 
     private void ensureWorkspaceIsReady(ReleaseOuterClass.Release workspaceRelease) {
@@ -200,14 +197,13 @@ public class WorkspaceService {
      * @param chartBuilder
      * @throws IOException
      */
-    private void installRelease(InstallReleaseRequest.Builder requestBuilder, ChartOuterClass.Chart.Builder chartBuilder) throws IOException {
+    private void installRelease(InstallReleaseRequest.Builder requestBuilder, ChartOuterClass.Chart.Builder chartBuilder) {
         requestBuilder
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
         log.info("Installing release {} with chart {} version {}", requestBuilder.getName(), chartBuilder.getMetadata().getName(), chartBuilder.getMetadata().getVersion());
-        var future = (ListenableFuture<?>) releaseManager.install(requestBuilder, chartBuilder);
 
-        handleCacheInvalidation(future, "Install " + requestBuilder.getName());
+        perform("Install " + requestBuilder.getName(), () -> releaseManager.install(requestBuilder, chartBuilder));
     }
 
     /**
@@ -216,14 +212,13 @@ public class WorkspaceService {
      * @param chartBuilder
      * @throws IOException
      */
-    private void updateRelease(Tiller.UpdateReleaseRequest.Builder requestBuilder, ChartOuterClass.Chart.Builder chartBuilder) throws IOException {
+    private void updateRelease(Tiller.UpdateReleaseRequest.Builder requestBuilder, ChartOuterClass.Chart.Builder chartBuilder) {
         requestBuilder
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
-        log.info("Updating release {} with chart {} version {}", requestBuilder.getName(), chartBuilder.getMetadata().getName(), chartBuilder.getMetadata().getVersion());
-        var future = (ListenableFuture<?>) releaseManager.update(requestBuilder, chartBuilder);
 
-        handleCacheInvalidation(future, "Update " + requestBuilder.getName());
+        perform(format("Update release %s to version %s", requestBuilder.getName(), chartBuilder.getMetadata().getVersion()),
+                () -> releaseManager.update(requestBuilder, chartBuilder));
     }
 
     /**
@@ -231,33 +226,36 @@ public class WorkspaceService {
      * @param requestBuilder
      * @throws IOException
      */
-    private void uninstallRelease(Tiller.UninstallReleaseRequest.Builder requestBuilder) throws IOException {
+    private void uninstallRelease(Tiller.UninstallReleaseRequest.Builder requestBuilder) {
         requestBuilder
                 .setTimeout(INSTALLATION_TIMEOUT_SEC);
-        log.info("Uninstalling release {}", requestBuilder.getName());
-        var future = (ListenableFuture<?>) releaseManager.uninstall(requestBuilder.build());
 
-        handleCacheInvalidation(future, "Uninstall " + requestBuilder.getName());
+        perform("Uninstall " + requestBuilder.getName(), () -> releaseManager.uninstall(requestBuilder.build()));
     }
 
     /**
-     * Handles release list cache invalidation when a helm command is executed and when it finishes
-     * @param future
+     * Handles release list cache invalidation and error handling when a Helm command is executed and when it finishes
+     * and ensures that no more than one command is executed at a time
      * @param helmCommand
+     * @param action Action to perform
      */
-    private void handleCacheInvalidation(ListenableFuture<?> future, String helmCommand) {
-        future.addListener(() -> {
+    private void perform(String helmCommand, Callable<Future<?>> action) {
+        worker.execute(() -> {
             try {
-                future.get();
+                log.info("Executing Helm command {}", helmCommand);
+                var future = action.call();
                 releaseList.invalidateCache();
-            } catch (ExecutionException e) {
-                log.error("Error performing helm command {}", helmCommand, e);
+                future.get();
+                log.info("Successfully executed Helm command {}", helmCommand);
             } catch (InterruptedException e) {
+                log.warn("Interrupted while performing Helm command {}", helmCommand);
                 currentThread().interrupt();
+            } catch (Exception e) {
+                log.error("Error performing Helm command {}", helmCommand, e);
+            } finally {
+                releaseList.invalidateCache();
             }
-        }, worker);
-
-        releaseList.invalidateCache();
+        });
     }
 
     private Workspace convertReleaseToWorkspace(ReleaseOuterClass.Release release) {
