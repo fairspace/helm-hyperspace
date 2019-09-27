@@ -4,13 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import hapi.release.ReleaseOuterClass;
-import hapi.services.tiller.Tiller;
-import io.fairspace.portal.model.WorkspaceApp;
 
 import java.io.IOException;
-
-import static io.fairspace.portal.utils.HelmUtils.getReleaseConfig;
 
 public abstract class BaseAppReleaseRequestBuilder implements AppReleaseRequestBuilder {
     protected static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());

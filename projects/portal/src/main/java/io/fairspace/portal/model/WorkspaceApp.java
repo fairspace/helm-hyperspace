@@ -16,4 +16,5 @@ public class WorkspaceApp {
     private String version;
     private String url;
     private String status;
+    private boolean ready;
 }
