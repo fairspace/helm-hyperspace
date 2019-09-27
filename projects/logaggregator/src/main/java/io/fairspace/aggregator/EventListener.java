@@ -6,6 +6,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import io.fairspace.aggregator.model.EventContainer;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Slf4j
 public class EventListener {
     private static final String CONTENT_TYPE_JSON = "application/json";
     private static final ObjectMapper mapper = new ObjectMapper()
@@ -51,6 +53,8 @@ public class EventListener {
                                 var eventContainer = mapper.readValue(payload, EventContainer.class);
 
                                 logger.log(properties.getTimestamp(), eventContainer, payload);
+                            } else {
+                                log.error("Unsupported content type {} for message with routing key {}", properties.getContentType(), envelope.getRoutingKey());
                             }
                         }
                     });
