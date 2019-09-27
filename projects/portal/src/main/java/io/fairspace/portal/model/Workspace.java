@@ -18,6 +18,7 @@ public class Workspace {
     private String version;
     private String url;
     private String status;
+    private String errorMessage;
     private boolean ready;
     private int logAndFilesVolumeSize;
     private int databaseVolumeSize;

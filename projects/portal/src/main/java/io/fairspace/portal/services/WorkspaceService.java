@@ -268,6 +268,7 @@ public class WorkspaceService {
                     .url("https://" + config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
                     .version(release.getChart().getMetadata().getVersion())
                     .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
+                    .errorMessage(release.getInfo().getStatus().getCode() == Code.FAILED ? release.getInfo().getDescription() : "")
                     .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
                     .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
                     .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
@@ -288,6 +289,7 @@ public class WorkspaceService {
                     .type(release.getChart().getMetadata().getName())
                     .version(release.getChart().getMetadata().getVersion())
                     .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
+                    .errorMessage(release.getInfo().getStatus().getCode() == Code.FAILED ? release.getInfo().getDescription() : "")
                     .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
                     .url("https://" + config.at(WORKSPACE_APP_INGRESS_DOMAIN_YAML_PATH).asText())
                     .build();
