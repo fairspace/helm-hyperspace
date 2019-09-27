@@ -51,17 +51,6 @@ spec:
           periodSeconds: 5
         resources:
 {{ toYaml .Values.logaggregator.resources | indent 12 }}
-        env:
-        - name: SECURITY_OIDC_CLIENTID
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-oauth-client
-              key: clientId
-        - name: SECURITY_OIDC_CLIENTSECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-oauth-client
-              key: clientSecret
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml . | indent 8 }}
