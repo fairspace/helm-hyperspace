@@ -182,9 +182,7 @@ public class WorkspaceService {
 
         // Update workspace release, if needed
         Optional<Tiller.UpdateReleaseRequest.Builder> builder = appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(workspaceRelease, workspaceApp);
-        if(builder.isPresent()) {
-            updateRelease(builder.get(), repo.get(WORKSPACE_CHART));
-        }
+        builder.ifPresent(update -> updateRelease(update, repo.get(WORKSPACE_CHART)));
     }
 
     private void ensureWorkspaceIsReady(ReleaseOuterClass.Release workspaceRelease) {

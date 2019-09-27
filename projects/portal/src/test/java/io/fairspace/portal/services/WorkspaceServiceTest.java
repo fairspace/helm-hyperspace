@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -66,20 +67,20 @@ public class WorkspaceServiceTest {
     @Mock
     private Future<Tiller.UninstallReleaseResponse> uninstallFuture;
 
+    private Map<String, AppReleaseRequestBuilder> appRequestBuilders;
 
     private WorkspaceService workspaceService;
 
+    private Map<String, Map<String, ?>> defaultValues  = Map.of("workspace", Map.of("saturn", Map.of("persistence",  Map.of("key", "value"))));
+
     @Before
     public void setUp() throws IOException {
-        var workspaceValues = Map.of("saturn", Map.of("persistence",  Map.of("key", "value")));
-        Map<String, Map<String, ?>> defaultValues = Map.of("workspace", workspaceValues);
-
         when(chartRepo.get("workspace")).thenReturn(workspaceChart);
         when(chartRepo.contains("workspace")).thenReturn(true);
         when(chartRepo.get(APP_TYPE)).thenReturn(appChart);
         when(chartRepo.contains(APP_TYPE)).thenReturn(true);
 
-        Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(APP_TYPE, appReleaseRequestBuilder);
+        appRequestBuilders = Map.of(APP_TYPE, appReleaseRequestBuilder);
 
         workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, appRequestBuilders, domain, defaultValues, Runnable::run);
 
@@ -283,6 +284,29 @@ public class WorkspaceServiceTest {
 
         verify(releaseManager).uninstall(uninstallReleaseRequest.build());
         verify(releaseManager).update(eq(updateReleaseRequest), any());
+    }
+
+    @Test
+    public void callsToReleaseManagerHappenOnTheWorkerExecutor() throws NotFoundException, IOException {
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appInstall(READY_WORKSPACE, app)).thenReturn(installReleaseRequest);
+        var asyncTasks = new ArrayList<Runnable>();
+        var workspaceService = new WorkspaceService(releaseManager, releaseList, chartRepo, appRequestBuilders, domain, defaultValues, asyncTasks::add);
+
+        workspaceService.installApp("workspaceId", app);
+        workspaceService.installApp("workspaceId", app);
+
+        assertEquals(2, asyncTasks.size());
+        verifyZeroInteractions(releaseManager);
+
+        asyncTasks.forEach(Runnable::run);
+        verify(releaseManager, times(2)).install(any(), any());
     }
 
     private ReleaseOuterClass.Release getAppRelease(String appType) {
