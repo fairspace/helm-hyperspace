@@ -29,9 +29,6 @@ spec:
 {{ toYaml .Values.podAnnotations.logaggregator | indent 8 }}
 {{- end }}
     spec:
-      {{- if .Values.hyperspace.rbac.enabled }}
-      serviceAccountName: {{ .Release.Name }}-logaggregator
-      {{- end }}
       containers:
       - name: {{ template "logaggregator.fullname" . }}
         image: "{{ .Values.logaggregator.image.image }}:{{ .Values.logaggregator.image.tag }}"
