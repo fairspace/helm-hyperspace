@@ -27,6 +27,7 @@ import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static io.fairspace.portal.errors.ErrorHelper.errorBody;
 import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
 import static io.fairspace.portal.utils.HelmUtils.JUPYTER_CHART;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static javax.servlet.http.HttpServletResponse.*;
 import static spark.Spark.*;
 
@@ -76,7 +77,7 @@ public class App {
         // Define the available apps to install
         Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(JUPYTER_CHART, new JupyterReleaseRequestBuilder(CONFIG.defaultConfig.get(JUPYTER_CHART)));
 
-        WorkspaceService workspaceService = new WorkspaceService(releaseManager, releaseList, repo, appRequestBuilders, CONFIG.domain, CONFIG.defaultConfig);
+        WorkspaceService workspaceService = new WorkspaceService(releaseManager, releaseList, repo, appRequestBuilders, CONFIG.domain, CONFIG.defaultConfig, newSingleThreadExecutor());
 
         path("/api/v1", () -> {
             path("/workspaces", new WorkspacesApp(workspaceService, tokenProvider));
@@ -89,6 +90,7 @@ public class App {
         exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
         exception(NotFoundException.class, exceptionHandler(SC_NOT_FOUND, "Not found"));
         exception(ForbiddenException.class, exceptionHandler(SC_FORBIDDEN, "Forbidden"));
+        exception(IllegalStateException.class, exceptionHandler(SC_CONFLICT, null));
         exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
 

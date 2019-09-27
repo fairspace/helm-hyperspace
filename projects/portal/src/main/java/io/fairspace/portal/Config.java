@@ -6,11 +6,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static io.fairspace.portal.utils.HelmUtils.WORKSPACE_CHART;
 
 public class Config {
     public String domain = "ci.fairway.app";

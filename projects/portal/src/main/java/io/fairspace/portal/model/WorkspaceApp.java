@@ -17,4 +17,5 @@ public class WorkspaceApp {
     private String url;
     private String status;
     private String errorMessage;
+    private boolean ready;
 }

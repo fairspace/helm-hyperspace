@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static io.fairspace.portal.utils.JacksonUtils.merge;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class JacksonUtilsTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();
