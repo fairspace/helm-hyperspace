@@ -1,0 +1,64 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "logaggregator.fullname" . }}
+  labels:
+    app: logaggregator
+    chart: {{ template "hyperspace.chart" . }}
+    draft: {{ default "draft-app" .Values.draft }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.logaggregator.replicaCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.logaggregator.rollingUpdate.maxSurge | default "25%" }}
+      maxUnavailable: {{ .Values.logaggregator.rollingUpdate.maxUnavailable | default "25%" }}
+  selector:
+    matchLabels:
+      app: logaggregator
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        draft: {{ default "draft-app" .Values.draft }}
+        app: logaggregator
+        release: {{ .Release.Name }}
+{{- if .Values.podAnnotations.logaggregator }}
+      annotations:
+{{ toYaml .Values.podAnnotations.logaggregator | indent 8 }}
+{{- end }}
+    spec:
+      {{- if .Values.hyperspace.rbac.enabled }}
+      serviceAccountName: {{ .Release.Name }}-logaggregator
+      {{- end }}
+      containers:
+      - name: {{ template "logaggregator.fullname" . }}
+        image: "{{ .Values.logaggregator.image.image }}:{{ .Values.logaggregator.image.tag }}"
+        imagePullPolicy: {{ .Values.logaggregator.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.logaggregator.service.internalPort }}
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/config
+        - name: logs
+          mountPath: /logs
+        livenessProbe:
+          exec:
+            command:
+              - ps -ef | grep java | grep io.fairspace.aggregator.App
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+{{ toYaml .Values.logaggregator.resources | indent 12 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ template "logaggregator.fullname" . }}
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ .Values.logaggregator.persistence.logs.existingClaim | default (printf "%s-logs" (include "logaggregator.fullname" .)) }}
