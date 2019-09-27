@@ -10,14 +10,22 @@ import NotificationSnackbar from "../common/components/NotificationSnackbar";
 
 export default () => {
     const [showNewWorkspaceDialog, setShowNewWorkspaceDialog] = useState(false);
-    const [addingWorkspace, setAddingWorkspace] = useState(false);
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
 
     usePageTitleUpdater("Workspaces");
 
     const createWorkspace = (workspace) => {
         setShowNewWorkspaceDialog(false);
-        setAddingWorkspace(true);
-        return WorkspaceAPI.createWorkspace(workspace);
+        return WorkspaceAPI.createWorkspace(workspace)
+            .then(() => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("The workspace is being created, this might take a while");
+            })
+            .catch(() => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("An error occurred while creating your workspace. Please try again later.");
+            });
     };
 
     const {currentUser: {authorizations}} = useContext(UserContext);
@@ -51,10 +59,11 @@ export default () => {
                 />
             )}
             <NotificationSnackbar
-                open={addingWorkspace}
-                onClose={() => setAddingWorkspace(false)}
-                message="The workspace is being created, this might take a while"
+                open={snackbarVisible}
+                onClose={() => setSnackbarVisible(false)}
+                message={snackbarMessage}
             />
+
         </BreadcrumbsContext.Provider>
     );
 };
