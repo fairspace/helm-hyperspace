@@ -46,6 +46,12 @@ spec:
               - ps -ef | grep java | grep io.fairspace.aggregator.App
           initialDelaySeconds: 10
           periodSeconds: 5
+        readinessProbe:
+            exec:
+                command:
+                    - ps -ef | grep java | grep io.fairspace.aggregator.App
+            initialDelaySeconds: 10
+            periodSeconds: 5
         resources:
 {{ toYaml .Values.logaggregator.resources | indent 12 }}
       {{- with .Values.imagePullSecrets }}

@@ -26,19 +26,12 @@ data:
     log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
 
     # Define the audit logger with appender file
-    log4j.logger.audit = INFO, FILE
-
-    # Logging can be configured per category, event type and workspace:
-    # log4j.logger.audit.METADATA.PUT.Workspace1 = NONE
+    log4j.logger.audit=INFO, FILE
 
     # Define the file appender
-    log4j.appender.FILE=org.apache.log4j.RollingFileAppender
-
-    # Set the name of the files
+    log4j.appender.FILE=org.apache.log4j.DailyRollingFileAppender
+    log4j.appender.FILE.datePattern='-'dd'.log'
     log4j.appender.FILE.File=/logs/audit.log
-
-    # Set the append to false, should not overwrite
-    log4j.appender.FILE.Append=true
 
     # Set the the backup index
     log4j.appender.FILE.MaxBackupIndex=1000000
