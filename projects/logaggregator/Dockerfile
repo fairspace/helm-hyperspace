@@ -6,4 +6,4 @@ RUN apt-get install -y procps
 ADD build/distributions/*.tar /opt/
 
 WORKDIR "/opt/config"
-CMD ["/bin/sh", "-c", "/opt/logaggregator-*/bin/logaggregator -Dlog4j.configuration=file:log4j.properties"]
+CMD ["/bin/sh", "-c", "/opt/logaggregator-*/bin/logaggregator -Dlog4j.configuration=file:/opt/config/log4j.properties"]
