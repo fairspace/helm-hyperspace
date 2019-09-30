@@ -227,7 +227,7 @@ portal:
         maxSurge: 25%
     image:
         image: eu.gcr.io/fairspace-207108/portal
-        tag: RELEASEVERSION
+        tag: 0.6.2
         pullPolicy: IfNotPresent
     service:
         type: ClusterIP
@@ -275,7 +275,7 @@ frontend:
     replicaCount: 1
     image:
         image: eu.gcr.io/fairspace-207108/frontend
-        tag: RELEASEVERSION
+        tag: 0.6.2
         pullPolicy: IfNotPresent
     service:
         type: ClusterIP
@@ -310,7 +310,7 @@ logaggregator:
         maxSurge: 25%
     image:
         image: eu.gcr.io/fairspace-207108/logaggregator
-        tag: RELEASEVERSION
+        tag: 0.6.2
         pullPolicy: IfNotPresent
     service:
         type: ClusterIP
