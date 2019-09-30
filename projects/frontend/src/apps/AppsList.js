@@ -4,9 +4,9 @@ import {
     Button, IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel
 } from '@material-ui/core';
 import {Delete} from "@material-ui/icons";
-import {BreadCrumbs, ConfirmationButton, ErrorDialog, useSorting} from "@fairspace/shared-frontend";
-import AppsBreadcrumbsContextProvider from "./AppsBreadcrumbsContextProvider";
+import {BreadCrumbs, ConfirmationButton, useSorting} from "@fairspace/shared-frontend";
 import {APP_TYPE_JUPYTER} from "../constants";
+import AppsBreadcrumbsContextProvider from "./AppsBreadcrumbsContextProvider";
 import NotificationSnackbar from "../common/components/NotificationSnackbar";
 
 const columns = {
@@ -29,25 +29,34 @@ const columns = {
 };
 
 const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
-    const [updatingApp, setUpdatingApp] = useState(false);
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
 
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(apps, columns, 'type');
     const isAppInstalled = appType => apps.some(app => app.type === appType);
 
     const addApp = appType => {
-        setUpdatingApp(true);
-        onAddApp(appType).catch(e => {
-            setUpdatingApp(false)
-            ErrorDialog.showError(e, "Error adding a " + appType + " app to this workspace");
-        });
+        onAddApp(appType)
+            .then(() => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("Your " + appType + " app is being added to the workspace, this might take a while for it to appear");
+            })
+            .catch(e => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("Error adding a " + appType + " app to this workspace");
+            });
     };
 
     const removeApp = appId => {
-        setUpdatingApp(true);
-        onRemoveApp(appId).catch(e => {
-            setUpdatingApp(false);
-            ErrorDialog.showError(e, "Error removing app " + appId + " from the workspace");
-        });
+        onRemoveApp(appId)
+            .then(() => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("Your app " + appId + " is being removed from the workspace. It might take a while for it to disappear");
+            })
+            .catch(e => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("Error removing the " + appId + " app from this workspace");
+            });
     }
 
     return (
@@ -151,9 +160,9 @@ const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
             </ConfirmationButton>
 
             <NotificationSnackbar
-                open={updatingApp}
-                onClose={() => setUpdatingApp(false)}
-                message="The app state is being updated, this might take a while"
+                open={snackbarVisible}
+                onClose={() => setSnackbarVisible(false)}
+                message={snackbarMessage}
             />
         </AppsBreadcrumbsContextProvider>
     );
