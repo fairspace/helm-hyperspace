@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography} from '@material-ui/core';
 import {
     LoadingInlay, MessageDisplay, SearchResultHighlights,
-    getSearchQueryFromString, SearchAPI, SORT_DATE_CREATED, useAsync
+    getSearchQueryFromString, SearchAPI, SORT_DATE_CREATED, useAsync, handleSearchError
 } from '@fairspace/shared-frontend';
 
 import Config from "../common/services/Config";
@@ -74,7 +74,6 @@ const SearchPageContainer = ({
     searchApi = SearchAPI(Config.get(), Config.get().searchIndex)
 }) => {
     const {error, loading, data} = useAsync(
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         useCallback(() => searchApi
             .search({query, sort: SORT_DATE_CREATED})
             .catch((e) => {
@@ -83,6 +82,7 @@ const SearchPageContainer = ({
                     default: return handleSearchError(e);
                 }
             }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [query])
     );
 
