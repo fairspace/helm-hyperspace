@@ -53,8 +53,10 @@ public class EventListener {
                                 var eventContainer = mapper.readValue(payload, EventContainer.class);
 
                                 logger.log(properties.getTimestamp(), eventContainer, payload);
+                                channel.basicAck(envelope.getDeliveryTag(), false);
                             } else {
                                 log.error("Unsupported content type {} for message with routing key {}", properties.getContentType(), envelope.getRoutingKey());
+                                channel.basicReject(envelope.getDeliveryTag(), false);
                             }
                         }
                     });
