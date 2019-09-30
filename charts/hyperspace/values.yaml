@@ -28,17 +28,30 @@ hyperspace:
 
     # Scripts for setting up keycloak for hyperspace
     configurationScripts:
-        dockerRepository: eu.gcr.io
-        image: fairspace-207108/keycloak-configuration
-        configurationScriptsTag: 0.1.4
-        pullPolicy: IfNotPresent
-        resources:
-            requests:
-                cpu: "50m"
-                memory: "512Mi"
-            limits:
-                cpu: "500m"
-                memory: "2048Mi"
+        keycloak:
+            dockerRepository: eu.gcr.io
+            image: fairspace-207108/keycloak-configuration
+            configurationScriptsTag: 0.1.5
+            pullPolicy: IfNotPresent
+            resources:
+                requests:
+                    cpu: "50m"
+                    memory: "512Mi"
+                limits:
+                    cpu: "1"
+                    memory: "2048Mi"
+        rabbitmq:
+            dockerRepository: eu.gcr.io
+            image: fairspace-207108/rabbitmq-configuration
+            configurationScriptsTag: 0.1.2
+            pullPolicy: IfNotPresent
+            resources:
+                requests:
+                    cpu: "50m"
+                    memory: "512Mi"
+                limits:
+                    cpu: "1"
+                    memory: "2048Mi"
     organisationadmin:
         username:
         password: fairspace123
@@ -72,6 +85,24 @@ keycloak:
             limits:
                 cpu: "500m"
                 memory: "512Mi"
+
+#################################################
+# RabbitMQ configuration
+#################################################
+rabbitmq:
+    enabled: true
+    expose: true
+    ingress:
+        enabled: false
+    persistence:
+        enabled: true
+    service:
+        managerPort: 15672
+    rabbitmq:
+        username: rabbitmq
+    user:
+        username: hyperspace
+        password:
 
 #####################################################################
 # Specific settings for ElasticSearch
@@ -146,7 +177,7 @@ pluto:
         maxSurge: 25%
     image:
         image: eu.gcr.io/fairspace-207108/pluto
-        tag: 0.6.7
+        tag: 0.6.9
         pullPolicy: IfNotPresent
     service:
         type: ClusterIP
@@ -179,6 +210,7 @@ pluto:
     # Where to find the backends for this proxy
     backends:
       portal:
+      keycloak:
       frontend:
 
     # Zuul timeouts when connecting to upstream services
@@ -219,6 +251,13 @@ portal:
         successThreshold: 1
         timeoutSeconds: 1
     terminationGracePeriodSeconds: 10
+    charts:
+      workspace:
+        repo: http://storage.googleapis.com/fairspace-helm/
+        file: workspace-0.6.8.tgz
+      jupyter:
+        repo: http://storage.googleapis.com/fairspace-helm/
+        file: jupyter-0.7.1.tgz
     mail:
         mail.from: info@fairspace.io
         mail.user: user
@@ -261,4 +300,48 @@ frontend:
         timeoutSeconds: 1
     terminationGracePeriodSeconds: 10
 
+#####################################################################
+# Specific settings for Log Aggregator
+#####################################################################
+logaggregator:
+    replicaCount: 1
+    rollingUpdate:
+        maxUnavailable: 25%
+        maxSurge: 25%
+    image:
+        image: eu.gcr.io/fairspace-207108/logaggregator
+        tag: RELEASEVERSION
+        pullPolicy: IfNotPresent
+    service:
+        type: ClusterIP
+        externalPort: 80
+        internalPort: 8080
+    resources:
+        limits:
+            cpu: 1
+            memory: 1024Mi
+        requests:
+            cpu: 50m
+            memory: 300Mi
+    persistence:
+        logs:
+            ## A manually managed Persistent Volume and Claim
+            ## If defined, PVC must be created manually before volume will be bound
+            # existingClaim:
+
+            ## Logs data Persistent Volume Storage Class
+            ## If defined, storageClassName: <storageClass>
+            ## If set to "-", storageClassName: "", which disables dynamic provisioning
+            ## If undefined (the default) or set to null, no storageClassName spec is
+            ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+            ##   GKE, AWS & OpenStack)
+            ##
+            # storageClass: "-"
+            accessMode: ReadWriteOnce
+            size: 50Gi
+            mountPath: /data
+    events:
+        ## workspace.category.eventType
+        routingKeyWildcards:
+            - "*.*.*"
 podAnnotations: {}

@@ -33,6 +33,8 @@ repositories {
 }
 
 dependencies {
+    compile 'com.google.guava:guava:28.1-jre'
+
     implementation "com.sparkjava:spark-core:2.9.0"
     implementation "com.fasterxml.jackson.core:jackson-core:2.9.9"
     implementation "com.fasterxml.jackson.core:jackson-databind:2.9.9"
@@ -41,7 +43,6 @@ dependencies {
     implementation("org.microbean:microbean-helm:2.8.2.1.1.1" ) { exclude group: 'io.netty', module: 'netty-tcnative-boringssl-static' }
     implementation "io.netty:netty-tcnative-boringssl-static:2.0.7.Final:${osdetector.classifier}"
     implementation "org.slf4j:slf4j-simple:1.7.28"
-
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.23.0"

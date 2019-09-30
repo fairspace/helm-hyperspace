@@ -11,12 +11,11 @@ data:
   config.json: |-
     {
       "roles": {
-        "organisationAdmin": "admin-organisation",
-        "workspaceCoordinator": "workspace-coordinator"
+        "organisationAdmin": "organisation-admin"
       }
     }
   version.json: |-
     {
       "name": "{{ .Release.Name }}",
-      "version": "{{ .Release.Version }}"
+      "version": "{{ .Chart.Version }}"
     }

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "logaggregator.fullname" . }}
+  labels:
+    app: logaggregator
+    chart: {{ template "hyperspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.logaggregator.service.type }}
+  ports:
+    - port: {{ .Values.logaggregator.service.externalPort }}
+      targetPort: {{ .Values.logaggregator.service.internalPort }}
+      protocol: TCP
+      name: http
+            {{- if and (eq "NodePort" .Values.logaggregator.service.type) .Values.logaggregator.service.nodePort }}
+      nodePort: {{ .Values.logaggregator.service.nodePort }}
+        {{- end }}
+  selector:
+    app: logaggregator
+    release: {{ .Release.Name }}

@@ -1,33 +1,35 @@
 import React, {useState, useContext} from 'react';
 import {withRouter} from "react-router-dom";
 import {
-    Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel, IconButton, Menu, MenuItem
+    Paper, Table, TableBody, TableCell, TableHead,
+    TablePagination, TableRow, TableSortLabel, IconButton,
+    Menu, MenuItem, Tooltip, Typography,
 } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Lock from '@material-ui/icons/Lock';
+import {
+    LoadingInlay, MessageDisplay, UserContext, useSorting,
+    usePagination, useAsync,
+} from '@fairspace/shared-frontend';
 
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import MessageDisplay from "../common/components/MessageDisplay";
-import WorkspaceAPI from "./WorkspaceAPI";
-import LoadingInlay from "../common/components/LoadingInlay";
+import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import useRepeat from "../common/hooks/UseRepeat";
-import useAsync from "../common/hooks/UseAsync";
-import UserContext from '../common/contexts/UserContext';
 import {isOrganisationAdmin, isWorkspaceCoordinator, isWorkspaceUser} from '../common/utils/userUtils';
-import Icon from "@material-ui/core/Icon";
+import JupyterIcon from "../common/components/apps/JupyterIcon";
+import {APP_TYPE_JUPYTER} from "../constants";
 
 const columns = {
     access: {
         valueExtractor: 'access',
         label: 'Access'
     },
+    id: {
+        valueExtractor: 'id',
+        label: 'Id'
+    },
     name: {
         valueExtractor: 'name',
         label: 'Name'
-    },
-    description: {
-        valueExtractor: 'description',
-        label: 'Description'
     },
     version: {
         valueExtractor: 'version',
@@ -47,10 +49,9 @@ const WorkspaceList = ({history}) => {
     useRepeat(refresh, 30000);
 
     const {currentUser: {authorizations}} = useContext(UserContext);
-    const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.name)}))
+    const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.id)}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-
 
     const handleMenuClick = event => {
         setAnchorEl(event.currentTarget);
@@ -60,12 +61,16 @@ const WorkspaceList = ({history}) => {
         setAnchorEl(null);
     };
 
-    const openWorkspaceRoles = (workspace) => {
-        history.push(`workspaces/${workspace}/roles`);
+    const openWorkspaceRoles = (workspaceId) => {
+        history.push(`workspaces/${workspaceId}/roles`);
     };
 
-    const canManageRoles = (workspace) => !(isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspace));
+    const manageApps = (workspaceId) => {
+        history.push(`workspaces/${workspaceId}/apps`);
+    };
 
+    const canManageRoles = (workspaceId) => isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspaceId);
+    const canManageApps = () => isOrganisationAdmin(authorizations);
 
     if (loading) {
         return <LoadingInlay />;
@@ -89,20 +94,20 @@ const WorkspaceList = ({history}) => {
                         </TableCell>
                         <TableCell>
                             <TableSortLabel
+                                active={orderBy === 'id'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('id')}
+                            >
+                                Id
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
                                 active={orderBy === 'name'}
                                 direction={orderAscending ? 'asc' : 'desc'}
                                 onClick={() => toggleSort('name')}
                             >
                                 Name
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                            <TableSortLabel
-                                active={orderBy === 'description'}
-                                direction={orderAscending ? 'asc' : 'desc'}
-                                onClick={() => toggleSort('description')}
-                            >
-                                Description
                             </TableSortLabel>
                         </TableCell>
                         <TableCell>
@@ -123,11 +128,14 @@ const WorkspaceList = ({history}) => {
                                 Status
                             </TableSortLabel>
                         </TableCell>
+                        <TableCell>
+                            Apps
+                        </TableCell>
                         <TableCell />
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({access, name, description, url, version, status}) => {
+                    {pagedItems.map(({access, id, name, url, version, status, apps = []}) => {
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -135,23 +143,40 @@ const WorkspaceList = ({history}) => {
                                 hover
                                 key={name}
                                 onDoubleClick={() => {
-                                    if (access) window.location.href = url
+                                    if (access) window.location.href = url;
                                 }}
                             >
                                 <TableCell padding="dense">
-                                    {!access && <Icon>lock</Icon>}
+                                    {!access && (
+                                        <Tooltip
+                                            title={(
+                                                <Typography
+                                                    variant="caption"
+                                                    color="inherit"
+                                                    style={{whiteSpace: 'pre-line'}}
+                                                >
+                                                    You have no access to this workspace
+                                                </Typography>
+                                            )}
+                                        >
+                                            <Lock />
+                                        </Tooltip>
+                                    )}
+                                </TableCell>
+                                <TableCell>
+                                    {id}
                                 </TableCell>
                                 <TableCell>
                                     {name}
-                                </TableCell>
-                                <TableCell>
-                                    {description}
                                 </TableCell>
                                 <TableCell>
                                     {version}
                                 </TableCell>
                                 <TableCell>
                                     {status}
+                                </TableCell>
+                                <TableCell>
+                                    {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
                                 </TableCell>
                                 <TableCell>
                                     <>
@@ -161,7 +186,6 @@ const WorkspaceList = ({history}) => {
                                             aria-owns={anchorEl ? 'actions-menu' : undefined}
                                             aria-haspopup="true"
                                             onClick={handleMenuClick}
-                                            disabled={canManageRoles(name)}
                                         >
                                             <MoreVertIcon />
                                         </IconButton>
@@ -171,8 +195,11 @@ const WorkspaceList = ({history}) => {
                                             open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
                                             onClose={handleMenuClose}
                                         >
-                                            <MenuItem onClick={() => openWorkspaceRoles(name)}>
-                                                Manage Roles
+                                            <MenuItem onClick={() => openWorkspaceRoles(id)} disabled={!canManageRoles(id)}>
+                                                Manage roles
+                                            </MenuItem>
+                                            <MenuItem onClick={() => manageApps(id)} disabled={!canManageApps(id)}>
+                                                Manage apps
                                             </MenuItem>
                                         </Menu>
                                     </>

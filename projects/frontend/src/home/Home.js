@@ -1,6 +1,7 @@
 import React from 'react';
-import BreadCrumbs from "../common/components/BreadCrumbs";
+import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
 
-export default () => (
-     <BreadCrumbs />
-);
+export default () => {
+    usePageTitleUpdater("Home");
+    return <BreadCrumbs />;
+};

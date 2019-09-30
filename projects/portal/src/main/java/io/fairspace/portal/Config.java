@@ -9,11 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Config {
-    public static final String WORKSPACE_CHART = "workspace";
     public String domain = "ci.fairway.app";
     public final Auth auth = new Auth();
     public final Map<String, URL> charts = new HashMap<>();
-    public final Map<String, Object> workspace = new HashMap<>();
+    public final Map<String, Map<String, ?>> defaultConfig = new HashMap<>();
     public String elasticSearchUrlTemplate = "http://hyperspace-ci-elasticsearch-client.hyperspace-ci.svc.cluster.local:9200/%s/_search";
 
     public static class Auth {

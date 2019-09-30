@@ -87,3 +87,15 @@ https://{{ template "portal.hostname" . }}
 {{- define "frontend.fullname" -}}
 {{- .Values.frontend.nameOverride | default (printf "%s-frontend" .Release.Name) -}}
 {{- end -}}
+
+{{- define "rabbitmq.prefix" -}}
+{{- printf "%s-%s" .Release.Name "rabbitmq" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "rabbitmq.host" -}}
+{{- printf "%s-rabbitmq.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
+{{- end -}}
+
+{{- define "logaggregator.fullname" -}}
+{{- .Values.logaggregator.nameOverride | default (printf "%s-logaggregator" .Release.Name) -}}
+{{- end -}}

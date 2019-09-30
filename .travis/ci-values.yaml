@@ -8,6 +8,8 @@ hyperspace:
   testuser:
     generate: true
     password: fairspace123
+  configurationScripts:
+    pullPolicy: Always
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
@@ -16,7 +18,21 @@ keycloak:
   postgresql:
     postgresPassword: "9FGwLKpEu$4w/knG"
 
+rabbitmq:
+  rabbitmq:
+    password: "X6SXtXV3Jzg4gyVR"
+    erlangCookie: "x6w5BVsp8HaQ3uXMvpt5YE46tSBARTNv"
+    diskFreeLimit: '"1GiB"'
+  user:
+    password: "VjwXg7wTEQETjSMN"
+
+pluto:
+  image:
+    tag: 0.6.8-SNAPSHOT
+
 portal:
+  workspace:
+    tag: 0.6.8-SNAPSHOT
   image:
     pullPolicy: Always
   mail:

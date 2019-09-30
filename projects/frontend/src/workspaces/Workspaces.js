@@ -1,28 +1,36 @@
 import React, {useContext, useState} from 'react';
-import BreadCrumbs from "../common/components/BreadCrumbs";
-import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
+import {Button} from "@material-ui/core";
+import {BreadCrumbs, BreadcrumbsContext, usePageTitleUpdater, UserContext} from '@fairspace/shared-frontend';
+
 import WorkspaceList from "./WorkspaceList";
-import Button from "@material-ui/core/Button";
 import NewWorkspaceDialog from "./NewWorkspaceDialog";
-import WorkspaceAPI from "./WorkspaceAPI";
-import AddingWorkspaceDialog from "./AddingWorkspaceDialog";
-import UserContext from "../common/contexts/UserContext";
+import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import {isOrganisationAdmin} from "../common/utils/userUtils";
+import NotificationSnackbar from "../common/components/NotificationSnackbar";
 
 export default () => {
     const [showNewWorkspaceDialog, setShowNewWorkspaceDialog] = useState(false);
-    const [addingWorkspace, setAddingWorkspace] = useState(false);
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+
+    usePageTitleUpdater("Workspaces");
 
     const createWorkspace = (workspace) => {
         setShowNewWorkspaceDialog(false);
-        setAddingWorkspace(true);
-        return WorkspaceAPI.createWorkspace(workspace);
+        return WorkspaceAPI.createWorkspace(workspace)
+            .then(() => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("The workspace is being created, this might take a while");
+            })
+            .catch(() => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("An error occurred while creating your workspace. Please try again later.");
+            });
     };
 
     const {currentUser: {authorizations}} = useContext(UserContext);
 
     return (
-    <>
         <BreadcrumbsContext.Provider value={{
             segments: [{
                 label: 'Workspaces',
@@ -42,15 +50,20 @@ export default () => {
                 disabled={showNewWorkspaceDialog || !isOrganisationAdmin(authorizations)}
                 onClick={() => setShowNewWorkspaceDialog(true)}
             >
-                New
+                Add New Workspace
             </Button>
-            {showNewWorkspaceDialog && <NewWorkspaceDialog
-                onCreate={createWorkspace}
-                onClose={() => setShowNewWorkspaceDialog(false)}
-            />}
-            {addingWorkspace && <AddingWorkspaceDialog
-                onClose={() => setAddingWorkspace(false)}
-            />}
+            {showNewWorkspaceDialog && (
+                <NewWorkspaceDialog
+                    onCreate={createWorkspace}
+                    onClose={() => setShowNewWorkspaceDialog(false)}
+                />
+            )}
+            <NotificationSnackbar
+                open={snackbarVisible}
+                onClose={() => setSnackbarVisible(false)}
+                message={snackbarMessage}
+            />
+
         </BreadcrumbsContext.Provider>
-    </>
-)};
+    );
+};

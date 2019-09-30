@@ -1,0 +1,10 @@
+[
+  {
+    "id": "jupyter-workspace",
+    "workspaceId": "workspace",
+    "type": "jupyter",
+    "version": "0.7.1",
+    "url": "http://localhost:3000/jupyter",
+    "status": "DEPLOYED"
+  }
+]

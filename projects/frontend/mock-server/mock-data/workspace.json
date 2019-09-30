@@ -1,0 +1,20 @@
+{
+  "id": "workspace",
+  "name": "Example workspace",
+  "description": "Workspace\ndescription",
+  "url": "http://localhost:3000",
+  "version": "0.6.1",
+  "status": "DEPLOYED",
+  "logAndFilesVolumeSize": 1024,
+  "databaseVolumeSize": 1024,
+  "apps": [
+    {
+      "id": "jupyter-workspace",
+      "workspaceId": "workspace",
+      "type": "jupyter",
+      "version": "0.7.1",
+      "url": "http://localhost:3000/jupyter",
+      "status": "DEPLOYED"
+    }
+  ]
+}

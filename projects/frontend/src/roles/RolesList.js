@@ -2,18 +2,16 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {withRouter} from "react-router-dom";
 import {
-    withStyles, TableSortLabel, TablePagination, Table, TableBody,
-    TableCell, TableHead, TableRow, Paper, FormGroup, FormControlLabel,
-    Checkbox, Grid, Typography, Button,
+    Button, Checkbox, IconButton, Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow,
+    TableSortLabel, withStyles
 } from '@material-ui/core';
+import {BreadCrumbs, ConfirmationButton, useSorting, usePagination} from '@fairspace/shared-frontend';
 
-import Config from "../common/services/Config/Config";
-import {
-    isWorkspaceUser, isWorkspaceCoordinator, isWorkspaceDatasteward,
-    isWorkspaceSparql, idToRoles
-} from '../common/utils/userUtils';
-import useSorting from '../common/hooks/UseSorting';
-import usePagination from '../common/hooks/UsePagination';
+import {Delete} from "@material-ui/icons";
+
+import RolesBreadcrumbsContextProvider from "./RolesBreadcrumbsContextProvider";
+import AddUserDialog from "./AddUserDialog";
+import {ROLE_COORDINATOR, ROLE_USER} from "../constants";
 
 const styles = theme => ({
     header: {
@@ -30,119 +28,101 @@ const styles = theme => ({
     },
 });
 
-const columns = {
-    firstName: {
-        valueExtractor: 'firstName',
-        label: 'Name'
-    }
-};
+const RolesList = ({classes, workspaceId, currentUser, users = [], roles = {}, update = () => {}, canManageCoordinators = false}) => {
+    const rolesToShow = Object.keys(roles).filter(role => role !== ROLE_USER);
 
-const RolesList = ({classes, workspace, users, canManageCoordinators = false}) => {
-    // The state would look like: {"user-id": Set()} where the set contains the roles
-    const [usersRolesMapping, setUsersRolesMapping] = useState(users.reduce(idToRoles, {}));
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'firstName');
-    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
-    const [isDirty, setIsDirty] = useState(false);
-
-    const handleChange = (event, id) => {
-        setIsDirty(true);
-        const roles = usersRolesMapping[id];
-
-        if (event.target.checked) {
-            roles.add(event.target.value);
-        } else {
-            roles.delete(event.target.value);
+    // Define the columns to sort on. Users can sort on the name
+    // as well as on whether or not the user has a specific role
+    const columns = rolesToShow.reduce(
+        (curr, role) => ({
+            ...curr,
+            [role]: {
+                label: role,
+                valueExtractor: row => row.authorizations[role]
+            }
+        }),
+        {
+            name: {
+                valueExtractor: row => `${row.firstName} ${row.lastName}`,
+                label: 'Name'
+            }
         }
-
-        setUsersRolesMapping(prev => ({
-            ...prev,
-            [id]: roles
-        }));
-    };
-
-    const {rolesPrefixes} = Config.get();
-
-    const RoleCheckbox = ({checked, onChange, label, value, disabled}) => (
-        <Grid item xs={4}>
-            <FormControlLabel
-                control={(
-                    <Checkbox
-                        className={classes.roleCheckbox}
-                        checked={checked}
-                        onChange={onChange}
-                        value={value}
-                        disabled={disabled}
-                    />
-                )}
-                label={label}
-            />
-        </Grid>
     );
 
+    const [dialogOpen, showDialog] = useState(false);
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(users, columns, 'name');
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+
+    const isRoleDisabled = (userId, role) => {
+        if (userId === currentUser.id) return true;
+        if (role === ROLE_COORDINATOR) return !canManageCoordinators;
+        return false;
+    };
+
+    // Remove all authorizations that the given user currently has
+    const removeFromWorkspace = (id, authorizations) => Object.keys(authorizations)
+        .filter(role => authorizations[role])
+        .map(role => update(id, role, false));
+
     return (
-        <>
-            <Typography variant="h5" className={classes.header}>
-                {workspace}
-            </Typography>
+        <RolesBreadcrumbsContextProvider workspaceId={workspaceId}>
+            <BreadCrumbs />
             <Paper className={classes.tableRoot}>
                 <Table style={{tableLayout: 'fixed'}}>
                     <TableHead>
                         <TableRow>
                             <TableCell>
                                 <TableSortLabel
-                                    active={orderBy === 'firstName'}
+                                    active={orderBy === 'name'}
                                     direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('firstName')}
+                                    onClick={() => toggleSort('name')}
                                 >
                                     User
                                 </TableSortLabel>
                             </TableCell>
-                            <TableCell>
-                                Roles
-                            </TableCell>
+                            {rolesToShow.map(role => (
+                                <TableCell key={role} align="center">
+                                    <TableSortLabel
+                                        active={orderBy === role}
+                                        direction={orderAscending ? 'asc' : 'desc'}
+                                        onClick={() => toggleSort(role)}
+                                    >
+                                        {role}
+                                    </TableSortLabel>
+                                </TableCell>
+                            ))}
+                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {
-                            pagedItems.map(({id, firstName, lastName}) => (
+                            pagedItems.map(({id, firstName, lastName, authorizations}) => (
                                 <TableRow key={id}>
                                     <TableCell component="th" scope="row">
                                         {`${firstName} ${lastName}`}
                                     </TableCell>
+                                    {rolesToShow
+                                        .map(role => (
+                                            <TableCell key={role} align="center">
+                                                <Checkbox
+                                                    key={role}
+                                                    className={classes.roleCheckbox}
+                                                    checked={authorizations[role]}
+                                                    onChange={(e) => update(id, role, e.target.checked)}
+                                                    disabled={isRoleDisabled(id, role)}
+                                                />
+                                            </TableCell>
+                                        ))}
                                     <TableCell>
-                                        <FormGroup>
-                                            <Grid container>
-                                                <RoleCheckbox
-                                                    userId={id}
-                                                    label="Coordinator"
-                                                    checked={isWorkspaceCoordinator(Array.from(usersRolesMapping[id] || {}), workspace)}
-                                                    onChange={(e) => handleChange(e, id)}
-                                                    value={rolesPrefixes.coordinator + workspace}
-                                                    disabled={!canManageCoordinators}
-                                                />
-                                                <RoleCheckbox
-                                                    userId={id}
-                                                    label="User"
-                                                    checked={isWorkspaceUser(Array.from(usersRolesMapping[id] || {}), workspace)}
-                                                    onChange={(e) => handleChange(e, id)}
-                                                    value={rolesPrefixes.user + workspace}
-                                                />
-                                                <RoleCheckbox
-                                                    userId={id}
-                                                    label="Data steward"
-                                                    checked={isWorkspaceDatasteward(Array.from(usersRolesMapping[id] || {}), workspace)}
-                                                    onChange={(e) => handleChange(e, id)}
-                                                    value={rolesPrefixes.datasteward + workspace}
-                                                />
-                                                <RoleCheckbox
-                                                    userId={id}
-                                                    label="SAPRQL"
-                                                    checked={isWorkspaceSparql(Array.from(usersRolesMapping[id] || {}), workspace)}
-                                                    onChange={(e) => handleChange(e, id)}
-                                                    value={rolesPrefixes.sparql + workspace}
-                                                />
-                                            </Grid>
-                                        </FormGroup>
+                                        <ConfirmationButton
+                                            onClick={() => removeFromWorkspace(id, authorizations)}
+                                            disabled={isRoleDisabled(id, ROLE_USER)}
+                                            message="Are you sure you want to remove this user from the workspace?"
+                                        >
+                                            <IconButton>
+                                                <Delete />
+                                            </IconButton>
+                                        </ConfirmationButton>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -159,24 +139,42 @@ const RolesList = ({classes, workspace, users, canManageCoordinators = false}) =
                     onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
                 />
             </Paper>
+
             <Button
                 style={{marginTop: 8}}
-                variant="contained"
                 color="primary"
-                disabled={!isDirty}
+                variant="contained"
+                aria-label="Add"
+                title="Add user to workspace"
+                onClick={() => showDialog(true)}
             >
-                Save Changes
+                New
             </Button>
-        </>
+            <AddUserDialog
+                open={dialogOpen}
+                users={users}
+                currentUser={currentUser}
+                onSubmit={(user) => update(user.id, ROLE_USER, true)}
+                onClose={() => showDialog(false)}
+            />
+
+        </RolesBreadcrumbsContextProvider>
     );
 };
 
-
 RolesList.propTypes = {
-    classes: PropTypes.shape(),
-    users: PropTypes.array.isRequired,
-    workspace: PropTypes.string.isRequired,
+    classes: PropTypes.object,
+    users: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        firstName: PropTypes.string,
+        lastName: PropTypes.string,
+        username: PropTypes.string.isRequired,
+        roles: PropTypes.arrayOf(PropTypes.string)
+    })).isRequired,
+    roles: PropTypes.object,
+    workspaceId: PropTypes.string.isRequired,
     canManageCoordinators: PropTypes.bool,
+    update: PropTypes.func
 };
 
 export default withRouter(withStyles(styles)(RolesList));
