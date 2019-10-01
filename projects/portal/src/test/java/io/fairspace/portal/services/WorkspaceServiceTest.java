@@ -18,11 +18,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.microbean.helm.ReleaseManager;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -44,6 +47,17 @@ public class WorkspaceServiceTest {
             .setInfo(InfoOuterClass.Info.newBuilder().setStatus(
                     StatusOuterClass.Status.newBuilder().setCode(StatusOuterClass.Status.Code.PENDING_INSTALL).build()))
             .build();
+    private static final ReleaseOuterClass.Release INSTALLED_APP_RELEASE = ReleaseOuterClass.Release.newBuilder()
+            .setConfig(
+                    ConfigOuterClass.Config.newBuilder().setRaw("{\"workspace\": {\"id\": \"workspaceId\"}}").build()
+            )
+            .setChart(ChartOuterClass.Chart.newBuilder().setMetadata(
+                    MetadataOuterClass.Metadata.newBuilder().setName(APP_TYPE).build()
+            ))
+            .setInfo(InfoOuterClass.Info.newBuilder().setStatus(
+                    StatusOuterClass.Status.newBuilder().setCode(StatusOuterClass.Status.Code.DEPLOYED).build()))
+            .build();
+
 
     @Mock
     private ReleaseManager releaseManager;
@@ -229,6 +243,36 @@ public class WorkspaceServiceTest {
 
         verify(releaseManager).install(installReleaseRequest, appChart);
         verifyNoMoreInteractions(releaseManager);
+    }
+
+    @Test
+    public void installAppInvalidatesCache() throws NotFoundException, IOException {
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        var installReleaseRequest = Tiller.InstallReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appInstall(READY_WORKSPACE, app)).thenReturn(installReleaseRequest);
+
+        workspaceService.installApp("workspaceId", app);
+
+        InOrder orderVerifier = Mockito.inOrder(releaseList);
+        orderVerifier.verify(releaseList).invalidateCache();
+        orderVerifier.verify(releaseList).get();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void installAppIfTypeIsAlreadyInstalled() throws NotFoundException, IOException {
+        when(releaseList.get()).thenReturn(List.of(INSTALLED_APP_RELEASE));
+
+        var app = WorkspaceApp.builder()
+                .id("app")
+                .type(APP_TYPE)
+                .build();
+
+        workspaceService.installApp("workspaceId", app);
     }
 
     @Test
