@@ -26,13 +26,10 @@ rabbitmq:
   user:
     password: "VjwXg7wTEQETjSMN"
 
-pluto:
-  image:
-    tag: 0.6.8-SNAPSHOT
-
 portal:
-  workspace:
-    tag: 0.6.8-SNAPSHOT
+  charts:
+    workspace:
+      file: workspace-0.6.9-SNAPSHOT.tgz
   image:
     pullPolicy: Always
   mail:
