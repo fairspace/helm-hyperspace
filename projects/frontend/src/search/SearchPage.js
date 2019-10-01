@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography} from '@material-ui/core';
 import {
     LoadingInlay, MessageDisplay, SearchResultHighlights,
-    getSearchQueryFromString, SearchAPI, SORT_DATE_CREATED, useAsync
+    getSearchQueryFromString, SearchAPI, SORT_DATE_CREATED, useAsync, handleSearchError
 } from '@fairspace/shared-frontend';
 
 import Config from "../common/services/Config";
@@ -75,8 +75,15 @@ const SearchPageContainer = ({
 }) => {
     const {error, loading, data} = useAsync(
         useCallback(() => searchApi
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            .search({query, sort: SORT_DATE_CREATED}), [query])
+            .search({query, sort: SORT_DATE_CREATED})
+            .catch((e) => {
+                switch (e.status) {
+                    case 403: throw new Error("No workspaces available to search in");
+                    default: return handleSearchError(e);
+                }
+            }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [query])
     );
 
     return <SearchPage error={error} loading={loading} results={data} />;
