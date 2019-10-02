@@ -1,5 +1,6 @@
 package io.fairspace.portal.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
 import hapi.services.tiller.Tiller;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static hapi.release.StatusOuterClass.Status.Code;
 import static io.fairspace.portal.utils.HelmUtils.*;
+import static io.fairspace.portal.utils.JacksonUtils.getConfigAsText;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 
@@ -152,6 +154,15 @@ public class WorkspaceService {
             throw new NotFoundException("No chart found for app type " + workspaceApp.getType());
         }
 
+        // Ensure we are looking at a fresh copy of the workspaces list
+        releaseList.invalidateCache();
+
+        // Every app can only be installed once for a workspace. Check for duplicates
+        List<WorkspaceApp> installedApps = listInstalledApps(workspaceId);
+        if(installedApps.stream().anyMatch(installedApp -> installedApp.getType().equals(workspaceApp.getType()))) {
+            throw new IllegalStateException("An app of type " + workspaceApp.getType() + " has already been installed for this workspace.");
+        }
+
         AppReleaseRequestBuilder appReleaseRequestBuilder = releaseRequestBuilders.get(workspaceApp.getType());
         ReleaseOuterClass.Release workspaceRelease = releaseList.getRelease(workspaceId).orElseThrow(() -> new NotFoundException("Workspace with given id could not be found"));
         ensureWorkspaceIsReady(workspaceRelease);
@@ -272,15 +283,15 @@ public class WorkspaceService {
             var config = getReleaseConfig(release);
             return Workspace.builder()
                     .id(release.getName())
-                    .name(config.at(WORKSPACE_NAME_YAML_PATH).asText())
-                    .description(config.at(WORKSPACE_DESCRIPTION_YAML_PATH).asText())
-                    .url("https://" + config.at(WORKSPACE_INGRESS_DOMAIN_YAML_PATH).asText())
+                    .name(getConfigAsText(config, WORKSPACE_NAME_YAML_PATH))
+                    .description(getConfigAsText(config, WORKSPACE_DESCRIPTION_YAML_PATH))
+                    .url("https://" + getConfigAsText(config, WORKSPACE_INGRESS_DOMAIN_YAML_PATH))
                     .version(release.getChart().getMetadata().getVersion())
                     .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
                     .errorMessage(release.getInfo().getStatus().getCode() == Code.FAILED ? release.getInfo().getDescription() : "")
                     .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
-                    .logAndFilesVolumeSize(getSize(config.at(FILE_STORAGE_SIZE_YAML_PATH).asText()))
-                    .databaseVolumeSize(getSize(config.at(DATABASE_STORAGE_SIZE_YAML_PATH).asText()))
+                    .logAndFilesVolumeSize(getSize(getConfigAsText(config, FILE_STORAGE_SIZE_YAML_PATH)))
+                    .databaseVolumeSize(getSize(getConfigAsText(config, DATABASE_STORAGE_SIZE_YAML_PATH)))
                     .apps(listInstalledApps(release.getName()))
                     .build();
         } catch (IOException e) {
@@ -294,13 +305,13 @@ public class WorkspaceService {
 
             return WorkspaceApp.builder()
                     .id(release.getName())
-                    .workspaceId(config.at(WORKSPACE_APP_WORKSPACE_ID_YAML_PATH).asText())
+                    .workspaceId(getConfigAsText(config, WORKSPACE_APP_WORKSPACE_ID_YAML_PATH))
                     .type(release.getChart().getMetadata().getName())
                     .version(release.getChart().getMetadata().getVersion())
                     .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
                     .errorMessage(release.getInfo().getStatus().getCode() == Code.FAILED ? release.getInfo().getDescription() : "")
                     .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
-                    .url("https://" + config.at(WORKSPACE_APP_INGRESS_DOMAIN_YAML_PATH).asText())
+                    .url("https://" + getConfigAsText(config, WORKSPACE_APP_INGRESS_DOMAIN_YAML_PATH))
                     .build();
         } catch (IOException e) {
             throw new RuntimeException(e);
