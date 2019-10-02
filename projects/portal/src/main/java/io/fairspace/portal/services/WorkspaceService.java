@@ -5,6 +5,7 @@ import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
 import hapi.services.tiller.Tiller;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
@@ -39,7 +40,6 @@ public class WorkspaceService {
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/database/size";
     private static final String WORKSPACE_APP_WORKSPACE_ID_YAML_PATH = "/workspace/id";
     private static final String WORKSPACE_APP_INGRESS_DOMAIN_YAML_PATH = "/ingress/domain";
-
 
     private final ReleaseManager releaseManager;
     private CachedReleaseList releaseList;
@@ -131,9 +131,22 @@ public class WorkspaceService {
 
         updateRelease(workspaceReleaseRequestBuilder.buildUpdate(workspace), repo.get(WORKSPACE_CHART));
     }
+    
+    /**
+     * Deletes a workspace installation
+     * @throws IOException
+     */
+    public void uninstallWorkspace(@NonNull String workspaceId) throws IOException, NotFoundException {
+        releaseList.invalidateCache();
 
-    private boolean isWorkspace(ReleaseOuterClass.Release release) {
-        return release.getChart().getMetadata().getName().equals(repo.get(WORKSPACE_CHART).getMetadata().getName());
+        Workspace workspace = getWorkspace(workspaceId).orElseThrow(NotFoundException::new);
+
+        // If there is any apps, remove them first
+        for(WorkspaceApp app: workspace.getApps()) {
+            uninstallApp(app.getId());
+        }
+
+        uninstallRelease(workspaceReleaseRequestBuilder.buildUninstall(workspace));
     }
 
     /**
@@ -204,6 +217,10 @@ public class WorkspaceService {
         Optional<Tiller.UpdateReleaseRequest.Builder> builder = appReleaseRequestBuilder.workspaceUpdateAfterAppUninstall(workspaceRelease, workspaceApp);
         builder.ifPresent(update -> updateRelease(update, repo.get(WORKSPACE_CHART)));
     }
+    
+    private boolean isWorkspace(ReleaseOuterClass.Release release) {
+        return release.getChart().getMetadata().getName().equals(repo.get(WORKSPACE_CHART).getMetadata().getName());
+    }
 
     private void ensureWorkspaceIsReady(ReleaseOuterClass.Release workspaceRelease) {
         if (workspaceRelease.getInfo().getStatus().getCode() != Code.DEPLOYED) {
@@ -223,7 +240,7 @@ public class WorkspaceService {
                 .setWait(true);
         log.info("Installing release {} with chart {} version {}", requestBuilder.getName(), chartBuilder.getMetadata().getName(), chartBuilder.getMetadata().getVersion());
 
-        perform("Install " + requestBuilder.getName(), () -> releaseManager.install(requestBuilder, chartBuilder));
+        performWithCacheInvalidation("Helm install " + requestBuilder.getName(), () -> releaseManager.install(requestBuilder, chartBuilder));
     }
 
     /**
@@ -237,7 +254,7 @@ public class WorkspaceService {
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
 
-        perform(format("Update release %s to version %s", requestBuilder.getName(), chartBuilder.getMetadata().getVersion()),
+        performWithCacheInvalidation(format("Helm upgrade release %s to version %s", requestBuilder.getName(), chartBuilder.getMetadata().getVersion()),
                 () -> releaseManager.update(requestBuilder, chartBuilder));
     }
 
@@ -250,28 +267,29 @@ public class WorkspaceService {
         requestBuilder
                 .setTimeout(INSTALLATION_TIMEOUT_SEC);
 
-        perform("Uninstall " + requestBuilder.getName(), () -> releaseManager.uninstall(requestBuilder.build()));
+        // Perform uninstallation command by helm
+        performWithCacheInvalidation("Helm uninstall " + requestBuilder.getName(), () -> releaseManager.uninstall(requestBuilder.build()));
     }
 
     /**
      * Handles release list cache invalidation and error handling when a Helm command is executed and when it finishes
      * and ensures that no more than one command is executed at a time
-     * @param helmCommand
-     * @param action Action to perform
+     * @param commandDescription
+     * @param action Action to performWithCacheInvalidation
      */
-    private void perform(String helmCommand, Callable<Future<?>> action) {
+    private void performWithCacheInvalidation(String commandDescription, Callable<Future<?>> action) {
         worker.execute(() -> {
             try {
-                log.info("Executing Helm command {}", helmCommand);
+                log.info("Executing command {}", commandDescription);
                 var future = action.call();
                 releaseList.invalidateCache();
                 future.get();
-                log.info("Successfully executed Helm command {}", helmCommand);
+                log.info("Successfully executed command {}", commandDescription);
             } catch (InterruptedException e) {
-                log.warn("Interrupted while performing Helm command {}", helmCommand);
+                log.warn("Interrupted while performing command {}", commandDescription);
                 currentThread().interrupt();
             } catch (Exception e) {
-                log.error("Error performing Helm command {}", helmCommand, e);
+                log.error("Error performing command {}", commandDescription, e);
             } finally {
                 releaseList.invalidateCache();
             }

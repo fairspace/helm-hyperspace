@@ -23,7 +23,7 @@ public class WorkspaceReleaseRequestBuilder{
         this.defaultValues = defaultValues;
     }
 
-    public Tiller.InstallReleaseRequest.Builder buildInstall(Workspace workspace)  {
+    public Tiller.InstallReleaseRequest.Builder buildInstall(Workspace workspace) {
         var customValues = createObjectNode();
         customValues.with("hyperspace").put("domain", domain);
         customValues.with("hyperspace").with("keycloak").put("clientId", workspace.getId() + "-pluto");
@@ -62,4 +62,11 @@ public class WorkspaceReleaseRequestBuilder{
                 .setReuseValues(true)
                 .setValues(toConfig(customValues));
     }
+
+    public Tiller.UninstallReleaseRequest.Builder buildUninstall(Workspace workspace) {
+        return Tiller.UninstallReleaseRequest.newBuilder()
+                .setName(workspace.getId())
+                .setPurge(true);
+    }
+
 }
