@@ -1,12 +1,14 @@
 import React, {useState, useContext} from 'react';
-import {withRouter} from "react-router-dom";
+import {Link, withRouter} from "react-router-dom";
 import {
     Paper, Table, TableBody, TableCell, TableHead,
     TablePagination, TableRow, TableSortLabel, IconButton,
     Menu, MenuItem, Tooltip, Typography,
 } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ErrorIcon from '@material-ui/icons/Error';
 import Lock from '@material-ui/icons/Lock';
+import withStyles from "@material-ui/core/styles/withStyles";
 import {
     LoadingInlay, MessageDisplay, UserContext, useSorting,
     usePagination, useAsync,
@@ -36,12 +38,20 @@ const columns = {
         label: 'Version'
     },
     status: {
-        valueExtractor: 'status',
+        valueExtractor: w => w.release.status,
         label: 'Status'
     }
 };
 
-const WorkspaceList = ({history, onEditWorkspace}) => {
+const styles = theme => ({
+    warning: {
+        color: theme.palette.error.main,
+        verticalAlign: "middle",
+        marginLeft: theme.spacing.unit
+    }
+});
+
+const WorkspaceList = ({classes, history, onEditWorkspace}) => {
     const {data: workspaces = [], loading, error, refresh} = useAsync(WorkspaceAPI.getWorkspaces);
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -136,7 +146,7 @@ const WorkspaceList = ({history, onEditWorkspace}) => {
                 </TableHead>
                 <TableBody>
                     {pagedItems.map((workspace) => {
-                        const {access, id, name, url, version, status, apps = []} = workspace;
+                        const {access, id, name, url, version, release, apps = []} = workspace;
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -173,8 +183,13 @@ const WorkspaceList = ({history, onEditWorkspace}) => {
                                 <TableCell>
                                     {version}
                                 </TableCell>
-                                <TableCell>
-                                    {status}
+                                <TableCell valign="middle">
+                                    {release.status}
+                                    {
+                                        release.ready
+                                            ? ''
+                                            : <Link to={`/workspaces/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>
+                                    }
                                 </TableCell>
                                 <TableCell>
                                     {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
@@ -230,4 +245,4 @@ const WorkspaceList = ({history, onEditWorkspace}) => {
     );
 };
 
-export default withRouter(WorkspaceList);
+export default withStyles(styles)(withRouter(WorkspaceList));

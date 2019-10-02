@@ -5,10 +5,14 @@
     "description": "Workspace\ndescription",
     "url": "http://localhost:3000",
     "version": "0.6.1",
-    "status": "DEPLOYED",
     "ready": true,
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024,
+    "release": {
+      "status": "DEPLOYED",
+      "description": "Install complete",
+      "ready": true
+    },
     "apps": [
       {
         "id": "jupyter-workspace",
@@ -16,8 +20,11 @@
         "type": "jupyter",
         "version": "0.7.1",
         "url": "http://localhost:3000/jupyter",
-        "status": "DEPLOYED",
-        "ready": true
+        "release": {
+          "status": "DEPLOYED",
+          "description": "Install complete",
+          "ready": true
+        }
       }
     ]
   },
@@ -29,6 +36,11 @@
     "version": "0.6.4",
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024,
+    "release": {
+      "status": "DEPLOYED",
+      "description": "Install complete",
+      "ready": true
+    },
     "apps": [
       {
         "id": "jupyter-workspace",
@@ -36,8 +48,11 @@
         "type": "jupyter",
         "version": "0.7.1",
         "url": "http://localhost:3000/jupyter",
-        "status": "DEPLOYED",
-        "ready": true
+        "release": {
+          "status": "DEPLOYED",
+          "description": "Install complete",
+          "ready": true
+        }
       },
       {
         "id": "rshiny-workspace",
@@ -45,8 +60,11 @@
         "type": "rshiny",
         "version": "0.1.5",
         "url": "http://localhost:3000/rshiny",
-        "status": "DEPLOYED",
-        "ready": true
+        "release": {
+          "status": "PENDING_INSTALL",
+          "description": "Pending install",
+          "ready": false
+        }
       }
     ]
   },
@@ -56,8 +74,11 @@
     "description": "Workspace\ndescription",
     "url": "http://example.com/ws2",
     "version": "0.0.1",
-    "status": "PENDING_INSTALL",
-    "ready": false,
+    "release": {
+      "status": "PENDING_INSTALL",
+      "description": "Pending first installation",
+      "ready": false
+    },
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024,
     "apps": []
@@ -68,8 +89,11 @@
     "description": "Workspace\ndescription",
     "url": "http://example.com/ws3",
     "version": "0.5.1-SNAPSHOT",
-    "status": "PENDING_INSTALL",
-    "ready": false,
+    "release": {
+      "status": "PENDING_UPGRADE",
+      "description": "Pending upgrade",
+      "ready": false
+    },
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024,
     "apps": []

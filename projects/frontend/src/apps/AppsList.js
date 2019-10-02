@@ -1,9 +1,13 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
+import {Link} from "react-router-dom";
+import withStyles from "@material-ui/core/styles/withStyles";
 import {
     Button, IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel
 } from '@material-ui/core';
-import {Delete} from "@material-ui/icons";
+import Delete from "@material-ui/icons/Delete";
+import ErrorIcon from '@material-ui/icons/Error';
+
 import {BreadCrumbs, ConfirmationButton, useSorting} from "@fairspace/shared-frontend";
 import {APP_TYPE_JUPYTER} from "../constants";
 import AppsBreadcrumbsContextProvider from "./AppsBreadcrumbsContextProvider";
@@ -23,12 +27,20 @@ const columns = {
         label: 'Version'
     },
     status: {
-        valueExtractor: 'status',
+        valueExtractor: a => a.release.status,
         label: 'Status'
     }
 };
 
-const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
+const styles = theme => ({
+    warning: {
+        color: theme.palette.error.main,
+        verticalAlign: "middle",
+        marginLeft: theme.spacing.unit
+    }
+});
+
+const AppsList = ({classes, apps, workspaceId, onAddApp, onRemoveApp}) => {
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -106,7 +118,7 @@ const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {orderedItems.map(({id, type, url, version, status}) => (
+                        {orderedItems.map(({id, type, url, version, release}) => (
                             <TableRow
                                 hover
                                 key={id}
@@ -124,7 +136,12 @@ const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
                                     {version}
                                 </TableCell>
                                 <TableCell>
-                                    {status}
+                                    {release.status}
+                                    {
+                                        release.ready
+                                            ? ''
+                                            : <Link to={`/workspaces/${workspaceId}/apps/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>
+                                    }
                                 </TableCell>
                                 <TableCell>
                                     <ConfirmationButton
@@ -174,4 +191,4 @@ AppsList.propTypes = {
     }),
 };
 
-export default AppsList;
+export default withStyles(styles)(AppsList);

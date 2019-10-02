@@ -8,11 +8,18 @@ import Workspaces from "./workspaces/Workspaces";
 import RolesContainer from './roles/RolesContainer';
 import AppsContainer from "./apps/AppsContainer";
 import SearchPage from './search/SearchPage';
+import WorkspacePage from "./workspaces/WorkspacePage";
+import AppPage from "./apps/AppPage";
 
 const routes = () => (
     <>
         <Route path="/" exact component={Home} />
         <Route path="/workspaces" exact component={Workspaces} />
+        <Route
+            path="/workspaces/:workspaceId"
+            exact
+            render={({match: {params: {workspaceId}}}) => <WorkspacePage workspaceId={workspaceId} />}
+        />
         <Route
             path="/workspaces/:workspaceId/roles"
             exact
@@ -22,6 +29,11 @@ const routes = () => (
             path="/workspaces/:workspaceId/apps"
             exact
             render={({match: {params: {workspaceId}}}) => <AppsContainer workspaceId={workspaceId} />}
+        />
+        <Route
+            path="/workspaces/:workspaceId/apps/:appId"
+            exact
+            render={({match: {params: {workspaceId, appId}}}) => <AppPage workspaceId={workspaceId} appId={appId} />}
         />
 
         <Route path="/login" render={() => {window.location.href = '/login';}} />
