@@ -1,14 +1,17 @@
 package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
+import io.fairspace.portal.apps.ClusterApp;
 import io.fairspace.portal.apps.SearchApp;
 import io.fairspace.portal.apps.WorkspacesApp;
 import io.fairspace.portal.errors.ForbiddenException;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.services.CachedReleaseList;
 import io.fairspace.portal.services.ChartRepo;
+import io.fairspace.portal.services.ClusterService;
 import io.fairspace.portal.services.WorkspaceService;
 import io.fairspace.portal.services.releases.AppReleaseRequestBuilder;
 import io.fairspace.portal.services.releases.JupyterReleaseRequestBuilder;
@@ -67,7 +70,8 @@ public class App {
         }
 
         // Setup workspaces app
-        ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager();
+        DefaultKubernetesClient kubernetesClient = new DefaultKubernetesClient();
+        ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager(kubernetesClient);
         CachedReleaseList releaseList = new CachedReleaseList(releaseManager);
 
         // Setup chart repo
@@ -78,10 +82,12 @@ public class App {
         Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(JUPYTER_CHART, new JupyterReleaseRequestBuilder(CONFIG.defaultConfig.get(JUPYTER_CHART)));
 
         WorkspaceService workspaceService = new WorkspaceService(releaseManager, releaseList, repo, appRequestBuilders, CONFIG.domain, CONFIG.defaultConfig, newSingleThreadExecutor());
+        ClusterService clusterService = new ClusterService(kubernetesClient);
 
         path("/api/v1", () -> {
             path("/workspaces", new WorkspacesApp(workspaceService, tokenProvider));
             get("/health", (request, response) -> "OK");
+            path("/cluster", new ClusterApp(clusterService));
             post("/search/hyperspace/_search", new SearchApp(tokenProvider));
         });
 
@@ -93,6 +99,4 @@ public class App {
         exception(IllegalStateException.class, exceptionHandler(SC_CONFLICT, null));
         exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }
-
-
 }
