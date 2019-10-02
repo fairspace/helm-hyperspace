@@ -17,8 +17,8 @@ public class Workspace {
     private String description;
     private String version;
     private String url;
-    private int logAndFilesVolumeSize;
-    private int databaseVolumeSize;
+    private Integer logAndFilesVolumeSize;
+    private Integer databaseVolumeSize;
     private List<WorkspaceApp> apps;
     private ReleaseInfo release;
 }

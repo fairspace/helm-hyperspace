@@ -14,5 +14,5 @@ import java.util.List;
 public class ReleaseInfo {
     private String status;
     private String description;
-    private boolean ready;
+    private Boolean ready;
 }
