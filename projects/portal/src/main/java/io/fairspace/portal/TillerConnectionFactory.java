@@ -9,9 +9,8 @@ import java.io.IOException;
 
 @Slf4j
 public class TillerConnectionFactory {
-    public static ReleaseManager getReleaseManager() throws IOException {
+    public static ReleaseManager getReleaseManager(DefaultKubernetesClient client) throws IOException {
         try {
-            var client = new DefaultKubernetesClient();
             var tiller = new Tiller(client);
             return new ReleaseManager(tiller);
         } catch(Exception e) {
