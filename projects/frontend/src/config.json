@@ -9,7 +9,8 @@
       "role": "/api/keycloak/roles/{roleName}"
     },
     "version": "/config/version.json",
-    "workspaces": "/api/v1/workspaces"
+    "workspaces": "/api/v1/workspaces",
+    "clusterInfo": "/api/v1/cluster"
   },
   "elasticsearch": {
     "host": "/api/v1/search",
