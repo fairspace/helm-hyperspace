@@ -40,6 +40,16 @@ public class WorkspacesApp implements RouteGroup {
                     .orElse(null);
         }, mapper::writeValueAsString);
 
+        delete("/:workspaceId", (request, response) -> {
+            requireOrganisationAdmin(request);
+
+            workspaceService
+                    .uninstallWorkspace(request.params(":workspaceId"));
+
+            return "";
+        });
+
+
         put("", (request, response) -> {
             requireOrganisationAdmin(request);
             workspaceService.installWorkspace(mapper.readValue(request.body(), Workspace.class));

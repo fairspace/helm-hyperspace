@@ -2,9 +2,9 @@ package io.fairspace.portal.services;
 
 import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
-import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
@@ -38,7 +38,6 @@ public class WorkspaceService {
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/database/size";
     private static final String WORKSPACE_APP_WORKSPACE_ID_YAML_PATH = "/workspace/id";
     private static final String WORKSPACE_APP_INGRESS_DOMAIN_YAML_PATH = "/ingress/domain";
-
 
     private final ReleaseManager releaseManager;
     private CachedReleaseList releaseList;
@@ -120,7 +119,24 @@ public class WorkspaceService {
      * @throws IOException
      */
     public void installWorkspace(Workspace workspace) throws IOException {
-        installRelease(workspaceReleaseRequestBuilder.build(workspace), repo.get(WORKSPACE_CHART));
+        installRelease(workspaceReleaseRequestBuilder.buildInstall(workspace), repo.get(WORKSPACE_CHART));
+    }
+
+    /**
+     * Deletes a workspace installation
+     * @throws IOException
+     */
+    public void uninstallWorkspace(@NonNull String workspaceId) throws IOException, NotFoundException {
+        releaseList.invalidateCache();
+
+        Workspace workspace = getWorkspace(workspaceId).orElseThrow(NotFoundException::new);
+
+        // If there is any apps, remove them first
+        for(WorkspaceApp app: workspace.getApps()) {
+            uninstallApp(app.getId());
+        }
+
+        uninstallRelease(workspaceReleaseRequestBuilder.buildUninstall(workspace));
     }
 
     /**
@@ -145,7 +161,7 @@ public class WorkspaceService {
         ReleaseOuterClass.Release workspaceRelease = releaseList.getRelease(workspaceId).orElseThrow(() -> new NotFoundException("Workspace with given id could not be found"));
         ensureWorkspaceIsReady(workspaceRelease);
 
-        // Set configuration and perform the actual installation
+        // Set configuration and performWithCacheInvalidation the actual installation
         InstallReleaseRequest.Builder installRequestBuilder = appReleaseRequestBuilder.appInstall(workspaceRelease, workspaceApp);
         installRelease(installRequestBuilder, repo.get(workspaceApp.getType()));
 
@@ -176,7 +192,7 @@ public class WorkspaceService {
 
         AppReleaseRequestBuilder appReleaseRequestBuilder = releaseRequestBuilders.get(workspaceApp.getType());
 
-        // Set configuration and perform the actual installation
+        // Set configuration and performWithCacheInvalidation the actual installation
         Tiller.UninstallReleaseRequest.Builder uninstallRequestBuilder = appReleaseRequestBuilder.appUninstall(workspaceApp);
         uninstallRelease(uninstallRequestBuilder);
 
@@ -203,7 +219,7 @@ public class WorkspaceService {
                 .setWait(true);
         log.info("Installing release {} with chart {} version {}", requestBuilder.getName(), chartBuilder.getMetadata().getName(), chartBuilder.getMetadata().getVersion());
 
-        perform("Install " + requestBuilder.getName(), () -> releaseManager.install(requestBuilder, chartBuilder));
+        performWithCacheInvalidation("Helm install " + requestBuilder.getName(), () -> releaseManager.install(requestBuilder, chartBuilder));
     }
 
     /**
@@ -217,7 +233,7 @@ public class WorkspaceService {
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
 
-        perform(format("Update release %s to version %s", requestBuilder.getName(), chartBuilder.getMetadata().getVersion()),
+        performWithCacheInvalidation(format("Helm upgrade release %s to version %s", requestBuilder.getName(), chartBuilder.getMetadata().getVersion()),
                 () -> releaseManager.update(requestBuilder, chartBuilder));
     }
 
@@ -230,32 +246,49 @@ public class WorkspaceService {
         requestBuilder
                 .setTimeout(INSTALLATION_TIMEOUT_SEC);
 
-        perform("Uninstall " + requestBuilder.getName(), () -> releaseManager.uninstall(requestBuilder.build()));
+        // Perform uninstallation command by helm
+        performWithCacheInvalidation("Helm uninstall " + requestBuilder.getName(), () -> releaseManager.uninstall(requestBuilder.build()));
     }
 
     /**
      * Handles release list cache invalidation and error handling when a Helm command is executed and when it finishes
      * and ensures that no more than one command is executed at a time
-     * @param helmCommand
-     * @param action Action to perform
+     * @param commandDescription
+     * @param action Action to performWithCacheInvalidation
      */
-    private void perform(String helmCommand, Callable<Future<?>> action) {
+    private void performWithWorker(String commandDescription, Callable<Future<?>> action, Runnable afterCreation, Runnable afterFinish) {
         worker.execute(() -> {
             try {
-                log.info("Executing Helm command {}", helmCommand);
+                log.info("Executing command {}", commandDescription);
                 var future = action.call();
-                releaseList.invalidateCache();
+
+                if(afterCreation != null) {
+                    afterCreation.run();
+                }
+
                 future.get();
-                log.info("Successfully executed Helm command {}", helmCommand);
+                log.info("Successfully executed command {}", commandDescription);
             } catch (InterruptedException e) {
-                log.warn("Interrupted while performing Helm command {}", helmCommand);
+                log.warn("Interrupted while performing command {}", commandDescription);
                 currentThread().interrupt();
             } catch (Exception e) {
-                log.error("Error performing Helm command {}", helmCommand, e);
+                log.error("Error performing command {}", commandDescription, e);
             } finally {
-                releaseList.invalidateCache();
+                if(afterFinish != null) {
+                    afterFinish.run();
+                }
             }
         });
+    }
+
+    /**
+     * Handles release list cache invalidation and error handling when a Helm command is executed and when it finishes
+     * and ensures that no more than one command is executed at a time
+     * @param commandDescription
+     * @param action Action to performWithCacheInvalidation
+     */
+    private void performWithCacheInvalidation(String commandDescription, Callable<Future<?>> action) {
+        performWithWorker(commandDescription, action, releaseList::invalidateCache, releaseList::invalidateCache);
     }
 
     private Workspace convertReleaseToWorkspace(ReleaseOuterClass.Release release) {

@@ -25,7 +25,7 @@ public class WorkspaceReleaseRequestBuilder{
         this.defaultValues = defaultValues;
     }
 
-    public Tiller.InstallReleaseRequest.Builder build(Workspace workspace) throws IOException {
+    public Tiller.InstallReleaseRequest.Builder buildInstall(Workspace workspace) throws IOException {
         var customValues = objectMapper.createObjectNode();
         customValues.with("hyperspace").put("domain", domain);
         customValues.with("hyperspace").with("keycloak").put("clientId", workspace.getId() + "-pluto");
@@ -47,4 +47,11 @@ public class WorkspaceReleaseRequestBuilder{
                 .setNamespace(workspace.getId())
                 .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build());
     }
+
+    public Tiller.UninstallReleaseRequest.Builder buildUninstall(Workspace workspace) {
+        return Tiller.UninstallReleaseRequest.newBuilder()
+                .setName(workspace.getId())
+                .setPurge(true);
+    }
+
 }

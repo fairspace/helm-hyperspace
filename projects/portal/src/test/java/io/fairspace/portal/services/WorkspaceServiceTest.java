@@ -10,6 +10,12 @@ import hapi.release.InfoOuterClass;
 import hapi.release.ReleaseOuterClass;
 import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller;
+import io.fabric8.kubernetes.api.model.DoneableNamespace;
+import io.fabric8.kubernetes.api.model.Namespace;
+import io.fabric8.kubernetes.api.model.NamespaceList;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
@@ -23,6 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -34,7 +41,8 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkspaceServiceTest {
-    public static final String APP_TYPE = "appType";
+    private static final String APP_TYPE = "appType";
+    private static final String APP_TYPE_2 = "jupyter";
     private static final String domain = "example.com";
     private static final ReleaseOuterClass.Release READY_WORKSPACE = ReleaseOuterClass.Release.newBuilder()
             .setInfo(InfoOuterClass.Info.newBuilder().setStatus(
@@ -45,6 +53,14 @@ public class WorkspaceServiceTest {
                     StatusOuterClass.Status.newBuilder().setCode(StatusOuterClass.Status.Code.PENDING_INSTALL).build()))
             .build();
 
+    @Mock
+    NonNamespaceOperation<Namespace, NamespaceList, DoneableNamespace, Resource<Namespace, DoneableNamespace>> namespaces;
+
+    @Mock
+    Resource<Namespace, DoneableNamespace> namespace;
+
+    @Mock
+    private DefaultKubernetesClient kubernetesClient;
     @Mock
     private ReleaseManager releaseManager;
     @Mock
@@ -87,6 +103,10 @@ public class WorkspaceServiceTest {
         when(releaseManager.install(any(), any())).thenReturn(installFuture);
         when(releaseManager.update(any(), any())).thenReturn(updateFuture);
         when(releaseManager.uninstall(any())).thenReturn(uninstallFuture);
+
+        when(kubernetesClient.namespaces()).thenReturn(namespaces);
+        when(namespaces.withName(any())).thenReturn(namespace);
+        when(namespace.delete()).thenReturn(true);
     }
 
     @Test
@@ -142,6 +162,25 @@ public class WorkspaceServiceTest {
             }),
             eq(workspaceChart)
         );
+    }
+
+    @Test
+    public void uninstallWorkspaceRemovesApps() throws NotFoundException, IOException {
+        when(releaseList.getRelease("workspaceId")).thenReturn(Optional.of(READY_WORKSPACE));
+        when(releaseList.getRelease("app")).thenReturn(Optional.of(getAppRelease(APP_TYPE)));
+        when(releaseList.get()).thenReturn(List.of(
+                getAppRelease(APP_TYPE),
+                getAppRelease(APP_TYPE_2)
+        ));
+
+        var uninstallReleaseRequest = Tiller.UninstallReleaseRequest.newBuilder();
+        when(appReleaseRequestBuilder.appUninstall(any())).thenReturn(uninstallReleaseRequest);
+
+        workspaceService.uninstallWorkspace("workspaceId");
+
+        // Expect 2 uninstallations of the apps and 1 for the workspace itself
+        verify(releaseManager, times(2)).uninstall(uninstallReleaseRequest.build());
+        verify(releaseManager, times(1)).uninstall(any());
     }
 
     @Test
@@ -243,6 +282,7 @@ public class WorkspaceServiceTest {
 
         verify(releaseManager).uninstall(uninstallReleaseRequest.build());
         verify(releaseManager, times(0)).update(any(), any());
+        verify(namespace).delete();
     }
 
     @Test(expected = NotFoundException.class)

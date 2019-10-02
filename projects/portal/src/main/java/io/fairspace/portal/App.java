@@ -1,6 +1,7 @@
 package io.fairspace.portal;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fairspace.oidc_auth.JwtTokenValidator;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.portal.apps.SearchApp;
@@ -67,7 +68,8 @@ public class App {
         }
 
         // Setup workspaces app
-        ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager();
+        DefaultKubernetesClient kubernetesClient = new DefaultKubernetesClient();
+        ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager(kubernetesClient);
         CachedReleaseList releaseList = new CachedReleaseList(releaseManager);
 
         // Setup chart repo
