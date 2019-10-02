@@ -13,7 +13,7 @@ import {isOrganisationAdmin} from "../common/utils/userUtils";
 import WorkspaceAPI from "../common/services/WorkspaceAPI";
 
 /**
- * This page will show information about a single workspace
+ * This page will show information about a single app
  *
  * @param {*} workspace
  */
