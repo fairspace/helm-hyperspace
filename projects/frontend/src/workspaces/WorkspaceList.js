@@ -199,7 +199,8 @@ const WorkspaceList = ({history, onEditWorkspace}) => {
                                             <MenuItem onClick={() => {
                                                 setAnchorEl(undefined);
                                                 onEditWorkspace(workspace);
-                                            }} disabled={!isOrganisationAdmin(authorizations)}>
+                                            }}
+                                                disabled={!isOrganisationAdmin(authorizations) || !workspace.ready}>
                                                 Update configuration
                                             </MenuItem>
                                             <MenuItem onClick={() => openWorkspaceRoles(id)} disabled={!canManageRoles(id)}>

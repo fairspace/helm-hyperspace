@@ -16,20 +16,9 @@ export default () => {
 
     usePageTitleUpdater("Workspaces");
 
-    const createWorkspace = (workspace, isUpdate) => {
+    const createWorkspace = (workspace) => {
         setShowWorkspaceDialog(false);
         setSelectedWorkspace(undefined);
-        if (isUpdate) {
-            return WorkspaceAPI.updateWorkspace(workspace)
-                .then(() => {
-                    setSnackbarVisible(true);
-                    setSnackbarMessage("The workspace is being updated, this might take a while");
-                })
-                .catch(() => {
-                    setSnackbarVisible(true);
-                    setSnackbarMessage("An error occurred while updating your workspace. Please try again later.");
-                });
-        }
         return WorkspaceAPI.createWorkspace(workspace)
             .then(() => {
                 setSnackbarVisible(true);
@@ -38,6 +27,20 @@ export default () => {
             .catch(() => {
                 setSnackbarVisible(true);
                 setSnackbarMessage("An error occurred while creating your workspace. Please try again later.");
+            });
+    };
+
+    const updateWorkspace = (workspace) => {
+        setShowWorkspaceDialog(false);
+        setSelectedWorkspace(undefined);
+        return WorkspaceAPI.updateWorkspace(workspace)
+            .then(() => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("The workspace is being updated, this might take a while");
+            })
+            .catch(() => {
+                setSnackbarVisible(true);
+                setSnackbarMessage("An error occurred while updating your workspace. Please try again later.");
             });
     };
 
@@ -72,7 +75,7 @@ export default () => {
             </Button>
             {showWorkspaceDialog && (
                 <WorkspaceDialog
-                    onSubmit={createWorkspace}
+                    onSubmit={selectedWorkspace ? updateWorkspace : createWorkspace}
                     onClose={() => {
                         setShowWorkspaceDialog(false);
                         setSelectedWorkspace(undefined);

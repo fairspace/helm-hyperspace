@@ -26,15 +26,14 @@ export default ({onSubmit, onClose, workspace: {id = '', name = '', description 
 
     const formValid = idValid && nameValid && logAndFilesVolumeSizeValid && databaseVolumeSizeValid;
 
-    const createWorkspace = () => formValid && onSubmit(
+    const validateAndSubmit = () => formValid && onSubmit(
         {
             id: idControl.value,
             name: nameControl.value,
             description: descriptionControl.value,
             logAndFilesVolumeSize: logAndFilesVolumeSizeControl.value,
             databaseVolumeSize: databaseVolumeSizeControl.value
-        },
-        isUpdate
+        }
     );
 
     const modified = [nameControl, descriptionControl, logAndFilesVolumeSizeControl, databaseVolumeSizeControl].some(ctrl => ctrl.touched);
@@ -57,7 +56,7 @@ export default ({onSubmit, onClose, workspace: {id = '', name = '', description 
                     onSubmit={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        createWorkspace();
+                        validateAndSubmit();
                     }}
                 >
                     <ControlledField
