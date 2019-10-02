@@ -1,14 +1,13 @@
 package io.fairspace.portal.services.releases;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.IOException;
 
+import static io.fairspace.portal.utils.JacksonUtils.createObjectNode;
+
 public abstract class BaseAppReleaseRequestBuilder implements AppReleaseRequestBuilder {
-    protected static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
     /**
      * Generates a configuration object with the workspace id and ingress domain prefilled
@@ -21,7 +20,7 @@ public abstract class BaseAppReleaseRequestBuilder implements AppReleaseRequestB
      * @return
      */
     protected ObjectNode getAppValues(String workspaceId, String appDomain) {
-        var appValues = objectMapper.createObjectNode();
+        var appValues = createObjectNode();
 
         // Sets the workspace identifier for associating this app with the workspace
         // See WorkspaceService#WORKSPACE_APP_WORKSPACE_ID_YAML_PATH

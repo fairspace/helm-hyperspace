@@ -127,7 +127,7 @@ public class WorkspaceService {
                 .filter(r -> r.getInfo().getStatus().getCode() == Code.DEPLOYED)
                 .orElseThrow(() -> new NotFoundException("Workspace " + workspace.getId() + " not found or not ready"));
 
-        updateRelease(workspaceReleaseRequestBuilder.buildUpdate(workspace, release.getConfig()), repo.get(WORKSPACE_CHART));
+        updateRelease(workspaceReleaseRequestBuilder.buildUpdate(workspace), repo.get(WORKSPACE_CHART));
     }
 
     private boolean isWorkspace(ReleaseOuterClass.Release release) {
