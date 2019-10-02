@@ -46,6 +46,12 @@ public class WorkspacesApp implements RouteGroup {
             return "";
         });
 
+        patch("", (request, response) -> {
+            requireOrganisationAdmin(request);
+            workspaceService.updateWorkspace(mapper.readValue(request.body(), Workspace.class));
+            return "";
+        });
+
         get("/:workspaceId/apps", (request, response) -> {
             response.type(APPLICATION_JSON.asString());
             return workspaceService

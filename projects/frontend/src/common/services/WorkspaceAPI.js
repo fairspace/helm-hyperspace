@@ -37,6 +37,11 @@ class WorkspaceAPI {
             .catch(handleHttpError("Failure when creating a workspace"));
     }
 
+    updateWorkspace(workspace) {
+        return axios.patch(baseUrl(), workspace, defaultConfig)
+            .catch(handleHttpError("Failure when updating a workspace"));
+    }
+
     addAppToWorkspace(workspaceId, appType) {
         const app = {
             id: appType + '-' + workspaceId,

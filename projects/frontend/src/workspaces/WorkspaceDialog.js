@@ -11,12 +11,13 @@ const DEFAULT_LOG_AND_FILES_SIZE = 100;
 const DEFAULT_DATABASE_VOLUME_SIZE = 50;
 const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
 
-export default ({onCreate, onClose}) => {
-    const idControl = useFormField('');
-    const nameControl = useFormField('');
-    const descriptionControl = useFormField('');
-    const logAndFilesVolumeSizeControl = useFormField(DEFAULT_LOG_AND_FILES_SIZE);
-    const databaseVolumeSizeControl = useFormField(DEFAULT_DATABASE_VOLUME_SIZE);
+export default ({onSubmit, onClose, workspace: {id = '', name = '', description = '', logAndFilesVolumeSize = DEFAULT_LOG_AND_FILES_SIZE, databaseVolumeSize = DEFAULT_DATABASE_VOLUME_SIZE} = {}}) => {
+    const isUpdate = !!id;
+    const idControl = useFormField(id);
+    const nameControl = useFormField(name);
+    const descriptionControl = useFormField(description);
+    const logAndFilesVolumeSizeControl = useFormField(logAndFilesVolumeSize);
+    const databaseVolumeSizeControl = useFormField(databaseVolumeSize);
 
     const idValid = !!idControl.value && ID_PATTERN.test(idControl.value);
     const nameValid = !!nameControl.value;
@@ -25,15 +26,18 @@ export default ({onCreate, onClose}) => {
 
     const formValid = idValid && nameValid && logAndFilesVolumeSizeValid && databaseVolumeSizeValid;
 
-    const createWorkspace = () => formValid && onCreate(
+    const createWorkspace = () => formValid && onSubmit(
         {
             id: idControl.value,
             name: nameControl.value,
             description: descriptionControl.value,
             logAndFilesVolumeSize: logAndFilesVolumeSizeControl.value,
             databaseVolumeSize: databaseVolumeSizeControl.value
-        }
+        },
+        isUpdate
     );
+
+    const modified = [nameControl, descriptionControl, logAndFilesVolumeSizeControl, databaseVolumeSizeControl].some(ctrl => ctrl.touched);
 
     return (
         <Dialog
@@ -44,7 +48,7 @@ export default ({onCreate, onClose}) => {
             maxWidth="sm"
         >
             <DialogTitle disableTypography id="form-dialog-title">
-                <Typography variant="h5">New Workspace</Typography>
+                <Typography variant="h5">{isUpdate ? `Update workspace ${id}`: "New Workspace"}</Typography>
             </DialogTitle>
             <DialogContent style={{overflowX: 'hidden'}}>
                 <form
@@ -67,6 +71,7 @@ export default ({onCreate, onClose}) => {
                         name="id"
                         fullWidth
                         required
+                        disabled={isUpdate}
                         helperText="Only lower case letters, numbers, hyphens and should start with a letter."
                     />
                     <ControlledField
@@ -130,11 +135,11 @@ export default ({onCreate, onClose}) => {
                 <Button
                     type="submit"
                     form="formId"
-                    disabled={!formValid}
+                    disabled={!formValid || (isUpdate && !modified)}
                     color="primary"
                     variant="contained"
                 >
-                    Create Workspace
+                    {isUpdate ? "Update Workspace" : "Create Workspace"}
                 </Button>
             </DialogActions>
         </Dialog>
