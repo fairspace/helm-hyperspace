@@ -125,7 +125,7 @@ public class WorkspaceService {
         var release = releaseList.getRelease(workspace.getId())
                 .filter(this::isWorkspace)
                 .filter(r -> r.getInfo().getStatus().getCode() == Code.DEPLOYED)
-                .orElseThrow(() -> new NotFoundException("Workspace " + workspace.getId() + " not found"));
+                .orElseThrow(() -> new NotFoundException("Workspace " + workspace.getId() + " not found or not ready"));
 
         updateRelease(workspaceReleaseRequestBuilder.buildUpdate(workspace, release.getConfig()), repo.get(WORKSPACE_CHART));
     }
