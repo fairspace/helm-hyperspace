@@ -19,8 +19,8 @@ public class Workspace {
     private String url;
     private String status;
     private String errorMessage;
-    private boolean ready;
-    private int logAndFilesVolumeSize;
-    private int databaseVolumeSize;
+    private Boolean ready;
+    private Integer logAndFilesVolumeSize;
+    private Integer databaseVolumeSize;
     private List<WorkspaceApp> apps;
 }

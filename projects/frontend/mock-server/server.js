@@ -25,6 +25,9 @@ app.get('/config/version.json', (req, res) => res.sendFile(`${mockDataDir}/versi
 app.get('/api/v1/account', (req, res) => res.sendFile(`${mockDataDir}/user.json`));
 app.get('/api/v1/workspaces', (req, res) => res.sendFile(`${mockDataDir}/workspaces.json`));
 app.put('/api/v1/workspaces', (req, res) => res.sendStatus(200));
+app.patch('/api/v1/workspaces', (req, res) => res.sendStatus(200));
+
+app.get('/api/v1/cluster', (req, res) => res.sendFile(`${mockDataDir}/cluster.json`));
 
 app.post('/api/v1/search/hyperspace/_search', (req, res) => res.sendFile(`${mockDataDir}/search.json`));
 
