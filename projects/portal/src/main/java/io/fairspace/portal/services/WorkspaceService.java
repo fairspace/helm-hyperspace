@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static hapi.release.StatusOuterClass.Status.Code;
 import static io.fairspace.portal.utils.HelmUtils.*;
+import static io.fairspace.portal.utils.JacksonUtils.getConfigAsText;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 
@@ -305,20 +306,6 @@ public class WorkspaceService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private String getConfigAsText(JsonNode config, String yamlPath) {
-        if(config == null) {
-            return null;
-        }
-
-        JsonNode node = config.at(yamlPath);
-
-        if(node == null) {
-            return null;
-        }
-
-        return node.asText();
     }
 
 }
