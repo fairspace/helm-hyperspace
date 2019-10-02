@@ -21,7 +21,7 @@ const ClusterHealthBar = ({onDismiss}) => {
                 onDismiss={onDismiss}
                 onRefresh={refresh}
                 message="An error occurred while retrieving cluster information"
-                showRefreshButton={true}
+                showRefreshButton
             />
         );
     } if (data.numUnschedulable) {
