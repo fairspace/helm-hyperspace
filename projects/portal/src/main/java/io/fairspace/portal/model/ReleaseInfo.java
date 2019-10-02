@@ -5,15 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WorkspaceApp {
-    private String id;
-    private String workspaceId;
-    private String type;
-    private String version;
-    private String url;
-    private ReleaseInfo release;
+public class ReleaseInfo {
+    private String status;
+    private String description;
+    private boolean ready;
 }

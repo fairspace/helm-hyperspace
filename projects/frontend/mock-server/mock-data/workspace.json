@@ -4,7 +4,11 @@
   "description": "Workspace\ndescription",
   "url": "http://localhost:3000",
   "version": "0.6.1",
-  "status": "DEPLOYED",
+  "release": {
+    "status": "DEPLOYED",
+    "description": "Install complete",
+    "ready": true
+  },
   "logAndFilesVolumeSize": 1024,
   "databaseVolumeSize": 1024,
   "apps": [
@@ -14,7 +18,11 @@
       "type": "jupyter",
       "version": "0.7.1",
       "url": "http://localhost:3000/jupyter",
-      "status": "DEPLOYED"
+      "release": {
+        "status": "DEPLOYED",
+        "description": "Install complete",
+        "ready": true
+      }
     }
   ]
 }

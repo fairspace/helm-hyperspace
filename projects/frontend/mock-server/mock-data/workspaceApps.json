@@ -5,6 +5,10 @@
     "type": "jupyter",
     "version": "0.7.1",
     "url": "http://localhost:3000/jupyter",
-    "status": "DEPLOYED"
+    "release": {
+      "status": "DEPLOYED",
+      "description": "Install complete",
+      "ready": true
+    }
   }
 ]

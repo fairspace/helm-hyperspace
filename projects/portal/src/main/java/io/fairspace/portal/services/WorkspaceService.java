@@ -6,6 +6,7 @@ import hapi.release.ReleaseOuterClass;
 import hapi.services.tiller.Tiller;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
 import io.fairspace.portal.errors.NotFoundException;
+import io.fairspace.portal.model.ReleaseInfo;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
 import io.fairspace.portal.services.releases.AppReleaseRequestBuilder;
@@ -277,9 +278,7 @@ public class WorkspaceService {
                     .description(getConfigAsText(config, WORKSPACE_DESCRIPTION_YAML_PATH))
                     .url("https://" + getConfigAsText(config, WORKSPACE_INGRESS_DOMAIN_YAML_PATH))
                     .version(release.getChart().getMetadata().getVersion())
-                    .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
-                    .errorMessage(release.getInfo().getStatus().getCode() == Code.FAILED ? release.getInfo().getDescription() : "")
-                    .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
+                    .release(getReleaseInfo(release))
                     .logAndFilesVolumeSize(getSize(getConfigAsText(config, FILE_STORAGE_SIZE_YAML_PATH)))
                     .databaseVolumeSize(getSize(getConfigAsText(config, DATABASE_STORAGE_SIZE_YAML_PATH)))
                     .apps(listInstalledApps(release.getName()))
@@ -298,14 +297,20 @@ public class WorkspaceService {
                     .workspaceId(getConfigAsText(config, WORKSPACE_APP_WORKSPACE_ID_YAML_PATH))
                     .type(release.getChart().getMetadata().getName())
                     .version(release.getChart().getMetadata().getVersion())
-                    .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
-                    .errorMessage(release.getInfo().getStatus().getCode() == Code.FAILED ? release.getInfo().getDescription() : "")
-                    .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
                     .url("https://" + getConfigAsText(config, WORKSPACE_APP_INGRESS_DOMAIN_YAML_PATH))
+                    .release(getReleaseInfo(release))
                     .build();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private ReleaseInfo getReleaseInfo(ReleaseOuterClass.Release release) {
+        return ReleaseInfo.builder()
+                .status(release.getInfo().getStatus().getCode().toString())
+                .description(release.getInfo().getDescription())
+                .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
+                .build();
     }
 
 }

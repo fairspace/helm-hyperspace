@@ -23,7 +23,7 @@ const columns = {
         label: 'Version'
     },
     status: {
-        valueExtractor: 'status',
+        valueExtractor: a => a.release.status,
         label: 'Status'
     }
 };
@@ -106,7 +106,7 @@ const AppsList = ({apps, workspaceId, onAddApp, onRemoveApp}) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {orderedItems.map(({id, type, url, version, status}) => (
+                        {orderedItems.map(({id, type, url, version, release: {status}}) => (
                             <TableRow
                                 hover
                                 key={id}

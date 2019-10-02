@@ -36,7 +36,7 @@ const columns = {
         label: 'Version'
     },
     status: {
-        valueExtractor: 'status',
+        valueExtractor: w => w.release.status,
         label: 'Status'
     }
 };
@@ -135,7 +135,7 @@ const WorkspaceList = ({history}) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({access, id, name, url, version, status, apps = []}) => {
+                    {pagedItems.map(({access, id, name, url, version, release: {status}, apps = []}) => {
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
