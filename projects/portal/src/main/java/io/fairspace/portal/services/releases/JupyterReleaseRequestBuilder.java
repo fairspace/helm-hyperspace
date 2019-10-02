@@ -2,7 +2,6 @@ package io.fairspace.portal.services.releases;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import hapi.chart.ConfigOuterClass;
 import hapi.release.ReleaseOuterClass;
 import hapi.services.tiller.Tiller;
 import io.fairspace.portal.model.WorkspaceApp;
@@ -12,9 +11,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.fairspace.portal.services.releases.ConfigHelper.toConfig;
 import static io.fairspace.portal.utils.HelmUtils.createRandomString;
 import static io.fairspace.portal.utils.HelmUtils.getReleaseConfig;
-import static io.fairspace.portal.utils.JacksonUtils.merge;
+import static io.fairspace.portal.utils.JacksonUtils.*;
 
 @Slf4j
 public class JupyterReleaseRequestBuilder extends BaseAppReleaseRequestBuilder {
@@ -51,13 +51,12 @@ public class JupyterReleaseRequestBuilder extends BaseAppReleaseRequestBuilder {
             throw new IllegalStateException("Error configuring Jupyter", e);
         }
 
-        var values = merge(objectMapper.valueToTree(defaultValues), customValues);
-        var yaml = objectMapper.writeValueAsString(values);
+        var values = merge(valueToTree(defaultValues), customValues);
 
         return Tiller.InstallReleaseRequest.newBuilder()
                 .setName(workspaceApp.getId())
                 .setNamespace(workspaceApp.getId())
-                .setValues(ConfigOuterClass.Config.newBuilder().setRaw(yaml).build());
+                .setValues(toConfig(values));
     }
 
     @Override
@@ -75,46 +74,35 @@ public class JupyterReleaseRequestBuilder extends BaseAppReleaseRequestBuilder {
 
         // Add the url for jupyter to the workspace configuration
         var appDomain = getAppDomain(workspaceDomain, DOMAIN_PREFIX);
-        var customValues = objectMapper.createObjectNode();
+        var customValues = createObjectNode();
         customValues.with("services").put("jupyterhub",  String.format("https://%s", appDomain));
 
         // Add pod annotation for mercury to ensure it will restart
         customValues.with("podAnnotations").with("mercury").put("commit",  "install-jupyter-" + createRandomString(5));
 
-        var yaml = objectMapper.writeValueAsString(customValues);
-
         return Optional.of(
                 Tiller.UpdateReleaseRequest.newBuilder()
                         .setName(workspaceRelease.getName())
                         .setReuseValues(true)
-                        .setValues(
-                                ConfigOuterClass.Config.newBuilder()
-                                        .setRaw(yaml)
-                                        .build()
-                        )
+                        .setValues(toConfig(customValues))
         );
     }
 
     @Override
     public Optional<Tiller.UpdateReleaseRequest.Builder> workspaceUpdateAfterAppUninstall(ReleaseOuterClass.Release workspaceRelease, WorkspaceApp workspaceApp) throws IOException {
         // Remove the url for jupyter from the workspace configuration
-        var customValues = objectMapper.createObjectNode();
+        var customValues = createObjectNode();
         customValues.with("services").put("jupyterhub", "");
 
         // Add pod annotation for mercury to ensure it will restart
         customValues.with("podAnnotations").with("mercury").put("commit",  "uninstall-jupyter-" + createRandomString(5));
 
-        var yaml = objectMapper.writeValueAsString(customValues);
 
         return Optional.of(
                 Tiller.UpdateReleaseRequest.newBuilder()
                         .setName(workspaceRelease.getName())
                         .setReuseValues(true)
-                        .setValues(
-                                ConfigOuterClass.Config.newBuilder()
-                                        .setRaw(yaml)
-                                        .build()
-                        )
+                        .setValues(toConfig(customValues))
         );
     }
 

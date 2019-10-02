@@ -1,9 +1,9 @@
 import React from 'react';
 import {mount} from "enzyme";
-import NewWorkspaceDialog from "../NewWorkspaceDialog";
+import WorkspaceDialog from "../WorkspaceDialog";
 
-describe('NewWorkspaceDialog', () => {
-    let onCreate;
+describe('WorkspaceDialog', () => {
+    let onSubmit;
     let wrapper;
 
     const enterValue = (type, id, value) => wrapper
@@ -17,8 +17,8 @@ describe('NewWorkspaceDialog', () => {
     const submit = () => wrapper.find('form').simulate('submit');
 
     beforeEach(() => {
-        onCreate = jest.fn();
-        wrapper = mount(<NewWorkspaceDialog onCreate={onCreate} />);
+        onSubmit = jest.fn();
+        wrapper = mount(<WorkspaceDialog onSubmit={onSubmit} />);
     });
 
     it('should send all entered parameters to the creation method', () => {
@@ -32,8 +32,8 @@ describe('NewWorkspaceDialog', () => {
 
         submit();
 
-        expect(onCreate.mock.calls.length).toEqual(1);
-        expect(onCreate.mock.calls[0][0]).toEqual({
+        expect(onSubmit.mock.calls.length).toEqual(1);
+        expect(onSubmit.mock.calls[0][0]).toEqual({
             id: 'a',
             name: 'b',
             description: 'c',
@@ -52,7 +52,7 @@ describe('NewWorkspaceDialog', () => {
 
         submit();
 
-        expect(onCreate.mock.calls.length).toEqual(0);
+        expect(onSubmit.mock.calls.length).toEqual(0);
     });
 
     it('should require a name', () => {
@@ -65,7 +65,7 @@ describe('NewWorkspaceDialog', () => {
 
         submit();
 
-        expect(onCreate.mock.calls.length).toEqual(0);
+        expect(onSubmit.mock.calls.length).toEqual(0);
     });
 
     it('should require PV sizes larger than 0', () => {
@@ -79,7 +79,7 @@ describe('NewWorkspaceDialog', () => {
 
         submit();
 
-        expect(onCreate.mock.calls.length).toEqual(0);
+        expect(onSubmit.mock.calls.length).toEqual(0);
     });
 
     it('should require PV sizes larger than 0', () => {
@@ -93,7 +93,7 @@ describe('NewWorkspaceDialog', () => {
 
         submit();
 
-        expect(onCreate.mock.calls.length).toEqual(0);
+        expect(onSubmit.mock.calls.length).toEqual(0);
     });
 
 });

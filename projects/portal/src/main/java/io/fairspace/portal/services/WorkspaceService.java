@@ -86,9 +86,8 @@ public class WorkspaceService {
     }
 
     public Optional<Workspace> getWorkspace(String workspaceId) {
-        var workspaceChart = repo.get(WORKSPACE_CHART);
         return releaseList.getRelease(workspaceId)
-                .filter(release -> release.getChart().getMetadata().getName().equals(workspaceChart.getMetadata().getName()))
+                .filter(this::isWorkspace)
                 .map(this::convertReleaseToWorkspace);
     }
 
@@ -120,8 +119,21 @@ public class WorkspaceService {
      * @param workspace
      * @throws IOException
      */
-    public void installWorkspace(Workspace workspace) throws IOException {
-        installRelease(workspaceReleaseRequestBuilder.build(workspace), repo.get(WORKSPACE_CHART));
+    public void installWorkspace(Workspace workspace) {
+        installRelease(workspaceReleaseRequestBuilder.buildInstall(workspace), repo.get(WORKSPACE_CHART));
+    }
+
+    public void updateWorkspace(Workspace workspace) throws NotFoundException {
+        var release = releaseList.getRelease(workspace.getId())
+                .filter(this::isWorkspace)
+                .filter(r -> r.getInfo().getStatus().getCode() == Code.DEPLOYED)
+                .orElseThrow(() -> new NotFoundException("Workspace " + workspace.getId() + " not found or not ready"));
+
+        updateRelease(workspaceReleaseRequestBuilder.buildUpdate(workspace), repo.get(WORKSPACE_CHART));
+    }
+
+    private boolean isWorkspace(ReleaseOuterClass.Release release) {
+        return release.getChart().getMetadata().getName().equals(repo.get(WORKSPACE_CHART).getMetadata().getName());
     }
 
     /**
@@ -161,9 +173,7 @@ public class WorkspaceService {
 
         // Update workspace release, if needed
         Optional<Tiller.UpdateReleaseRequest.Builder> builder = appReleaseRequestBuilder.workspaceUpdateAfterAppInstall(workspaceRelease, workspaceApp);
-        if(builder.isPresent()) {
-            updateRelease(builder.get(), repo.get(WORKSPACE_CHART));
-        }
+        builder.ifPresent(value -> updateRelease(value, repo.get(WORKSPACE_CHART)));
     }
 
     /**

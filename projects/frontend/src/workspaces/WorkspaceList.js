@@ -41,7 +41,7 @@ const columns = {
     }
 };
 
-const WorkspaceList = ({history}) => {
+const WorkspaceList = ({history, onEditWorkspace}) => {
     const {data: workspaces = [], loading, error, refresh} = useAsync(WorkspaceAPI.getWorkspaces);
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -135,7 +135,8 @@ const WorkspaceList = ({history}) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {pagedItems.map(({access, id, name, url, version, status, apps = []}) => {
+                    {pagedItems.map((workspace) => {
+                        const {access, id, name, url, version, status, apps = []} = workspace;
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -195,6 +196,13 @@ const WorkspaceList = ({history}) => {
                                             open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
                                             onClose={handleMenuClose}
                                         >
+                                            <MenuItem onClick={() => {
+                                                setAnchorEl(undefined);
+                                                onEditWorkspace(workspace);
+                                            }}
+                                                disabled={!isOrganisationAdmin(authorizations) || !workspace.ready}>
+                                                Update configuration
+                                            </MenuItem>
                                             <MenuItem onClick={() => openWorkspaceRoles(id)} disabled={!canManageRoles(id)}>
                                                 Manage roles
                                             </MenuItem>

@@ -6,6 +6,7 @@
     "url": "http://localhost:3000",
     "version": "0.6.1",
     "status": "DEPLOYED",
+    "ready": true,
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024,
     "apps": [
@@ -15,7 +16,8 @@
         "type": "jupyter",
         "version": "0.7.1",
         "url": "http://localhost:3000/jupyter",
-        "status": "DEPLOYED"
+        "status": "DEPLOYED",
+        "ready": true
       }
     ]
   },
@@ -34,7 +36,8 @@
         "type": "jupyter",
         "version": "0.7.1",
         "url": "http://localhost:3000/jupyter",
-        "status": "DEPLOYED"
+        "status": "DEPLOYED",
+        "ready": true
       },
       {
         "id": "rshiny-workspace",
@@ -42,7 +45,8 @@
         "type": "rshiny",
         "version": "0.1.5",
         "url": "http://localhost:3000/rshiny",
-        "status": "DEPLOYED"
+        "status": "DEPLOYED",
+        "ready": true
       }
     ]
   },
@@ -53,6 +57,7 @@
     "url": "http://example.com/ws2",
     "version": "0.0.1",
     "status": "PENDING_INSTALL",
+    "ready": false,
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024,
     "apps": []
@@ -64,6 +69,7 @@
     "url": "http://example.com/ws3",
     "version": "0.5.1-SNAPSHOT",
     "status": "PENDING_INSTALL",
+    "ready": false,
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024,
     "apps": []
