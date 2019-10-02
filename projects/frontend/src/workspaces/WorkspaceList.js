@@ -3,7 +3,7 @@ import {Link, withRouter} from "react-router-dom";
 import {
     Paper, Table, TableBody, TableCell, TableHead,
     TablePagination, TableRow, TableSortLabel, IconButton,
-    Menu, MenuItem, Tooltip, Typography,
+    Menu, MenuItem, Tooltip, Typography, Grid,
 } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ErrorIcon from '@material-ui/icons/Error';
@@ -146,7 +146,7 @@ const WorkspaceList = ({classes, history, onEditWorkspace}) => {
                 </TableHead>
                 <TableBody>
                     {pagedItems.map((workspace) => {
-                        const {access, id, name, url, version, release, apps = []} = workspace;
+                        const {access, id, name, url, version, release: {ready, status}, apps = []} = workspace;
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -183,13 +183,13 @@ const WorkspaceList = ({classes, history, onEditWorkspace}) => {
                                 <TableCell>
                                     {version}
                                 </TableCell>
-                                <TableCell valign="middle">
-                                    {release.status}
-                                    {
-                                        release.ready
-                                            ? ''
-                                            : <Link to={`/workspaces/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>
-                                    }
+                                <TableCell>
+                                    <Grid container alignItems="center" spacing={8}>
+                                        <Grid item xs={11}>{status}</Grid>
+                                        <Grid item xs={1}>
+                                            {!ready && <Link to={`/workspaces/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>}
+                                        </Grid>
+                                    </Grid>
                                 </TableCell>
                                 <TableCell>
                                     {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
@@ -211,17 +211,25 @@ const WorkspaceList = ({classes, history, onEditWorkspace}) => {
                                             open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
                                             onClose={handleMenuClose}
                                         >
-                                            <MenuItem onClick={() => {
-                                                setAnchorEl(undefined);
-                                                onEditWorkspace(workspace);
-                                            }}
-                                                disabled={!isOrganisationAdmin(authorizations) || !workspace.ready}>
+                                            <MenuItem
+                                                onClick={() => {
+                                                    setAnchorEl(undefined);
+                                                    onEditWorkspace(workspace);
+                                                }}
+                                                disabled={!isOrganisationAdmin(authorizations) || !ready}
+                                            >
                                                 Update configuration
                                             </MenuItem>
-                                            <MenuItem onClick={() => openWorkspaceRoles(id)} disabled={!canManageRoles(id)}>
+                                            <MenuItem
+                                                onClick={() => openWorkspaceRoles(id)}
+                                                disabled={!canManageRoles(id) || !ready}
+                                            >
                                                 Manage roles
                                             </MenuItem>
-                                            <MenuItem onClick={() => manageApps(id)} disabled={!canManageApps(id)}>
+                                            <MenuItem
+                                                onClick={() => manageApps(id)}
+                                                disabled={!canManageApps(id) || !ready}
+                                            >
                                                 Manage apps
                                             </MenuItem>
                                         </Menu>
