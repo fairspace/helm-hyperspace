@@ -171,7 +171,7 @@ public class WorkspaceService {
         ReleaseOuterClass.Release workspaceRelease = releaseList.getRelease(workspaceId).orElseThrow(() -> new NotFoundException("Workspace with given id could not be found"));
         ensureWorkspaceIsReady(workspaceRelease);
 
-        // Set configuration and performWithCacheInvalidation the actual installation
+        // Set configuration and perform the actual installation
         InstallReleaseRequest.Builder installRequestBuilder = appReleaseRequestBuilder.appInstall(workspaceRelease, workspaceApp);
         installRelease(installRequestBuilder, repo.get(workspaceApp.getType()));
 
@@ -202,7 +202,7 @@ public class WorkspaceService {
 
         AppReleaseRequestBuilder appReleaseRequestBuilder = releaseRequestBuilders.get(workspaceApp.getType());
 
-        // Set configuration and performWithCacheInvalidation the actual installation
+        // Set configuration and perform the actual installation
         Tiller.UninstallReleaseRequest.Builder uninstallRequestBuilder = appReleaseRequestBuilder.appUninstall(workspaceApp);
         uninstallRelease(uninstallRequestBuilder);
 
@@ -266,16 +266,12 @@ public class WorkspaceService {
      * @param commandDescription
      * @param action Action to performWithCacheInvalidation
      */
-    private void performWithWorker(String commandDescription, Callable<Future<?>> action, Runnable afterCreation, Runnable afterFinish) {
+    private void performWithCacheInvalidation(String commandDescription, Callable<Future<?>> action) {
         worker.execute(() -> {
             try {
                 log.info("Executing command {}", commandDescription);
                 var future = action.call();
-
-                if(afterCreation != null) {
-                    afterCreation.run();
-                }
-
+                releaseList.invalidateCache();
                 future.get();
                 log.info("Successfully executed command {}", commandDescription);
             } catch (InterruptedException e) {
@@ -284,21 +280,9 @@ public class WorkspaceService {
             } catch (Exception e) {
                 log.error("Error performing command {}", commandDescription, e);
             } finally {
-                if(afterFinish != null) {
-                    afterFinish.run();
-                }
+                releaseList.invalidateCache();
             }
         });
-    }
-
-    /**
-     * Handles release list cache invalidation and error handling when a Helm command is executed and when it finishes
-     * and ensures that no more than one command is executed at a time
-     * @param commandDescription
-     * @param action Action to performWithCacheInvalidation
-     */
-    private void performWithCacheInvalidation(String commandDescription, Callable<Future<?>> action) {
-        performWithWorker(commandDescription, action, releaseList::invalidateCache, releaseList::invalidateCache);
     }
 
     private Workspace convertReleaseToWorkspace(ReleaseOuterClass.Release release) {
