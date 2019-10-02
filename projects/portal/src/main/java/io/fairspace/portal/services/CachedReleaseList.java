@@ -54,10 +54,6 @@ public class CachedReleaseList {
         }
     }
 
-    public Optional<ReleaseOuterClass.Release> getRelease(String releaseId) {
-        return get().stream().filter(release -> release.getName().equals(releaseId)).findFirst();
-    }
-
     public void invalidateCache() {
         cache.invalidateAll();
     }
