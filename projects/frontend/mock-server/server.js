@@ -40,6 +40,8 @@ app.get('/api/v1/workspaces/:workspaceId', (req, res) => {
         res.sendStatus(404);
     }
 });
+app.delete('/api/v1/workspaces/:workspaceId', (req, res) => res.sendStatus(200));
+
 app.get('/api/v1/workspaces/:workspaceId/apps', (req, res) => {
     const workspace = workspaces.find(w => w.id === req.params.workspaceId);
 

@@ -42,6 +42,11 @@ class WorkspaceAPI {
             .catch(handleHttpError("Failure when updating a workspace"));
     }
 
+    deleteWorkspace(workspaceId) {
+        return axios.delete(workspaceUrl(workspaceId), defaultConfig)
+            .catch(handleHttpError(`Failure when deleting ${workspaceId}`));
+    }
+
     addAppToWorkspace(workspaceId, appType) {
         const app = {
             id: appType + '-' + workspaceId,
