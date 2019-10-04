@@ -43,10 +43,4 @@ public class CachedReleaseListTest {
 
         verify(releaseManager, times(1)).list(any());
     }
-
-    @Test
-    public void getRelease() {
-        assertTrue(releaseList.getRelease("jupyter").isPresent());
-        assertFalse(releaseList.getRelease("something-else").isPresent());
-    }
 }
