@@ -2,8 +2,10 @@ package io.fairspace.portal.services;
 
 import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
+import hapi.release.StatusOuterClass;
 import hapi.services.tiller.Tiller;
 import hapi.services.tiller.Tiller.InstallReleaseRequest;
+import io.fairspace.portal.model.ReleaseInfo;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.microbean.helm.ReleaseManager;
@@ -88,6 +90,14 @@ public class ReleaseService {
 
         // Perform uninstallation command by helm
         performWithCacheInvalidation("Helm uninstall " + requestBuilder.getName(), () -> releaseManager.uninstall(requestBuilder.build()));
+    }
+
+    public ReleaseInfo getReleaseInfo(ReleaseOuterClass.Release release) {
+        return ReleaseInfo.builder()
+                .status(release.getInfo().getStatus().getCode().toString())
+                .description(release.getInfo().getDescription())
+                .ready(release.getInfo().getStatus().getCode() == StatusOuterClass.Status.Code.DEPLOYED)
+                .build();
     }
 
     /**

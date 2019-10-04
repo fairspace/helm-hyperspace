@@ -155,9 +155,7 @@ public class WorkspaceAppService {
                     .workspaceId(getConfigAsText(config, WORKSPACE_APP_WORKSPACE_ID_YAML_PATH))
                     .type(release.getChart().getMetadata().getName())
                     .version(release.getChart().getMetadata().getVersion())
-                    .status(release.getInfo().getStatus().getCode() == Code.FAILED ? "Failed" : release.getInfo().getDescription())
-                    .errorMessage(release.getInfo().getStatus().getCode() == Code.FAILED ? release.getInfo().getDescription() : "")
-                    .ready(release.getInfo().getStatus().getCode() == Code.DEPLOYED)
+                    .release(releaseService.getReleaseInfo(release))
                     .url("https://" + getConfigAsText(config, WORKSPACE_APP_INGRESS_DOMAIN_YAML_PATH))
                     .build();
         } catch (IOException e) {
