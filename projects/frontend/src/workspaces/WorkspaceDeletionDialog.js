@@ -4,15 +4,15 @@ import {
     DialogActions, TextField, Typography
 } from '@material-ui/core';
 
-const WorkspaceDeletion = ({open, workspaceId, onClose, onConfirm}) => {
-    const [enteredWSId, setEnteredWSId] = useState('');
+const WorkspaceDeletionDialog = ({open, workspaceId, onClose, onConfirm}) => {
+    const [enteredWorkspaceId, setEnteredWorkspaceId] = useState('');
 
     // reset user input
     useEffect(() => {
-        setEnteredWSId('');
+        setEnteredWorkspaceId('');
     }, [open, workspaceId]);
 
-    const enteredWSIdMatch = enteredWSId === workspaceId;
+    const enteredWSIdMatch = enteredWorkspaceId === workspaceId;
 
     return (
         <Dialog
@@ -29,8 +29,8 @@ const WorkspaceDeletion = ({open, workspaceId, onClose, onConfirm}) => {
                 </Typography>
                 <TextField
                     label="Please type in the workspace id"
-                    value={enteredWSId}
-                    onChange={(e) => setEnteredWSId(e.target.value)}
+                    value={enteredWorkspaceId}
+                    onChange={(e) => setEnteredWorkspaceId(e.target.value)}
                     margin="normal"
                     fullWidth
                 />
@@ -58,4 +58,4 @@ const WorkspaceDeletion = ({open, workspaceId, onClose, onConfirm}) => {
     );
 };
 
-export default WorkspaceDeletion;
+export default WorkspaceDeletionDialog;

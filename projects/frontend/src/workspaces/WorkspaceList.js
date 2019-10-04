@@ -19,8 +19,6 @@ import useRepeat from "../common/hooks/UseRepeat";
 import {isOrganisationAdmin, isWorkspaceCoordinator, isWorkspaceUser} from '../common/utils/userUtils';
 import JupyterIcon from "../common/components/apps/JupyterIcon";
 import {APP_TYPE_JUPYTER} from "../constants";
-import WorkspaceDeletion from './WorkspaceDeletion';
-import NotificationSnackbar from '../common/components/NotificationSnackbar';
 
 const columns = {
     access: {
@@ -53,12 +51,9 @@ const styles = theme => ({
     }
 });
 
-const WorkspaceList = ({classes, history, onEditWorkspace}) => {
+const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace}) => {
     const {data: workspaces = [], loading, error, refresh: refreshWorkspaces} = useAsync(WorkspaceAPI.getWorkspaces);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [workspaceIdToDelete, setWorkspaceIdToDelete] = useState('');
-    const [workspaceBeingDeleted, setWorkspaceBeingDeleted] = useState('');
-    const [detletingWorkspaceError, setDetletingWorkspaceError] = useState(false);
 
     // refresh every 30 seconds
     useRepeat(refreshWorkspaces, 30000);
@@ -87,20 +82,6 @@ const WorkspaceList = ({classes, history, onEditWorkspace}) => {
     const canManageRoles = (workspaceId) => isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspaceId);
     const canManageApps = () => isOrganisationAdmin(authorizations);
 
-    const deleteWorkspace = workspaceId => WorkspaceAPI.deleteWorkspace(workspaceId)
-        .then(() => {
-            refreshWorkspaces();
-        })
-        .catch(() => {
-            setDetletingWorkspaceError(true);
-        });
-
-    const handleWorkspaceDeletion = (workspaceId) => {
-        setWorkspaceIdToDelete('');
-        setWorkspaceBeingDeleted(workspaceId);
-        deleteWorkspace(workspaceId);
-    };
-
     if (loading) {
         return <LoadingInlay />;
     }
@@ -110,191 +91,171 @@ const WorkspaceList = ({classes, history, onEditWorkspace}) => {
     }
 
     return (
-        <>
-            <Paper>
-                <Table size="small">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell padding="dense">
-                                <TableSortLabel
-                                    active={orderBy === 'access'}
-                                    direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('access')}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={orderBy === 'id'}
-                                    direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('id')}
-                                >
-                                    Id
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={orderBy === 'name'}
-                                    direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('name')}
-                                >
-                                    Name
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={orderBy === 'version'}
-                                    direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('version')}
-                                >
-                                    Version
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                <TableSortLabel
-                                    active={orderBy === 'status'}
-                                    direction={orderAscending ? 'asc' : 'desc'}
-                                    onClick={() => toggleSort('status')}
-                                >
-                                    Status
-                                </TableSortLabel>
-                            </TableCell>
-                            <TableCell>
-                                Apps
-                            </TableCell>
-                            <TableCell />
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {pagedItems.map((workspace) => {
-                            const {access, id, name, url, version, release, apps = []} = workspace;
-                            const actionsButtonId = name + 'ActionsBtn';
+        <Paper>
+            <Table size="small">
+                <TableHead>
+                    <TableRow>
+                        <TableCell padding="dense">
+                            <TableSortLabel
+                                active={orderBy === 'access'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('access')}
+                            />
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
+                                active={orderBy === 'id'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('id')}
+                            >
+                                Id
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
+                                active={orderBy === 'name'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('name')}
+                            >
+                                Name
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
+                                active={orderBy === 'version'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('version')}
+                            >
+                                Version
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            <TableSortLabel
+                                active={orderBy === 'status'}
+                                direction={orderAscending ? 'asc' : 'desc'}
+                                onClick={() => toggleSort('status')}
+                            >
+                                Status
+                            </TableSortLabel>
+                        </TableCell>
+                        <TableCell>
+                            Apps
+                        </TableCell>
+                        <TableCell />
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {pagedItems.map((workspace) => {
+                        const {access, id, name, url, version, release, apps = []} = workspace;
+                        const actionsButtonId = name + 'ActionsBtn';
 
-                            return (
-                                <TableRow
-                                    hover
-                                    key={name}
-                                    onDoubleClick={() => {
-                                        if (access) window.location.href = url;
-                                    }}
-                                >
-                                    <TableCell padding="dense">
-                                        {!access && (
-                                            <Tooltip
-                                                title={(
-                                                    <Typography
-                                                        variant="caption"
-                                                        color="inherit"
-                                                        style={{whiteSpace: 'pre-line'}}
-                                                    >
-                                                        You have no access to this workspace
-                                                    </Typography>
-                                                )}
-                                            >
-                                                <Lock />
-                                            </Tooltip>
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        {id}
-                                    </TableCell>
-                                    <TableCell>
-                                        {name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {version}
-                                    </TableCell>
-                                    <TableCell valign="middle">
-                                        {release.status}
-                                        {
-                                            release.ready
-                                                ? ''
-                                                : <Link to={`/workspaces/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>
-                                        }
-                                    </TableCell>
-                                    <TableCell>
-                                        {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
-                                    </TableCell>
-                                    <TableCell>
-                                        <>
-                                            <IconButton
-                                                id={actionsButtonId}
-                                                aria-label="Roles"
-                                                aria-owns={anchorEl ? 'actions-menu' : undefined}
-                                                aria-haspopup="true"
-                                                onClick={handleMenuClick}
-                                            >
-                                                <MoreVertIcon />
-                                            </IconButton>
-                                            <Menu
-                                                id="actions-menu"
-                                                anchorEl={anchorEl}
-                                                open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
-                                                onClose={handleMenuClose}
-                                            >
-                                                <MenuItem
-                                                    onClick={() => {
-                                                        setAnchorEl(null);
-                                                        onEditWorkspace(workspace);
-                                                    }}
-                                                    disabled={!isOrganisationAdmin(authorizations) || !workspace.release.ready}
+                        return (
+                            <TableRow
+                                hover
+                                key={name}
+                                onDoubleClick={() => {
+                                    if (access) window.location.href = url;
+                                }}
+                            >
+                                <TableCell padding="dense">
+                                    {!access && (
+                                        <Tooltip
+                                            title={(
+                                                <Typography
+                                                    variant="caption"
+                                                    color="inherit"
+                                                    style={{whiteSpace: 'pre-line'}}
                                                 >
-                                                    Update configuration
-                                                </MenuItem>
-                                                <MenuItem onClick={() => openWorkspaceRoles(id)} disabled={!canManageRoles(id)}>
-                                                    Manage roles
-                                                </MenuItem>
-                                                <MenuItem onClick={() => manageApps(id)} disabled={!canManageApps(id)}>
-                                                    Manage apps
-                                                </MenuItem>
-                                                <Divider />
-                                                <MenuItem
-                                                    onClick={() => {
-                                                        setAnchorEl(null);
-                                                        setWorkspaceIdToDelete(id);
-                                                    }}
-                                                    disabled={!isOrganisationAdmin(authorizations)}
-                                                >
-                                                    <Typography variant="inherit" color="error">
-                                                        Delete Workspace
-                                                    </Typography>
-                                                </MenuItem>
-                                            </Menu>
-                                        </>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 100]}
-                    component="div"
-                    count={workspaces.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onChangePage={(e, p) => setPage(p)}
-                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
-                />
-            </Paper>
-            <WorkspaceDeletion
-                open={!!workspaceIdToDelete}
-                workspaceId={workspaceIdToDelete}
-                onClose={() => setWorkspaceIdToDelete('')}
-                onConfirm={() => handleWorkspaceDeletion(workspaceIdToDelete)}
+                                                    You have no access to this workspace
+                                                </Typography>
+                                            )}
+                                        >
+                                            <Lock />
+                                        </Tooltip>
+                                    )}
+                                </TableCell>
+                                <TableCell>
+                                    {id}
+                                </TableCell>
+                                <TableCell>
+                                    {name}
+                                </TableCell>
+                                <TableCell>
+                                    {version}
+                                </TableCell>
+                                <TableCell valign="middle">
+                                    {release.status}
+                                    {
+                                        release.ready
+                                            ? ''
+                                            : <Link to={`/workspaces/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>
+                                    }
+                                </TableCell>
+                                <TableCell>
+                                    {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
+                                </TableCell>
+                                <TableCell>
+                                    <>
+                                        <IconButton
+                                            id={actionsButtonId}
+                                            aria-label="Roles"
+                                            aria-owns={anchorEl ? 'actions-menu' : undefined}
+                                            aria-haspopup="true"
+                                            onClick={handleMenuClick}
+                                        >
+                                            <MoreVertIcon />
+                                        </IconButton>
+                                        <Menu
+                                            id="actions-menu"
+                                            anchorEl={anchorEl}
+                                            open={Boolean(anchorEl) && anchorEl.id === actionsButtonId}
+                                            onClose={handleMenuClose}
+                                        >
+                                            <MenuItem
+                                                onClick={() => {
+                                                    setAnchorEl(null);
+                                                    onEditWorkspace(workspace);
+                                                }}
+                                                disabled={!isOrganisationAdmin(authorizations) || !workspace.release.ready}
+                                            >
+                                                Update configuration
+                                            </MenuItem>
+                                            <MenuItem onClick={() => openWorkspaceRoles(id)} disabled={!canManageRoles(id)}>
+                                                Manage roles
+                                            </MenuItem>
+                                            <MenuItem onClick={() => manageApps(id)} disabled={!canManageApps(id)}>
+                                                Manage apps
+                                            </MenuItem>
+                                            <Divider />
+                                            <MenuItem
+                                                onClick={() => {
+                                                    setAnchorEl(null);
+                                                    onDeleteWorkspace(id);
+                                                }}
+                                                disabled={!isOrganisationAdmin(authorizations)}
+                                            >
+                                                <Typography variant="inherit" color="error">
+                                                    Delete Workspace
+                                                </Typography>
+                                            </MenuItem>
+                                        </Menu>
+                                    </>
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+            </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 100]}
+                component="div"
+                count={workspaces.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={(e, p) => setPage(p)}
+                onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
             />
-            <NotificationSnackbar
-                key="beingDeletedKey"
-                open={!!workspaceBeingDeleted}
-                onClose={() => setWorkspaceBeingDeleted('')}
-                message={`The workspace ${workspaceBeingDeleted} is being deleted, this may take a while.`}
-            />
-            <NotificationSnackbar
-                key="errorDelteingKey"
-                open={detletingWorkspaceError}
-                onClose={() => setDetletingWorkspaceError(false)}
-                message="An error happened while deleting the workspace"
-            />
-        </>
+        </Paper>
     );
 };
 
