@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import hapi.release.ReleaseOuterClass;
+import hapi.services.tiller.Tiller;
 import hapi.services.tiller.Tiller.ListReleasesRequest;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class CachedReleaseList {
     private static final String RELEASES_KEY = "RELEASES";
 
     private final ReleaseManager releaseManager;
-    private final LoadingCache<String, List<ReleaseOuterClass.Release>> cache;
+    private final LoadingCache<String, Collection<ReleaseOuterClass.Release>> cache;
 
     public CachedReleaseList(@NonNull ReleaseManager releaseManager) {
         this.releaseManager = releaseManager;
@@ -39,13 +40,13 @@ public class CachedReleaseList {
                 .expireAfterWrite(EXPIRATION_INTERVAL_SEC, TimeUnit.SECONDS)
                 .build(
                         new CacheLoader<>() {
-                            public List<ReleaseOuterClass.Release> load(String key) {
+                            public Collection<ReleaseOuterClass.Release> load(String key) {
                                 return fetchReleases();
                             }
                         });
     }
 
-    public List<ReleaseOuterClass.Release> get() {
+    public Collection<ReleaseOuterClass.Release> get() {
         try {
             return cache.get(RELEASES_KEY);
         } catch (ExecutionException e) {
@@ -58,19 +59,28 @@ public class CachedReleaseList {
         cache.invalidateAll();
     }
 
-    private List<ReleaseOuterClass.Release> fetchReleases() {
-        var result = new ArrayList<ReleaseOuterClass.Release>();
+    private Collection<ReleaseOuterClass.Release> fetchReleases() {
+        var result = new HashMap<String, ReleaseOuterClass.Release>();
         var request = ListReleasesRequest.newBuilder()
                 .addAllStatusCodes(RELEVANT_STATUSES)
                 .setLimit(MAX_RELEASES_TO_RETURN)
+                .setSortBy(Tiller.ListSort.SortBy.LAST_RELEASED)
+                .setSortOrder(Tiller.ListSort.SortOrder.DESC)
                 .build();
 
         var responseIterator = releaseManager.list(request);
         while (responseIterator.hasNext()) {
             var response = responseIterator.next();
-            result.addAll(response.getReleasesList());
+
+            // Make sure to only add a release for which we do not have information yet
+            // This procedure will filter out previous failures
+            for(var release: response.getReleasesList()) {
+                if(!result.containsKey(release.getName())) {
+                    result.put(release.getName(), release);
+                }
+            }
         }
 
-        return result;
+        return result.values();
     }
 }
