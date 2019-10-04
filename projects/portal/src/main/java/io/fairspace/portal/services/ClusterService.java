@@ -51,6 +51,11 @@ public class ClusterService {
     }
 
     private List<Pod> fetchPodsWithStatus(String status) {
-        return kubernetesClient.pods().withField(STATUS_FIELD_NAME, status).list().getItems();
+        return kubernetesClient
+                .inAnyNamespace()
+                .pods()
+                .withField(STATUS_FIELD_NAME, status)
+                .list()
+                .getItems();
     }
 }
