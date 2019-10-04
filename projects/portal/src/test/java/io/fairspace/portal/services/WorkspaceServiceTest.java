@@ -7,6 +7,7 @@ import hapi.chart.ChartOuterClass;
 import hapi.release.InfoOuterClass;
 import hapi.release.ReleaseOuterClass;
 import hapi.release.StatusOuterClass;
+import io.fairspace.portal.errors.ConflictException;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
@@ -21,8 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -107,6 +107,27 @@ public class WorkspaceServiceTest {
     }
 
     @Test
+    public void installWorkspaceThatAlreadyExists() {
+        when(releaseService.getRelease(WORKSPACE_ID)).thenReturn(Optional.of(READY_WORKSPACE));
+
+        try {
+            workspaceService.installWorkspace(Workspace.builder()
+                    .id(WORKSPACE_ID)
+                    .name("Test")
+                    .description("description")
+                    .logAndFilesVolumeSize(1)
+                    .databaseVolumeSize(2)
+                    .build());
+        } catch(ConflictException e) {
+            // Expected
+        }
+
+        verify(releaseService).invalidateCache();
+        verify(releaseService).getRelease(WORKSPACE_ID);
+        verifyNoMoreInteractions(releaseService);
+    }
+
+    @Test
     public void uninstallWorkspaceRemovesApps() throws NotFoundException, IOException {
         when(releaseService.getRelease(WORKSPACE_ID)).thenReturn(Optional.of(READY_WORKSPACE));
         when(workspaceAppService.listInstalledApps(WORKSPACE_ID)).thenReturn(List.of(
@@ -126,5 +147,21 @@ public class WorkspaceServiceTest {
         verify(workspaceAppService).uninstallApp("app2");
 
         verify(releaseService).uninstallRelease(any());
+    }
+
+    @Test
+    public void uninstallNonExistingWorkspace() throws IOException, NotFoundException {
+        when(releaseService.getRelease(WORKSPACE_ID)).thenReturn(Optional.empty());
+
+        try {
+            workspaceService.uninstallWorkspace(WORKSPACE_ID);
+            fail();
+        } catch(NotFoundException e) {
+            // OK
+        }
+
+        verify(releaseService).invalidateCache();
+        verify(releaseService).getRelease(WORKSPACE_ID);
+        verifyNoMoreInteractions(releaseService);
     }
 }

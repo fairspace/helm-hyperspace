@@ -7,6 +7,7 @@ import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.portal.apps.ClusterApp;
 import io.fairspace.portal.apps.SearchApp;
 import io.fairspace.portal.apps.WorkspacesApp;
+import io.fairspace.portal.errors.ConflictException;
 import io.fairspace.portal.errors.ForbiddenException;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.services.*;
@@ -95,6 +96,7 @@ public class App {
         exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
         exception(NotFoundException.class, exceptionHandler(SC_NOT_FOUND, "Not found"));
         exception(ForbiddenException.class, exceptionHandler(SC_FORBIDDEN, "Forbidden"));
+        exception(ConflictException.class, exceptionHandler(SC_CONFLICT, "Conflict"));
         exception(IllegalStateException.class, exceptionHandler(SC_CONFLICT, null));
         exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
     }

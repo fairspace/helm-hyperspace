@@ -1,6 +1,7 @@
 package io.fairspace.portal.services;
 
 import hapi.release.ReleaseOuterClass;
+import io.fairspace.portal.errors.ConflictException;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.ReleaseInfo;
 import io.fairspace.portal.model.Workspace;
@@ -71,6 +72,13 @@ public class WorkspaceService {
      * @throws IOException
      */
     public void installWorkspace(Workspace workspace) {
+        // Make sure that the workspace does not exist yet
+        releaseService.invalidateCache();
+        releaseService.getRelease(workspace.getId())
+                .ifPresent(release -> {
+                    throw new ConflictException("Workspace with identifier " + workspace.getId() + " already exists");
+                });
+
         releaseService.installRelease(workspaceReleaseRequestBuilder.buildInstall(workspace), repo.get(WORKSPACE_CHART));
     }
 
@@ -80,7 +88,7 @@ public class WorkspaceService {
      * @throws NotFoundException
      */
     public void updateWorkspace(Workspace workspace) throws NotFoundException {
-        var release = releaseService.getRelease(workspace.getId())
+        releaseService.getRelease(workspace.getId())
                 .filter(this::isWorkspace)
                 .filter(r -> r.getInfo().getStatus().getCode() == Code.DEPLOYED)
                 .orElseThrow(() -> new NotFoundException("Workspace " + workspace.getId() + " not found or not ready"));
