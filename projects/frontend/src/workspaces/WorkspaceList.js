@@ -4,7 +4,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import {
     Paper, Table, TableBody, TableCell, TableHead,
     TablePagination, TableRow, TableSortLabel, IconButton,
-    Menu, MenuItem, Tooltip, Typography, Grid,
+    Menu, MenuItem, Tooltip, Typography, Divider, Grid
 } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ErrorIcon from '@material-ui/icons/Error';
@@ -63,12 +63,12 @@ const styles = theme => ({
 
 });
 
-export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces = WorkspaceAPI.getWorkspaces}) => {
-    const {data: workspaces = [], loading, error, refresh} = useAsync(getWorkspaces);
+export const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace, getWorkspaces = WorkspaceAPI.getWorkspaces}) => {
+    const {data: workspaces = [], loading, error, refreshWorkspaces} = useAsync(getWorkspaces);
     const [anchorEl, setAnchorEl] = useState(null);
 
     // refresh every 30 seconds
-    useRepeat(refresh, 30000);
+    useRepeat(refreshWorkspaces, 30000);
 
     const {currentUser: {authorizations}} = useContext(UserContext);
 
@@ -240,6 +240,18 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces 
                                                 disabled={!isAdmin || !ready}
                                             >
                                                 Manage apps
+                                            </MenuItem>
+                                            <Divider />
+                                            <MenuItem
+                                                onClick={() => {
+                                                    setAnchorEl(null);
+                                                    onDeleteWorkspace(id);
+                                                }}
+                                                disabled={!isOrganisationAdmin(authorizations)}
+                                            >
+                                                <Typography variant="inherit" color="error">
+                                                    Delete Workspace
+                                                </Typography>
                                             </MenuItem>
                                         </Menu>
                                     </>

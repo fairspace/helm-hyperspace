@@ -1,12 +1,11 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import {IconButton, Snackbar} from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 
-export default ({
-    open = true,
-    onClose = () => {},
-    autoHideDuration = 6000,
-    message
+const NotificationSnackbar = ({
+    open = true, onClose = () => {},
+    autoHideDuration = 6000, message
 }) => (
     <Snackbar
         open={open}
@@ -28,3 +27,12 @@ export default ({
         )}
     />
 );
+
+NotificationSnackbar.propTypes = {
+    open: PropTypes.bool,
+    autoHideDuration: PropTypes.number,
+    message: PropTypes.node,
+    onClose: PropTypes.func,
+};
+
+export default NotificationSnackbar;

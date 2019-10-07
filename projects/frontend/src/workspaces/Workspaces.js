@@ -7,12 +7,16 @@ import WorkspaceDialog from "./WorkspaceDialog";
 import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import {isOrganisationAdmin} from "../common/utils/userUtils";
 import NotificationSnackbar from "../common/components/NotificationSnackbar";
+import WorkspaceDeletionDialog from './WorkspaceDeletionDialog';
 
 export default () => {
     const [showWorkspaceDialog, setShowWorkspaceDialog] = useState(false);
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [selectedWorkspace, setSelectedWorkspace] = useState();
+    const [workspaceIdToDelete, setWorkspaceIdToDelete] = useState('');
+
+    const {currentUser: {authorizations}} = useContext(UserContext);
 
     usePageTitleUpdater("Workspaces");
 
@@ -44,11 +48,22 @@ export default () => {
             });
     };
 
-    const {currentUser: {authorizations}} = useContext(UserContext);
-
     const editWorkspace = (workspace) => {
         setSelectedWorkspace(workspace);
         setShowWorkspaceDialog(true);
+    };
+
+    const deleteWorkspace = workspaceId => WorkspaceAPI.deleteWorkspace(workspaceId)
+        .catch(() => {
+            setSnackbarVisible(true);
+            setSnackbarMessage("An error happened while deleting the workspace");
+        });
+
+    const handleWorkspaceDeletion = (workspaceId) => {
+        setWorkspaceIdToDelete('');
+        setSnackbarVisible(true);
+        setSnackbarMessage(`The workspace ${workspaceId} is being deleted, this may take a while.`);
+        deleteWorkspace(workspaceId);
     };
 
     return (
@@ -61,7 +76,16 @@ export default () => {
         }}
         >
             <BreadCrumbs />
-            <WorkspaceList onEditWorkspace={editWorkspace}/>
+            <WorkspaceList
+                onEditWorkspace={editWorkspace}
+                onDeleteWorkspace={(id) => setWorkspaceIdToDelete(id)}
+            />
+            <WorkspaceDeletionDialog
+                open={!!workspaceIdToDelete}
+                workspaceId={workspaceIdToDelete}
+                onClose={() => setWorkspaceIdToDelete('')}
+                onConfirm={() => handleWorkspaceDeletion(workspaceIdToDelete)}
+            />
             <Button
                 style={{marginTop: 8}}
                 color="primary"
