@@ -65,6 +65,10 @@ public class SearchApp implements Route {
                 .build();
 
         try (okhttp3.Response esResponse = httpClient.newCall(esRequest).execute()) {
+            if(!esResponse.isSuccessful()) {
+                log.warn("ElasticSearch request unsuccessful: {} - {}", esResponse.code(), elasticSearchUrl);
+            }
+
             response.status(esResponse.code());
             response.header("Content-type", esResponse.header("Content-type"));
             return esResponse.body().string();

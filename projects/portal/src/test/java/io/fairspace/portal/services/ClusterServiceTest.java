@@ -43,6 +43,7 @@ public class ClusterServiceTest {
         listOfPods = new ArrayList();
 
         when(kubernetesClient.pods()).thenReturn(pods);
+        when(kubernetesClient.inAnyNamespace()).thenReturn(kubernetesClient);
         when(pods.withField(any(), any())).thenReturn(podsWithField);
         when(podsWithField.list()).thenReturn(podList);
         when(podList.getItems()).thenReturn(listOfPods);
