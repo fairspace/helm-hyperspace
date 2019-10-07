@@ -4,7 +4,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import {
     Paper, Table, TableBody, TableCell, TableHead,
     TablePagination, TableRow, TableSortLabel, IconButton,
-    Menu, MenuItem, Tooltip, Typography, Divider,
+    Menu, MenuItem, Tooltip, Typography, Divider, Grid
 } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ErrorIcon from '@material-ui/icons/Error';
@@ -63,14 +63,15 @@ const styles = theme => ({
 
 });
 
-const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace}) => {
-    const {data: workspaces = [], loading, error, refresh: refreshWorkspaces} = useAsync(WorkspaceAPI.getWorkspaces);
+export const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace, getWorkspaces = WorkspaceAPI.getWorkspaces}) => {
+    const {data: workspaces = [], loading, error, refreshWorkspaces} = useAsync(getWorkspaces);
     const [anchorEl, setAnchorEl] = useState(null);
 
     // refresh every 30 seconds
     useRepeat(refreshWorkspaces, 30000);
 
     const {currentUser: {authorizations}} = useContext(UserContext);
+
     const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.id)}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
@@ -91,8 +92,9 @@ const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace}) =
         history.push(`workspaces/${workspaceId}/apps`);
     };
 
-    const canManageRoles = (workspaceId) => isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspaceId);
-    const canManageApps = () => isOrganisationAdmin(authorizations);
+    const isAdmin = isOrganisationAdmin(authorizations);
+
+    const canManageRoles = (workspaceId) => isAdmin || isWorkspaceCoordinator(authorizations, workspaceId);
 
     if (loading) {
         return <LoadingInlay />;
@@ -149,7 +151,7 @@ const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace}) =
                 </TableHead>
                 <TableBody>
                     {pagedItems.map((workspace) => {
-                        const {access, id, name, url, version, release, apps = []} = workspace;
+                        const {access, id, name, url, version, release: {ready, status}, apps = []} = workspace;
                         const actionsButtonId = name + 'ActionsBtn';
 
                         return (
@@ -186,13 +188,13 @@ const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace}) =
                                 <TableCell className={classes.hideOnSmallScreens}>
                                     {version}
                                 </TableCell>
-                                <TableCell valign="middle">
-                                    {release.status}
-                                    {
-                                        release.ready
-                                            ? ''
-                                            : <Link to={`/workspaces/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>
-                                    }
+                                <TableCell>
+                                    <Grid container alignItems="center" spacing={8}>
+                                        <Grid item xs={11}>{status}</Grid>
+                                        <Grid item xs={1}>
+                                            {!ready && <Link to={`/workspaces/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>}
+                                        </Grid>
+                                    </Grid>
                                 </TableCell>
                                 <TableCell className={classes.hideOnMediumScreens}>
                                     {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
@@ -201,6 +203,7 @@ const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace}) =
                                     <>
                                         <IconButton
                                             id={actionsButtonId}
+                                            data-testid="actions-buttton"
                                             aria-label="Roles"
                                             aria-owns={anchorEl ? 'actions-menu' : undefined}
                                             aria-haspopup="true"
@@ -215,18 +218,27 @@ const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace}) =
                                             onClose={handleMenuClose}
                                         >
                                             <MenuItem
+                                                data-testid="config-menu-item"
                                                 onClick={() => {
-                                                    setAnchorEl(null);
+                                                    setAnchorEl(undefined);
                                                     onEditWorkspace(workspace);
                                                 }}
-                                                disabled={!isOrganisationAdmin(authorizations) || !workspace.release.ready}
+                                                disabled={!isAdmin || !ready}
                                             >
                                                 Update configuration
                                             </MenuItem>
-                                            <MenuItem onClick={() => openWorkspaceRoles(id)} disabled={!canManageRoles(id)}>
+                                            <MenuItem
+                                                data-testid="roles-menu-item"
+                                                onClick={() => openWorkspaceRoles(id)}
+                                                disabled={!canManageRoles(id) || !ready}
+                                            >
                                                 Manage roles
                                             </MenuItem>
-                                            <MenuItem onClick={() => manageApps(id)} disabled={!canManageApps(id)}>
+                                            <MenuItem
+                                                data-testid="apps-menu-item"
+                                                onClick={() => manageApps(id)}
+                                                disabled={!isAdmin || !ready}
+                                            >
                                                 Manage apps
                                             </MenuItem>
                                             <Divider />

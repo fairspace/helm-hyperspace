@@ -5,7 +5,6 @@
     "description": "Workspace\ndescription",
     "url": "http://localhost:3000",
     "version": "0.6.1",
-    "ready": true,
     "logAndFilesVolumeSize": 1024,
     "databaseVolumeSize": 1024,
     "release": {
