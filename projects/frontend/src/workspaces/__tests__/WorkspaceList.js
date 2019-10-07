@@ -75,7 +75,10 @@ describe('WorkspaceList', () => {
         };
 
         await act(async () => {
-            const component = wrap(<WorkspaceList getWorkspaces={workspaceApi.getWorkspaces} />);
+            const component = wrap(<WorkspaceList
+                classes={{}}
+                getWorkspaces={workspaceApi.getWorkspaces}
+            />);
             render(component);
         });
 
