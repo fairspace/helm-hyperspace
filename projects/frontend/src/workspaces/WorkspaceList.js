@@ -51,14 +51,15 @@ const styles = theme => ({
     }
 });
 
-const WorkspaceList = ({classes, history, onEditWorkspace}) => {
-    const {data: workspaces = [], loading, error, refresh} = useAsync(WorkspaceAPI.getWorkspaces);
+export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces = WorkspaceAPI.getWorkspaces}) => {
+    const {data: workspaces = [], loading, error, refresh} = useAsync(getWorkspaces);
     const [anchorEl, setAnchorEl] = useState(null);
 
     // refresh every 30 seconds
     useRepeat(refresh, 30000);
 
     const {currentUser: {authorizations}} = useContext(UserContext);
+
     const workspacesWithAccess = workspaces.map(ws => ({...ws, access: isWorkspaceUser(authorizations, ws.id)}));
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspacesWithAccess, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
@@ -79,8 +80,9 @@ const WorkspaceList = ({classes, history, onEditWorkspace}) => {
         history.push(`workspaces/${workspaceId}/apps`);
     };
 
-    const canManageRoles = (workspaceId) => isOrganisationAdmin(authorizations) || isWorkspaceCoordinator(authorizations, workspaceId);
-    const canManageApps = () => isOrganisationAdmin(authorizations);
+    const isAdmin = isOrganisationAdmin(authorizations);
+
+    const canManageRoles = (workspaceId) => isAdmin || isWorkspaceCoordinator(authorizations, workspaceId);
 
     if (loading) {
         return <LoadingInlay />;
@@ -198,6 +200,7 @@ const WorkspaceList = ({classes, history, onEditWorkspace}) => {
                                     <>
                                         <IconButton
                                             id={actionsButtonId}
+                                            data-testid="actions-buttton"
                                             aria-label="Roles"
                                             aria-owns={anchorEl ? 'actions-menu' : undefined}
                                             aria-haspopup="true"
@@ -212,23 +215,26 @@ const WorkspaceList = ({classes, history, onEditWorkspace}) => {
                                             onClose={handleMenuClose}
                                         >
                                             <MenuItem
+                                                data-testid="config-menu-item"
                                                 onClick={() => {
                                                     setAnchorEl(undefined);
                                                     onEditWorkspace(workspace);
                                                 }}
-                                                disabled={!isOrganisationAdmin(authorizations) || !ready}
+                                                disabled={!isAdmin || !ready}
                                             >
                                                 Update configuration
                                             </MenuItem>
                                             <MenuItem
+                                                data-testid="roles-menu-item"
                                                 onClick={() => openWorkspaceRoles(id)}
                                                 disabled={!canManageRoles(id) || !ready}
                                             >
                                                 Manage roles
                                             </MenuItem>
                                             <MenuItem
+                                                data-testid="apps-menu-item"
                                                 onClick={() => manageApps(id)}
-                                                disabled={!canManageApps(id) || !ready}
+                                                disabled={!isAdmin || !ready}
                                             >
                                                 Manage apps
                                             </MenuItem>

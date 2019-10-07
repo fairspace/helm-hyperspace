@@ -21,7 +21,7 @@
     "/config/config.json"
   ],
   "roles": {
-    "organisationAdmin": "",
+    "organisationAdmin": "organisation-admin",
     "workspaceRoles": [
       "user",
       "coordinator",
