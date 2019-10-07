@@ -16,6 +16,8 @@ export default () => {
     const [selectedWorkspace, setSelectedWorkspace] = useState();
     const [workspaceIdToDelete, setWorkspaceIdToDelete] = useState('');
 
+    const {currentUser: {authorizations}} = useContext(UserContext);
+
     usePageTitleUpdater("Workspaces");
 
     const createWorkspace = (workspace) => {
@@ -45,8 +47,6 @@ export default () => {
                 setSnackbarMessage("An error occurred while updating your workspace. Please try again later.");
             });
     };
-
-    const {currentUser: {authorizations}} = useContext(UserContext);
 
     const editWorkspace = (workspace) => {
         setSelectedWorkspace(workspace);

@@ -12,7 +12,7 @@ const WorkspaceDeletionDialog = ({open, workspaceId, onClose, onConfirm}) => {
         setEnteredWorkspaceId('');
     }, [open, workspaceId]);
 
-    const enteredWSIdMatch = enteredWorkspaceId === workspaceId;
+    const enteredWorkspaceIdMatch = enteredWorkspaceId === workspaceId;
 
     return (
         <Dialog
@@ -44,11 +44,11 @@ const WorkspaceDeletionDialog = ({open, workspaceId, onClose, onConfirm}) => {
                 </Button>
                 <Button
                     onClick={onConfirm}
-                    disabled={!enteredWSIdMatch}
+                    disabled={!enteredWorkspaceIdMatch}
                 >
                     <Typography
                         variant="inherit"
-                        color={enteredWSIdMatch ? 'error' : 'textSecondary'}
+                        color={enteredWorkspaceIdMatch ? 'error' : 'textSecondary'}
                     >
                         Delete workspace forever
                     </Typography>
