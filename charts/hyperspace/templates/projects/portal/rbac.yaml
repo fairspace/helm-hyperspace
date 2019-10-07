@@ -25,6 +25,15 @@ rules:
     resources: ["pods", "pods/portforward"]
     verbs: ["get", "list", "create"]
 ---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Release.Name }}-pod-lister
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["list"]
+---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -42,5 +51,23 @@ subjects:
 roleRef:
   kind: Role
   name: {{ .Release.Name }}-port-forwarder
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Release.Name }}-pod-lister
+  labels:
+    app: portal
+    chart: {{ template "hyperspace.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Release.Name }}-portal
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Release.Name }}-pod-lister
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
