@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
+import io.fairspace.portal.services.WorkspaceAppService;
 import io.fairspace.portal.services.WorkspaceService;
 import spark.Request;
 import spark.RouteGroup;
@@ -19,10 +20,12 @@ public class WorkspacesApp implements RouteGroup {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private WorkspaceService workspaceService;
+    private WorkspaceAppService workspaceAppService;
     private Function<Request, OAuthAuthenticationToken> tokenProvider;
 
-    public WorkspacesApp(WorkspaceService workspaceService, Function<Request, OAuthAuthenticationToken> tokenProvider) {
+    public WorkspacesApp(WorkspaceService workspaceService, WorkspaceAppService workspaceAppService , Function<Request, OAuthAuthenticationToken> tokenProvider) {
         this.workspaceService = workspaceService;
+        this.workspaceAppService = workspaceAppService;
         this.tokenProvider = tokenProvider;
     }
 
@@ -79,14 +82,14 @@ public class WorkspacesApp implements RouteGroup {
                 throw new IllegalArgumentException("No identifier provided for app to install");
             }
 
-            workspaceService.installApp(request.params(":workspaceId"), workspaceApp);
+            workspaceAppService.installApp(request.params(":workspaceId"), workspaceApp);
             return "";
         });
 
         delete("/:workspaceId/apps/:appId", (request, response) -> {
             requireOrganisationAdmin(request);
 
-            workspaceService.uninstallApp(request.params(":appId"));
+            workspaceAppService.uninstallApp(request.params(":appId"));
             return "";
         });
     }

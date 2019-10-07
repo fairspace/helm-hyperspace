@@ -1,5 +1,6 @@
 import React, {useState, useContext} from 'react';
 import {Link, withRouter} from "react-router-dom";
+import ListItemText from "@material-ui/core/ListItemText";
 import {
     Paper, Table, TableBody, TableCell, TableHead,
     TablePagination, TableRow, TableSortLabel, IconButton,
@@ -48,7 +49,18 @@ const styles = theme => ({
         color: theme.palette.error.main,
         verticalAlign: "middle",
         marginLeft: theme.spacing.unit
+    },
+    hideOnSmallScreens: {
+        [theme.breakpoints.down('sm')]: {
+            display: 'none'
+        }
+    },
+    hideOnMediumScreens: {
+        [theme.breakpoints.down('md')]: {
+            display: 'none'
+        }
     }
+
 });
 
 export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces = WorkspaceAPI.getWorkspaces}) => {
@@ -106,15 +118,6 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces 
                         </TableCell>
                         <TableCell>
                             <TableSortLabel
-                                active={orderBy === 'id'}
-                                direction={orderAscending ? 'asc' : 'desc'}
-                                onClick={() => toggleSort('id')}
-                            >
-                                Id
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                            <TableSortLabel
                                 active={orderBy === 'name'}
                                 direction={orderAscending ? 'asc' : 'desc'}
                                 onClick={() => toggleSort('name')}
@@ -122,7 +125,7 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces 
                                 Name
                             </TableSortLabel>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className={classes.hideOnSmallScreens}>
                             <TableSortLabel
                                 active={orderBy === 'version'}
                                 direction={orderAscending ? 'asc' : 'desc'}
@@ -140,7 +143,7 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces 
                                 Status
                             </TableSortLabel>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className={classes.hideOnMediumScreens}>
                             Apps
                         </TableCell>
                         <TableCell />
@@ -177,12 +180,12 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces 
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    {id}
+                                    <ListItemText
+                                        primary={name}
+                                        secondary={id}
+                                    />
                                 </TableCell>
-                                <TableCell>
-                                    {name}
-                                </TableCell>
-                                <TableCell>
+                                <TableCell className={classes.hideOnSmallScreens}>
                                     {version}
                                 </TableCell>
                                 <TableCell>
@@ -193,7 +196,7 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, getWorkspaces 
                                         </Grid>
                                     </Grid>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className={classes.hideOnMediumScreens}>
                                     {apps.find(app => app.type === APP_TYPE_JUPYTER) && <JupyterIcon style={{height: 36}} />}
                                 </TableCell>
                                 <TableCell>

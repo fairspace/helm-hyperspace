@@ -21,8 +21,10 @@ export default ({onSubmit, onClose, workspace: {id = '', name = '', description 
 
     const idValid = !!idControl.value && ID_PATTERN.test(idControl.value);
     const nameValid = !!nameControl.value;
-    const logAndFilesVolumeSizeValid = logAndFilesVolumeSizeControl.value >= 1;
-    const databaseVolumeSizeValid = databaseVolumeSizeControl.value >= 1;
+    const minLogAndFilesVolumeSize = isUpdate ? logAndFilesVolumeSize : 1;
+    const logAndFilesVolumeSizeValid = logAndFilesVolumeSizeControl.value >= minLogAndFilesVolumeSize;
+    const minDatabaseVolumeSize = isUpdate ? databaseVolumeSize : 1;
+    const databaseVolumeSizeValid = databaseVolumeSizeControl.value >= minDatabaseVolumeSize;
 
     const formValid = idValid && nameValid && logAndFilesVolumeSizeValid && databaseVolumeSizeValid;
 
@@ -104,7 +106,7 @@ export default ({onSubmit, onClose, workspace: {id = '', name = '', description 
                         label="Log and files volume size in gigabytes"
                         name="logAndFilesVolumeSize"
                         type="number"
-                        inputProps={{min: 1}}
+                        inputProps={{min: minLogAndFilesVolumeSize}}
                         fullWidth
                         required
                     />
@@ -117,7 +119,7 @@ export default ({onSubmit, onClose, workspace: {id = '', name = '', description 
                         label="Database volume size in gigabytes"
                         name="databaseVolumeSize"
                         type="number"
-                        inputProps={{min: 1}}
+                        inputProps={{min: minDatabaseVolumeSize}}
                         fullWidth
                         required
                     />
