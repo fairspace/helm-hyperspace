@@ -73,6 +73,7 @@ public class ReleaseService {
      */
     public void updateRelease(Tiller.UpdateReleaseRequest.Builder requestBuilder, ChartOuterClass.Chart.Builder chartBuilder) {
         requestBuilder
+                .setRecreate(true)
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
 
