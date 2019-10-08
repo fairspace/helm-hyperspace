@@ -1,4 +1,4 @@
-import {useEffect, useRef} from "react";
+import {useEffect} from "react";
 
 /**
  * Performs a promise-returning action periodically with a fixed delay between executions.
@@ -7,24 +7,13 @@ import {useEffect, useRef} from "react";
  * @param delay
  */
 export default (callback, delay) => {
-    const savedCallback = useRef();
-    const id = useRef();
-
-    // Remember the latest callback.
-    useEffect(() => {
-        savedCallback.current = callback;
-    }, [callback]);
-
     // Set up the interval.
     useEffect(() => {
-        function tick () {
-            savedCallback.current()
-                .finally(() => {
-                    id.current = setTimeout(tick, delay);
-                });
-        }
-
-        id.current = setTimeout(tick, delay);
-        return () => clearTimeout(id.current);
-    }, [delay]);
+        let id = setTimeout(function tick() {
+            callback().finally(() => {
+                id = setTimeout(tick, delay);
+            });
+        }, delay);
+        return () => clearTimeout(id);
+    }, [callback, delay]);
 };
