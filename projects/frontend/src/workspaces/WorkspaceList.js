@@ -64,11 +64,11 @@ const styles = theme => ({
 });
 
 export const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorkspace, getWorkspaces = WorkspaceAPI.getWorkspaces}) => {
-    const {data: workspaces = [], loading, error, refreshWorkspaces} = useAsync(getWorkspaces);
+    const {data: workspaces = [], loading, error, refresh} = useAsync(getWorkspaces);
     const [anchorEl, setAnchorEl] = useState(null);
 
     // refresh every 30 seconds
-    useRepeat(refreshWorkspaces, 30000);
+    useRepeat(refresh, 30000);
 
     const {currentUser: {authorizations}} = useContext(UserContext);
 
