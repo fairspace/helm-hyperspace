@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ClusterInformation {
-    private long numUnSchedulable;
+    private long numUnschedulable;
 }
