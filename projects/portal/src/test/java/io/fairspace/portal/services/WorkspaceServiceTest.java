@@ -7,6 +7,7 @@ import hapi.chart.ChartOuterClass;
 import hapi.release.InfoOuterClass;
 import hapi.release.ReleaseOuterClass;
 import hapi.release.StatusOuterClass;
+import hapi.services.tiller.Tiller;
 import io.fairspace.portal.errors.ConflictException;
 import io.fairspace.portal.errors.NotFoundException;
 import io.fairspace.portal.model.Workspace;
@@ -14,6 +15,7 @@ import io.fairspace.portal.model.WorkspaceApp;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -43,8 +45,6 @@ public class WorkspaceServiceTest {
     private ReleaseService releaseService;
     @Mock
     private WorkspaceAppService workspaceAppService;
-    @Mock
-    private ChartRepo chartRepo;
 
     ChartOuterClass.Chart.Builder workspaceChart = ChartOuterClass.Chart.newBuilder();
 
@@ -54,14 +54,11 @@ public class WorkspaceServiceTest {
 
     @Before
     public void setUp() {
-        when(chartRepo.get("workspace")).thenReturn(workspaceChart);
-        when(chartRepo.contains("workspace")).thenReturn(true);
-
-        workspaceService = new WorkspaceService(releaseService, workspaceAppService, chartRepo, domain, defaultValues);
+        workspaceService = new WorkspaceService(releaseService, workspaceAppService, workspaceChart, domain, defaultValues);
     }
 
     @Test
-    public void itSetsConfigurationOnWorkspaceInstallation() throws IOException {
+    public void itSetsConfigurationOnWorkspaceInstallation() {
         var ws = Workspace.builder()
                 .id("test")
                 .name("Test")
@@ -163,5 +160,32 @@ public class WorkspaceServiceTest {
         verify(releaseService).invalidateCache();
         verify(releaseService).getRelease(WORKSPACE_ID);
         verifyNoMoreInteractions(releaseService);
+    }
+
+    @Test
+    public void updateWithoutResizingVolumesDoesNotTriggerPodRestart() throws NotFoundException {
+        when(releaseService.getRelease(WORKSPACE_ID)).thenReturn(Optional.of(READY_WORKSPACE));
+
+        var ws = Workspace.builder()
+                .id(WORKSPACE_ID)
+                .build();
+
+        workspaceService.updateWorkspace(ws);
+        verify(releaseService, times(1)).updateRelease(any(), any());
+    }
+
+    @Test
+    public void resizingVolumesTriggersPodRestart() throws NotFoundException {
+        when(releaseService.getRelease(WORKSPACE_ID)).thenReturn(Optional.of(READY_WORKSPACE));
+
+        var ws = Workspace.builder()
+                .id(WORKSPACE_ID)
+                .databaseVolumeSize(123)
+                .logAndFilesVolumeSize(123)
+                .build();
+
+        workspaceService.updateWorkspace(ws);
+
+        verify(releaseService, times(1)).updateRelease(any(), any(), any(), anyLong());
     }
 }

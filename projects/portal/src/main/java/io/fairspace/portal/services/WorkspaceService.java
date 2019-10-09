@@ -1,9 +1,9 @@
 package io.fairspace.portal.services;
 
+import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
 import io.fairspace.portal.errors.ConflictException;
 import io.fairspace.portal.errors.NotFoundException;
-import io.fairspace.portal.model.ReleaseInfo;
 import io.fairspace.portal.model.Workspace;
 import io.fairspace.portal.model.WorkspaceApp;
 import io.fairspace.portal.services.releases.WorkspaceReleaseRequestBuilder;
@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static hapi.release.StatusOuterClass.Status.Code;
 import static io.fairspace.portal.utils.HelmUtils.*;
 import static io.fairspace.portal.utils.JacksonUtils.getConfigAsText;
 
@@ -27,32 +26,28 @@ public class WorkspaceService {
     private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "/workspace/ingress/domain";
     private static final String FILE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/files/size";
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/database/size";
+    public static final int SATURN_RESTART_DELAY_MS = 20_000;
 
     private ReleaseService releaseService;
     private WorkspaceAppService workspaceAppService;
-    private ChartRepo repo;
+    private ChartOuterClass.Chart.Builder workspaceChart;
     private final WorkspaceReleaseRequestBuilder workspaceReleaseRequestBuilder;
 
     public WorkspaceService(
             @NonNull ReleaseService releaseService,
             @NonNull WorkspaceAppService workspaceAppService,
-            @NonNull ChartRepo repo,
+            @NonNull ChartOuterClass.Chart.Builder workspaceChart,
             @NonNull String domain,
             @NonNull Map<String, Map<String, ?>> defaultConfig) {
         this.releaseService = releaseService;
         this.workspaceAppService = workspaceAppService;
-        this.repo = repo;
+        this.workspaceChart = workspaceChart;
 
         // Add a release builder for workspaces
         workspaceReleaseRequestBuilder = new WorkspaceReleaseRequestBuilder(domain, defaultConfig.get(WORKSPACE_CHART));
-
-        if(!repo.contains(WORKSPACE_CHART)) {
-            throw new IllegalStateException("No workspace chart is available in repo");
-        }
     }
 
     public List<Workspace> listWorkspaces() {
-        var workspaceChart = repo.get(WORKSPACE_CHART);
         return releaseService.getReleases()
                 .stream()
                 .filter(release -> release.getChart().getMetadata().getName().equals(workspaceChart.getMetadata().getName()))
@@ -79,7 +74,7 @@ public class WorkspaceService {
                     throw new ConflictException("Workspace with identifier " + workspace.getId() + " already exists");
                 });
 
-        releaseService.installRelease(workspaceReleaseRequestBuilder.buildInstall(workspace), repo.get(WORKSPACE_CHART));
+        releaseService.installRelease(workspaceReleaseRequestBuilder.buildInstall(workspace), workspaceChart);
     }
 
     /**
@@ -88,12 +83,20 @@ public class WorkspaceService {
      * @throws NotFoundException
      */
     public void updateWorkspace(Workspace workspace) throws NotFoundException {
-        releaseService.getRelease(workspace.getId())
-                .filter(this::isWorkspace)
-                .filter(r -> r.getInfo().getStatus().getCode() == Code.DEPLOYED)
+        var existingWorkspace = getWorkspace(workspace.getId())
+                .filter(ws -> ws.getRelease().isReady())
                 .orElseThrow(() -> new NotFoundException("Workspace " + workspace.getId() + " not found or not ready"));
 
-        releaseService.updateRelease(workspaceReleaseRequestBuilder.buildUpdate(workspace), repo.get(WORKSPACE_CHART));
+        var saturnsPersistentVolumesResized = workspace.getDatabaseVolumeSize() != null && !workspace.getDatabaseVolumeSize().equals(existingWorkspace.getDatabaseVolumeSize())
+                || workspace.getLogAndFilesVolumeSize() != null && !workspace.getLogAndFilesVolumeSize().equals(existingWorkspace.getLogAndFilesVolumeSize());
+
+        if (saturnsPersistentVolumesResized) {
+            var restartSaturnRequest = workspaceReleaseRequestBuilder.buildRestartPod(workspace.getId(), "saturn");
+            releaseService.updateRelease(workspaceReleaseRequestBuilder.buildUpdate(workspace), workspaceChart,
+                    () -> releaseService.updateRelease(restartSaturnRequest, workspaceChart), SATURN_RESTART_DELAY_MS);
+        } else {
+            releaseService.updateRelease(workspaceReleaseRequestBuilder.buildUpdate(workspace), workspaceChart);
+        }
     }
     
     /**
@@ -114,7 +117,7 @@ public class WorkspaceService {
     }
 
     private boolean isWorkspace(ReleaseOuterClass.Release release) {
-        return release.getChart().getMetadata().getName().equals(repo.get(WORKSPACE_CHART).getMetadata().getName());
+        return release.getChart().getMetadata().getName().equals(workspaceChart.getMetadata().getName());
     }
 
     private Workspace convertReleaseToWorkspace(ReleaseOuterClass.Release release) {
@@ -126,7 +129,7 @@ public class WorkspaceService {
                     .description(getConfigAsText(config, WORKSPACE_DESCRIPTION_YAML_PATH))
                     .url("https://" + getConfigAsText(config, WORKSPACE_INGRESS_DOMAIN_YAML_PATH))
                     .version(release.getChart().getMetadata().getVersion())
-                    .release(releaseService.getReleaseInfo(release))
+                    .release(ReleaseService.getReleaseInfo(release))
                     .logAndFilesVolumeSize(getSize(getConfigAsText(config, FILE_STORAGE_SIZE_YAML_PATH)))
                     .databaseVolumeSize(getSize(getConfigAsText(config, DATABASE_STORAGE_SIZE_YAML_PATH)))
                     .apps(workspaceAppService.listInstalledApps(release.getName()))

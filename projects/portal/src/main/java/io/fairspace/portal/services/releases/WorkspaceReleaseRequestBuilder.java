@@ -4,13 +4,13 @@ import hapi.services.tiller.Tiller;
 import io.fairspace.portal.model.Workspace;
 
 import java.util.Map;
-import java.util.UUID;
 
 import static io.fairspace.portal.services.releases.ConfigHelper.toConfig;
 import static io.fairspace.portal.utils.HelmUtils.GIGABYTE_SUFFIX;
 import static io.fairspace.portal.utils.HelmUtils.createRandomString;
 import static io.fairspace.portal.utils.JacksonUtils.*;
 import static java.util.Optional.ofNullable;
+import static java.util.UUID.randomUUID;
 
 public class WorkspaceReleaseRequestBuilder{
 
@@ -27,7 +27,7 @@ public class WorkspaceReleaseRequestBuilder{
         var customValues = createObjectNode();
         customValues.with("hyperspace").put("domain", domain);
         customValues.with("hyperspace").with("keycloak").put("clientId", workspace.getId() + "-pluto");
-        customValues.with("hyperspace").with("keycloak").put("clientSecret", UUID.randomUUID().toString());
+        customValues.with("hyperspace").with("keycloak").put("clientSecret", randomUUID().toString());
         customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getId());
         customValues.with("workspace").put("name", workspace.getName());
         customValues.with("workspace").put("description", workspace.getDescription());
@@ -59,6 +59,16 @@ public class WorkspaceReleaseRequestBuilder{
 
         return Tiller.UpdateReleaseRequest.newBuilder()
                 .setName(workspace.getId())
+                .setReuseValues(true)
+                .setValues(toConfig(customValues));
+    }
+
+    public Tiller.UpdateReleaseRequest.Builder buildRestartPod(String workspaceId, String app) {
+        var customValues = createObjectNode();
+        customValues.with("podAnnotations").with(app).put("updateTag", randomUUID().toString());
+
+        return Tiller.UpdateReleaseRequest.newBuilder()
+                .setName(workspaceId)
                 .setReuseValues(true)
                 .setValues(toConfig(customValues));
     }
