@@ -28,7 +28,9 @@ import static io.fairspace.portal.ConfigLoader.CONFIG;
 import static io.fairspace.portal.errors.ErrorHelper.errorBody;
 import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
 import static io.fairspace.portal.utils.HelmUtils.JUPYTER_CHART;
+import static io.fairspace.portal.utils.HelmUtils.WORKSPACE_CHART;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static javax.servlet.http.HttpServletResponse.*;
 import static spark.Spark.*;
 
@@ -79,9 +81,9 @@ public class App {
         // Define the available apps to install
         Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(JUPYTER_CHART, new JupyterReleaseRequestBuilder(CONFIG.defaultConfig.get(JUPYTER_CHART)));
 
-        ReleaseService releaseService = new ReleaseService(releaseManager, releaseList, newSingleThreadExecutor());
+        ReleaseService releaseService = new ReleaseService(releaseManager, releaseList, newSingleThreadScheduledExecutor());
         WorkspaceAppService workspaceAppService = new WorkspaceAppService(releaseService, repo, appRequestBuilders);
-        WorkspaceService workspaceService = new WorkspaceService(releaseService, workspaceAppService, repo, CONFIG.domain, CONFIG.defaultConfig);
+        WorkspaceService workspaceService = new WorkspaceService(releaseService, workspaceAppService, repo.get(WORKSPACE_CHART), CONFIG.domain, CONFIG.defaultConfig);
         ClusterService clusterService = new ClusterService(kubernetesClient);
 
         path("/api/v1", () -> {

@@ -1,5 +1,6 @@
 package io.fairspace.portal.services;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import hapi.chart.ChartOuterClass;
 import hapi.release.ReleaseOuterClass;
 import hapi.release.StatusOuterClass;
@@ -12,14 +13,12 @@ import org.microbean.helm.ReleaseManager;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Slf4j
 public class ReleaseService {
@@ -27,12 +26,12 @@ public class ReleaseService {
 
     private final ReleaseManager releaseManager;
     private CachedReleaseList releaseList;
-    private final Executor worker;
+    private final ScheduledExecutorService worker;
 
     public ReleaseService(
             @NonNull ReleaseManager releaseManager,
             @NonNull CachedReleaseList releaseList,
-            @NonNull Executor worker) {
+            @NonNull ScheduledExecutorService worker) {
         this.releaseManager = releaseManager;
         this.releaseList = releaseList;
         this.worker = worker;
@@ -69,16 +68,31 @@ public class ReleaseService {
      * Upgrades the specified release and invalidates the cache when finished
      * @param requestBuilder
      * @param chartBuilder
-     * @throws IOException
      */
     public void updateRelease(Tiller.UpdateReleaseRequest.Builder requestBuilder, ChartOuterClass.Chart.Builder chartBuilder) {
+        updateRelease(requestBuilder, chartBuilder, null, 0);
+    }
+
+    /**
+     * Upgrades the specified release and invalidates the cache when finished and performs a post update action after delay
+     * @param requestBuilder
+     * @param chartBuilder
+     * @param onPostUpdate Action to schedule in case of successful update
+     * @param delayMs delay before execution of the post update action
+     */
+    public void updateRelease(Tiller.UpdateReleaseRequest.Builder requestBuilder, ChartOuterClass.Chart.Builder chartBuilder, Runnable onPostUpdate, long delayMs) {
         requestBuilder
-                .setRecreate(true)
                 .setTimeout(INSTALLATION_TIMEOUT_SEC)
                 .setWait(true);
 
         performWithCacheInvalidation(format("Helm upgrade release %s to version %s", requestBuilder.getName(), chartBuilder.getMetadata().getVersion()),
-                () -> releaseManager.update(requestBuilder, chartBuilder));
+                () -> {
+                   var future = (ListenableFuture) releaseManager.update(requestBuilder, chartBuilder);
+                   if (onPostUpdate != null) {
+                       future.addListener(() -> worker.schedule(onPostUpdate, delayMs, MILLISECONDS), Runnable::run);
+                   }
+                   return future;
+                });
     }
 
     /**
@@ -94,7 +108,7 @@ public class ReleaseService {
         performWithCacheInvalidation("Helm uninstall " + requestBuilder.getName(), () -> releaseManager.uninstall(requestBuilder.build()));
     }
 
-    public ReleaseInfo getReleaseInfo(ReleaseOuterClass.Release release) {
+    public static ReleaseInfo getReleaseInfo(ReleaseOuterClass.Release release) {
         return ReleaseInfo.builder()
                 .status(release.getInfo().getStatus().getCode().toString())
                 .description(release.getInfo().getDescription())
@@ -109,6 +123,16 @@ public class ReleaseService {
      * @param action Action to performWithCacheInvalidation
      */
     private void performWithCacheInvalidation(String commandDescription, Callable<Future<?>> action) {
+        performWithCacheInvalidation(commandDescription, action, null, 0);
+    }
+
+    /**
+     * Handles release list cache invalidation and error handling when a Helm command is executed and when it finishes
+     * and ensures that no more than one command is executed at a time
+     * @param commandDescription
+     * @param action Action to performWithCacheInvalidation
+     */
+    private void performWithCacheInvalidation(String commandDescription, Callable<Future<?>> action, Runnable onPostUpdate, long delayMs) {
         worker.execute(() -> {
             try {
                 log.info("Executing command {}", commandDescription);
@@ -116,6 +140,9 @@ public class ReleaseService {
                 releaseList.invalidateCache();
                 future.get();
                 log.info("Successfully executed command {}", commandDescription);
+                if (onPostUpdate != null) {
+                    worker.schedule(onPostUpdate, delayMs, MILLISECONDS);
+                }
             } catch (InterruptedException e) {
                 log.warn("Interrupted while performing command {}", commandDescription);
                 currentThread().interrupt();

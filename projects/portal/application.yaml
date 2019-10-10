@@ -9,7 +9,7 @@ auth:
   # Organisation admin role
   organisationAdminRole: organisation-admin
 charts:
-  workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.7.tgz
+  workspace: http://storage.googleapis.com/fairspace-helm/workspace-0.6.9-SNAPSHOT.tgz
   jupyter: http://storage.googleapis.com/fairspace-helm/jupyter-0.7.1.tgz
 defaultConfig:
   workspace:
