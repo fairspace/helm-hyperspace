@@ -82,7 +82,7 @@ describe('WorkspaceDialog', () => {
         expect(onSubmit.mock.calls.length).toEqual(0);
     });
 
-    it('should require PV sizes larger than 0', () => {
+    it('should require PV sizes larger than 0 (databaseVolumeSize is 0)', () => {
         enterIntoInput('id', 'a');
         enterIntoInput('name', 'b');
         enterIntoTextArea('description', 'c');
@@ -95,5 +95,4 @@ describe('WorkspaceDialog', () => {
 
         expect(onSubmit.mock.calls.length).toEqual(0);
     });
-
 });

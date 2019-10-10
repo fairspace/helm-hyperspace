@@ -45,12 +45,12 @@ class KeycloakAPI {
                 postBody,
                 requestOptions
             ).catch(handleHttpError('Error while updating roles for user'));
-        } else {
-            return axios.delete(
-                Config.get().urls.keycloak.roleMappings.replace("{userId}", userId),
-                {...requestOptions, data: postBody}
-            ).catch(handleHttpError('Error while updating roles for user'));
         }
+
+        return axios.delete(
+            Config.get().urls.keycloak.roleMappings.replace("{userId}", userId),
+            {...requestOptions, data: postBody}
+        ).catch(handleHttpError('Error while updating roles for user'));
     }
 }
 

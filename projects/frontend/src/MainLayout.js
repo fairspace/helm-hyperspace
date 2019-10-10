@@ -10,7 +10,7 @@ export default () => {
 
     return (
         <>
-            {!dismissed && isOrganisationAdmin(authorizations) ? <ClusterHealthBar onDismiss={() => setDismissed(true)}/> : undefined}
+            {!dismissed && isOrganisationAdmin(authorizations) ? <ClusterHealthBar onDismiss={() => setDismissed(true)} /> : undefined}
             <Routes />
         </>
     );

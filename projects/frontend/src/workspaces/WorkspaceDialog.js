@@ -49,7 +49,7 @@ export default ({onSubmit, onClose, workspace: {id = '', name = '', description 
             maxWidth="sm"
         >
             <DialogTitle disableTypography id="form-dialog-title">
-                <Typography variant="h5">{isUpdate ? `Update workspace ${id}`: "New Workspace"}</Typography>
+                <Typography variant="h5">{isUpdate ? `Update workspace ${id}` : "New Workspace"}</Typography>
             </DialogTitle>
             <DialogContent style={{overflowX: 'hidden'}}>
                 <form

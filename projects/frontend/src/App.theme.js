@@ -6,7 +6,7 @@ export default createMuiTheme({
         useNextVariants: true,
     },
     palette: {
-        primary: process.env.NODE_ENV === 'development' ? { main: blueGrey.A200 } : blueGrey,
+        primary: process.env.NODE_ENV === 'development' ? {main: blueGrey.A200} : blueGrey,
         secondary: blue
     },
     props: {

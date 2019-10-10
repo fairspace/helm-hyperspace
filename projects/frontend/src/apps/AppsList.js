@@ -53,7 +53,7 @@ const AppsList = ({classes, apps, workspaceId, onAddApp, onRemoveApp}) => {
                 setSnackbarVisible(true);
                 setSnackbarMessage("Your " + appType + " app is being added to the workspace, this might take a while for it to appear");
             })
-            .catch(e => {
+            .catch(() => {
                 setSnackbarVisible(true);
                 setSnackbarMessage("Error adding a " + appType + " app to this workspace");
             });
@@ -65,11 +65,11 @@ const AppsList = ({classes, apps, workspaceId, onAddApp, onRemoveApp}) => {
                 setSnackbarVisible(true);
                 setSnackbarMessage("Your app " + appId + " is being removed from the workspace. It might take a while for it to disappear");
             })
-            .catch(e => {
+            .catch(() => {
                 setSnackbarVisible(true);
                 setSnackbarMessage("Error removing the " + appId + " app from this workspace");
             });
-    }
+    };
 
     return (
         <AppsBreadcrumbsContextProvider workspaceId={workspaceId}>

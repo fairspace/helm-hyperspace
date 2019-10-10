@@ -1,16 +1,14 @@
 import React, {useCallback, useContext} from 'react';
 import PropTypes from 'prop-types';
 import {Link, withRouter} from "react-router-dom";
+import {List, ListItem, ListItemText, Grid} from "@material-ui/core";
 import {
     BreadCrumbs, LoadingInlay, MessageDisplay, useAsync, usePageTitleUpdater, UserContext
 } from "@fairspace/shared-frontend";
+
 import {isOrganisationAdmin} from "../common/utils/userUtils";
 import WorkspaceAPI from "../common/services/WorkspaceAPI";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 import WorkspaceBreadcrumbsContextProvider from "./WorkspaceBreadcrumbsContextProvider";
-import Grid from "@material-ui/core/Grid";
 
 /**
  * This page will show information about a single workspace
