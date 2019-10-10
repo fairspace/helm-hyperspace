@@ -247,7 +247,7 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorksp
                                                     setAnchorEl(null);
                                                     onDeleteWorkspace(id);
                                                 }}
-                                                disabled={!isOrganisationAdmin(authorizations)}
+                                                disabled={!isAdmin}
                                             >
                                                 <Typography variant="inherit" color="error">
                                                     Delete Workspace
