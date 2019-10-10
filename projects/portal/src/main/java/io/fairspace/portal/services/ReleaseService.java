@@ -77,8 +77,8 @@ public class ReleaseService {
      * Upgrades the specified release and invalidates the cache when finished and performs a post update action after delay
      * @param requestBuilder
      * @param chartBuilder
-     * @param onPostUpdate
-     * @param delayMs
+     * @param onPostUpdate Action to schedule in case of successful update
+     * @param delayMs delay before execution of the post update action
      */
     public void updateRelease(Tiller.UpdateReleaseRequest.Builder requestBuilder, ChartOuterClass.Chart.Builder chartBuilder, Runnable onPostUpdate, long delayMs) {
         requestBuilder
@@ -123,6 +123,16 @@ public class ReleaseService {
      * @param action Action to performWithCacheInvalidation
      */
     private void performWithCacheInvalidation(String commandDescription, Callable<Future<?>> action) {
+        performWithCacheInvalidation(commandDescription, action, null, 0);
+    }
+
+    /**
+     * Handles release list cache invalidation and error handling when a Helm command is executed and when it finishes
+     * and ensures that no more than one command is executed at a time
+     * @param commandDescription
+     * @param action Action to performWithCacheInvalidation
+     */
+    private void performWithCacheInvalidation(String commandDescription, Callable<Future<?>> action, Runnable onPostUpdate, long delayMs) {
         worker.execute(() -> {
             try {
                 log.info("Executing command {}", commandDescription);
@@ -130,6 +140,9 @@ public class ReleaseService {
                 releaseList.invalidateCache();
                 future.get();
                 log.info("Successfully executed command {}", commandDescription);
+                if (onPostUpdate != null) {
+                    worker.schedule(onPostUpdate, delayMs, MILLISECONDS);
+                }
             } catch (InterruptedException e) {
                 log.warn("Interrupted while performing command {}", commandDescription);
                 currentThread().interrupt();

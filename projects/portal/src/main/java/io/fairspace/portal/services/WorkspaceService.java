@@ -26,7 +26,7 @@ public class WorkspaceService {
     private static final String WORKSPACE_INGRESS_DOMAIN_YAML_PATH = "/workspace/ingress/domain";
     private static final String FILE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/files/size";
     private static final String DATABASE_STORAGE_SIZE_YAML_PATH = "/saturn/persistence/database/size";
-    public static final int SATURN_RESTART_DELAY_MS = 20_000;
+    private static final int SATURN_RESTART_DELAY_MS = 20_000;
 
     private ReleaseService releaseService;
     private WorkspaceAppService workspaceAppService;

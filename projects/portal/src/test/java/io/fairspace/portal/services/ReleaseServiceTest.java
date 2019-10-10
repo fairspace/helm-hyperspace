@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.util.concurrent.Futures.immediateFuture;
 import static org.junit.Assert.assertFalse;
@@ -39,7 +40,7 @@ public class ReleaseServiceTest {
     private Future<Tiller.UninstallReleaseResponse> uninstallFuture;
 
     @Mock
-    private ScheduledExecutorService immediateExecutor;
+    private ScheduledExecutorService executorService;
 
     private ReleaseService releaseService;
 
@@ -48,14 +49,14 @@ public class ReleaseServiceTest {
         doAnswer(invocation -> {
             ((Runnable)invocation.getArgument(0)).run();
             return null;
-        }).when(immediateExecutor).execute(any());
+        }).when(executorService).execute(any());
 
         doAnswer(invocation -> {
             ((Runnable)invocation.getArgument(0)).run();
             return null;
-        }).when(immediateExecutor).schedule(any(Runnable.class), anyLong(), any());
+        }).when(executorService).schedule(any(Runnable.class), anyLong(), any());
 
-        releaseService = new ReleaseService(releaseManager, releaseList, immediateExecutor);
+        releaseService = new ReleaseService(releaseManager, releaseList, executorService);
 
         when(releaseManager.install(any(), any())).thenReturn(installFuture);
         when(releaseManager.update(any(), any())).thenReturn(updateFuture);
@@ -148,6 +149,8 @@ public class ReleaseServiceTest {
                 onPostUpdate,
                 10
         );
+
+        verify(executorService).schedule(onPostUpdate, 10, TimeUnit.MILLISECONDS);
 
         verify(onPostUpdate).run();
     }
