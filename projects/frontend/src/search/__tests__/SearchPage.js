@@ -20,6 +20,7 @@ describe('<SearchPage />', () => {
     it('should render table when receiving results', () => {
         const {queryByTestId} = render(
             <SearchPage
+                classes={{}}
                 loading={false}
                 results={{
                     total: 1,
@@ -34,6 +35,7 @@ describe('<SearchPage />', () => {
     it('should render error component on error', () => {
         const {container, queryByTestId} = render(
             <SearchPage
+                classes={{}}
                 error={{
                     message: 'An error'
                 }}
@@ -54,6 +56,7 @@ describe('<SearchPage />', () => {
 
         await act(async () => {
             render(<SearchPageContainer
+                classes={{}}
                 location={{
                     search: 'query'
                 }}
