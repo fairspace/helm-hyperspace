@@ -14,14 +14,12 @@ import AddUserDialog from "./AddUserDialog";
 import {ROLE_COORDINATOR, ROLE_USER} from "../constants";
 
 const styles = theme => ({
-    header: {
-        marginTop: theme.spacing.unit * 3,
-        textAlign: 'center',
-    },
     tableRoot: {
         width: '100%',
-        marginTop: theme.spacing.unit * 3,
-        overflowX: 'auto',
+        overflowX: 'auto'
+    },
+    table: {
+        minWidth: 700,
     },
     roleCheckbox: {
         padding: theme.spacing.unit
@@ -68,7 +66,7 @@ const RolesList = ({classes, workspaceId, currentUser, users = [], roles = {}, u
         <RolesBreadcrumbsContextProvider workspaceId={workspaceId}>
             <BreadCrumbs />
             <Paper className={classes.tableRoot}>
-                <Table style={{tableLayout: 'fixed'}}>
+                <Table className={classes.root}>
                     <TableHead>
                         <TableRow>
                             <TableCell>

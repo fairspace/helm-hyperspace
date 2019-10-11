@@ -1,6 +1,6 @@
 import React, {useCallback} from 'react';
 import PropTypes from "prop-types";
-import {Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography} from '@material-ui/core';
+import {Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, withStyles} from '@material-ui/core';
 import {
     LoadingInlay, MessageDisplay, SearchResultHighlights,
     getSearchQueryFromString, SearchAPI, SORT_DATE_CREATED, useAsync, handleSearchError
@@ -8,7 +8,17 @@ import {
 
 import Config from "../common/services/Config";
 
-export const SearchPage = ({loading, error, results}) => {
+const styles = () => ({
+    tableRoot: {
+        width: '100%',
+        overflowX: 'auto'
+    },
+    table: {
+        minWidth: 700,
+    }
+});
+
+export const SearchPage = ({classes, loading, error, results}) => {
     const handleResultDoubleClick = (url) => {
         window.open(url, '_blank');
     };
@@ -26,8 +36,8 @@ export const SearchPage = ({loading, error, results}) => {
     }
 
     return (
-        <Paper style={{width: '100%'}} data-testid="results-table">
-            <Table padding="dense">
+        <Paper className={classes.root} data-testid="results-table">
+            <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
                         <TableCell>Entity</TableCell>
@@ -69,6 +79,7 @@ export const SearchPage = ({loading, error, results}) => {
 };
 
 const SearchPageContainer = ({
+    classes,
     location: {search},
     query = getSearchQueryFromString(search),
     searchApi = SearchAPI(Config.get(), Config.get().searchIndex)
@@ -86,7 +97,7 @@ const SearchPageContainer = ({
         [query])
     );
 
-    return <SearchPage error={error} loading={loading} results={data} />;
+    return <SearchPage classes={classes} error={error} loading={loading} results={data} />;
 };
 
 SearchPageContainer.propTypes = {
@@ -99,4 +110,4 @@ SearchPageContainer.propTypes = {
     })
 };
 
-export default SearchPageContainer;
+export default withStyles(styles)(SearchPageContainer);

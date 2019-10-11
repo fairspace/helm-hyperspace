@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Link} from "react-router-dom";
-import withStyles from "@material-ui/core/styles/withStyles";
 import {
-    Button, IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel
+    Button, IconButton, Paper, Table, TableBody, TableCell,
+    TableHead, TableRow, TableSortLabel, withStyles
 } from '@material-ui/core';
 import Delete from "@material-ui/icons/Delete";
 import ErrorIcon from '@material-ui/icons/Error';
@@ -33,6 +33,13 @@ const columns = {
 };
 
 const styles = theme => ({
+    root: {
+        width: '100%',
+        overflowX: 'auto'
+    },
+    table: {
+        minWidth: 700,
+    },
     warning: {
         color: theme.palette.error.main,
         verticalAlign: "middle",
@@ -74,8 +81,8 @@ const AppsList = ({classes, apps, workspaceId, onAddApp, onRemoveApp}) => {
     return (
         <AppsBreadcrumbsContextProvider workspaceId={workspaceId}>
             <BreadCrumbs />
-            <Paper>
-                <Table style={{tableLayout: 'fixed'}}>
+            <Paper className={classes.root}>
+                <Table className={classes.table}>
                     <TableHead>
                         <TableRow>
                             <TableCell>
