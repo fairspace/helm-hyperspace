@@ -4,12 +4,11 @@ import ListItemText from "@material-ui/core/ListItemText";
 import {
     Paper, Table, TableBody, TableCell, TableHead,
     TablePagination, TableRow, TableSortLabel, IconButton,
-    Menu, MenuItem, Tooltip, Typography, Divider, Grid
+    Menu, MenuItem, Tooltip, Typography, Divider, Grid, withStyles
 } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ErrorIcon from '@material-ui/icons/Error';
 import Lock from '@material-ui/icons/Lock';
-import withStyles from "@material-ui/core/styles/withStyles";
 import {
     LoadingInlay, MessageDisplay, UserContext, useSorting,
     usePagination, useAsync,
@@ -45,6 +44,13 @@ const columns = {
 };
 
 const styles = theme => ({
+    root: {
+        width: '100%',
+        overflowX: 'auto'
+    },
+    table: {
+        minWidth: 700,
+    },
     warning: {
         color: theme.palette.error.main,
         verticalAlign: "middle",
@@ -105,8 +111,8 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorksp
     }
 
     return (
-        <Paper>
-            <Table size="small">
+        <Paper className={classes.root}>
+            <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
                         <TableCell padding="dense">
