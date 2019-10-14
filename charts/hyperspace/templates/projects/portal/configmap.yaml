@@ -22,8 +22,9 @@ data:
       {{- end }}
     defaultConfig:
       workspace:
-        hyperspace:
+        external:
           keycloak:
+            baseUrl: {{ template "keycloak.baseUrl" . }}
             username: {{ .Values.keycloak.keycloak.username }}
             password: {{ .Values.keycloak.keycloak.password }}
             realm: {{ .Values.hyperspace.keycloak.realm }}

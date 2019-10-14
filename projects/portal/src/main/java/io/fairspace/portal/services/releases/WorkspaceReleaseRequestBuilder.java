@@ -25,10 +25,9 @@ public class WorkspaceReleaseRequestBuilder{
 
     public Tiller.InstallReleaseRequest.Builder buildInstall(Workspace workspace) {
         var customValues = createObjectNode();
-        customValues.with("hyperspace").put("domain", domain);
-        customValues.with("hyperspace").with("keycloak").put("clientId", workspace.getId() + "-pluto");
-        customValues.with("hyperspace").with("keycloak").put("clientSecret", randomUUID().toString());
-        customValues.with("hyperspace").with("elasticsearch").put("indexName", workspace.getId());
+        customValues.with("external").with("keycloak").put("clientId", workspace.getId() + "-pluto");
+        customValues.with("external").with("keycloak").put("clientSecret", randomUUID().toString());
+        customValues.with("external").with("elasticsearch").put("indexName", workspace.getId());
         customValues.with("workspace").put("name", workspace.getName());
         customValues.with("workspace").put("description", workspace.getDescription());
         customValues.with("workspace").with("ingress").put("domain", workspace.getId() + "." + domain);
