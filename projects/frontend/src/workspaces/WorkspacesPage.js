@@ -20,32 +20,34 @@ export default () => {
 
     usePageTitleUpdater("Workspaces");
 
-    const createWorkspace = (workspace) => {
+    const createWorkspace = async (workspace) => {
         setShowWorkspaceDialog(false);
         setSelectedWorkspace(undefined);
-        return WorkspaceAPI.createWorkspace(workspace)
-            .then(() => {
-                setSnackbarVisible(true);
-                setSnackbarMessage("The workspace is being created, this might take a while");
-            })
-            .catch(() => {
-                setSnackbarVisible(true);
-                setSnackbarMessage("An error occurred while creating your workspace. Please try again later.");
-            });
+
+        try {
+            await WorkspaceAPI.createWorkspace(workspace);
+            setSnackbarMessage("The workspace is being created, "
+                + "it could take a few minutes before the workspace appears in the table, "
+                + "and up to 10 minutes before it becomes accessible");
+        } catch (e) {
+            setSnackbarMessage("An error occurred while creating your workspace. Please try again later.");
+        }
+
+        setSnackbarVisible(true);
     };
 
-    const updateWorkspace = (workspace) => {
+    const updateWorkspace = async (workspace) => {
         setShowWorkspaceDialog(false);
         setSelectedWorkspace(undefined);
-        return WorkspaceAPI.updateWorkspace(workspace)
-            .then(() => {
-                setSnackbarVisible(true);
-                setSnackbarMessage("The workspace is being updated, this might take a while");
-            })
-            .catch(() => {
-                setSnackbarVisible(true);
-                setSnackbarMessage("An error occurred while updating your workspace. Please try again later.");
-            });
+
+        try {
+            await WorkspaceAPI.updateWorkspace(workspace);
+            setSnackbarMessage("The workspace is being updated, this might a few minutes before the changes take affect.");
+        } catch (e) {
+            setSnackbarMessage("An error occurred while updating your workspace. Please try again later.");
+        }
+
+        setSnackbarVisible(true);
     };
 
     const editWorkspace = (workspace) => {
@@ -53,16 +55,19 @@ export default () => {
         setShowWorkspaceDialog(true);
     };
 
-    const deleteWorkspace = workspaceId => WorkspaceAPI.deleteWorkspace(workspaceId)
-        .catch(() => {
+    const deleteWorkspace = async (workspaceId) => {
+        try {
+            await WorkspaceAPI.deleteWorkspace(workspaceId);
+        } catch (e) {
             setSnackbarVisible(true);
             setSnackbarMessage("An error happened while deleting the workspace");
-        });
+        }
+    };
 
     const handleWorkspaceDeletion = (workspaceId) => {
         setWorkspaceIdToDelete('');
         setSnackbarVisible(true);
-        setSnackbarMessage(`The workspace ${workspaceId} is being deleted, this may take a while.`);
+        setSnackbarMessage(`The workspace ${workspaceId} is being deleted, it may take a while before it is completely removed for the system.`);
         deleteWorkspace(workspaceId);
     };
 
@@ -109,8 +114,9 @@ export default () => {
             )}
             <NotificationSnackbar
                 open={snackbarVisible}
-                onClose={() => setSnackbarVisible(false)}
+                autoHideDuration={null}
                 message={snackbarMessage}
+                onClose={() => setSnackbarVisible(false)}
             />
 
         </BreadcrumbsContext.Provider>

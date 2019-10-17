@@ -4,7 +4,7 @@ import {logout} from '@fairspace/shared-frontend';
 
 import Config from "./common/services/Config";
 import Home from "./home/Home";
-import Workspaces from "./workspaces/Workspaces";
+import WorkspacesPage from "./workspaces/WorkspacesPage";
 import RolesContainer from './roles/RolesContainer';
 import AppsContainer from "./apps/AppsContainer";
 import SearchPage from './search/SearchPage';
@@ -14,7 +14,7 @@ import AppPage from "./apps/AppPage";
 const routes = () => (
     <>
         <Route path="/" exact component={Home} />
-        <Route path="/workspaces" exact component={Workspaces} />
+        <Route path="/workspaces" exact component={WorkspacesPage} />
         <Route
             path="/workspaces/:workspaceId"
             exact
