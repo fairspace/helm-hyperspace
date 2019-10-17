@@ -1,6 +1,6 @@
 import React, {useCallback, useContext} from 'react';
 import PropTypes from 'prop-types';
-import {Link, withRouter} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {List, ListItem, ListItemText, Grid} from "@material-ui/core";
 import {
     BreadCrumbs, LoadingInlay, MessageDisplay, useAsync, usePageTitleUpdater, UserContext
@@ -110,4 +110,4 @@ WorkspacePage.propTypes = {
     workspaceId: PropTypes.string.isRequired
 };
 
-export default withRouter(WorkspacePage);
+export default WorkspacePage;
