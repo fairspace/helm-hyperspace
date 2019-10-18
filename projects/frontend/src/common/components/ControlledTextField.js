@@ -1,28 +1,28 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import {TextField} from "@material-ui/core";
 
 /**
  * This component is an input field that is aware of it's touched (blur) state and will only error if it's touched
  */
-const ControlledField = ({component: Component, control, valid, ...props}) => (
-    <Component
+const ControlledTextField = ({control: {value, touched, setValue, valid, declareTouched}, ...props}) => (
+    <TextField
         {...props}
-        value={control.value}
-        onChange={e => control.setValue(e.target.value)}
-        onBlur={control.declareTouched}
-        error={!valid && control.touched}
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onBlur={declareTouched}
+        error={touched && !valid}
     />
 );
 
-ControlledField.propTypes = {
-    component: PropTypes.elementType.isRequired,
+ControlledTextField.propTypes = {
     control: PropTypes.exact({
         value: PropTypes.any.isRequired,
         setValue: PropTypes.func.isRequired,
+        valid: PropTypes.bool.isRequired,
         touched: PropTypes.bool.isRequired,
         declareTouched: PropTypes.func.isRequired,
     }),
-    valid: PropTypes.bool.isRequired,
 };
 
-export default ControlledField;
+export default ControlledTextField;
