@@ -16,7 +16,7 @@ export default ({onSubmit, onClose, isUpdate, workspace: {id = '', name = '', de
     const descriptionControl = useFormField(description, () => true);
     const logAndFilesVolumeSizeControl = useFormField(logAndFilesVolumeSize, value => value >= minLogAndFilesVolumeSize);
     const databaseVolumeSizeControl = useFormField(databaseVolumeSize, value => value >= minDatabaseVolumeSize);
-    const allControls = [nameControl, descriptionControl, logAndFilesVolumeSizeControl, databaseVolumeSizeControl];
+    const allControls = [idControl, nameControl, descriptionControl, logAndFilesVolumeSizeControl, databaseVolumeSizeControl];
 
     const formValid = allControls.every(({valid}) => valid);
     const modified = allControls.some(({touched}) => touched);
@@ -97,7 +97,7 @@ export default ({onSubmit, onClose, isUpdate, workspace: {id = '', name = '', de
             title={isUpdate ? `Update workspace ${id}` : "New Workspace"}
             details={details}
             configuration={configuration}
-            submitDisabled={!formValid || (isUpdate && !modified)}
+            submitDisabled={Boolean(!formValid || (isUpdate && !modified))}
             submitText={isUpdate ? "Update Workspace" : "Create Workspace"}
         />
     );

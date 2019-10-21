@@ -13,23 +13,26 @@ const ControlledTextFieldWrapper = ({
     control, type, autoFocus = false, required = false,
     id, label, name, disabled, multiline = false, helperText, inputProps
 }) => (
-        <ControlledTextField
-            key={id}
-            fullWidth
-            margin="dense"
-            autoFocus={autoFocus}
-            control={control}
-            type={type}
-            disabled={disabled}
-            id={id}
-            label={label}
-            name={name}
-            multiline={multiline}
-            required={required}
-            helperText={helperText}
-            inputProps={inputProps}
-        />
-    );
+    <ControlledTextField
+        key={id}
+        fullWidth
+        margin="dense"
+        autoFocus={autoFocus}
+        control={control}
+        type={type}
+        disabled={disabled}
+        id={id}
+        label={label}
+        name={name}
+        multiline={multiline}
+        required={required}
+        helperText={helperText}
+        inputProps={{
+            'aria-label': label,
+            ...inputProps
+        }}
+    />
+);
 
 export default ({onSubmit, onClose, title, details, configuration, submitDisabled, submitText}) => {
     const [activeStep, setActiveStep] = React.useState(0);
@@ -51,7 +54,6 @@ export default ({onSubmit, onClose, title, details, configuration, submitDisable
         setActiveStep(prevActiveStep => prevActiveStep - 1);
     };
 
-    // const fieldsHaveError = (fields) => fields.some(({control}) => !control.valid);
     const fieldsHaveError = (fields) => fields.some(({control}) => control.touched && !control.valid);
 
     return (
@@ -67,6 +69,7 @@ export default ({onSubmit, onClose, title, details, configuration, submitDisable
             </DialogTitle>
             <DialogContent style={{overflowX: 'hidden'}}>
                 <form
+                    data-testid="form"
                     id="formId"
                     noValidate
                     onSubmit={onSubmit}
@@ -96,7 +99,7 @@ export default ({onSubmit, onClose, title, details, configuration, submitDisable
                                                 color="primary"
                                                 onClick={handleNext}
                                             >
-                                                {activeStep === TOTAL_STEPS ? 'Finish' : 'Next'}
+                                                {activeStep === TOTAL_STEPS - 1 ? 'Finish' : 'Next'}
                                             </Button>
                                         </div>
                                     </StepContent>
