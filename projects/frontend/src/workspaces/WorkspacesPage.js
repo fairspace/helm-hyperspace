@@ -28,7 +28,7 @@ export default () => {
             await WorkspaceAPI.createWorkspace(workspace);
             setSnackbarMessage("The workspace is being created, "
                 + "it could take a few minutes before the workspace appears in the table, "
-                + "and up to 10 minutes before it becomes accessible");
+                + "and up to 10 minutes before it becomes accessible.");
         } catch (e) {
             setSnackbarMessage("An error occurred while creating your workspace. Please try again later.");
         }
@@ -60,14 +60,14 @@ export default () => {
             await WorkspaceAPI.deleteWorkspace(workspaceId);
         } catch (e) {
             setSnackbarVisible(true);
-            setSnackbarMessage("An error happened while deleting the workspace");
+            setSnackbarMessage("An error happened while deleting the workspace.");
         }
     };
 
     const handleWorkspaceDeletion = (workspaceId) => {
         setWorkspaceIdToDelete('');
         setSnackbarVisible(true);
-        setSnackbarMessage(`The workspace ${workspaceId} is being deleted, it may take a while before it is completely removed for the system.`);
+        setSnackbarMessage(`The workspace ${workspaceId} is being deleted, it may take a while before it is completely removed from the system.`);
         deleteWorkspace(workspaceId);
     };
 
