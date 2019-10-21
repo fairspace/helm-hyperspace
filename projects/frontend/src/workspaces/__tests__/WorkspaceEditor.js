@@ -3,17 +3,16 @@ import {render, fireEvent, cleanup} from '@testing-library/react';
 
 import WorkspaceEditor from "../WorkspaceEditor";
 
-const ID_LABEL = "Id";
-const NAME_LABEL = "Name";
-const DESCRIPTION_LABEL = "Description";
-const LOG_AND_FILES_VOLUME_SIZE_LABEL = "Log and files volume size in gigabytes";
-const DATABASE_VOLUME_SIZE_LABEL = "Database volume size in gigabytes";
-
 describe('WorkspaceEditor', () => {
     let onSubmit;
     let utils;
 
     const enterValue = (label, value) => fireEvent.change(utils.getByLabelText(label), {target: {value}});
+    const enterId = (value) => enterValue('Id', value);
+    const enterName = (value) => enterValue('Name', value);
+    const enterDescription = (value) => enterValue('Description', value);
+    const enterLogAndFilesSize = (value) => enterValue('Log and files volume size in gigabytes', value);
+    const enterDatabaseSize = (value) => enterValue('Database volume size in gigabytes', value);
 
     const submit = () => fireEvent.submit(utils.getByTestId('form'));
 
@@ -28,12 +27,12 @@ describe('WorkspaceEditor', () => {
     afterEach(cleanup);
 
     it('should send all entered parameters to the creation method', () => {
-        enterValue(ID_LABEL, 'a');
-        enterValue(NAME_LABEL, 'b');
-        enterValue(DESCRIPTION_LABEL, 'c');
+        enterId('a');
+        enterName('b');
+        enterDescription('c');
         next();
-        enterValue(LOG_AND_FILES_VOLUME_SIZE_LABEL, '4');
-        enterValue(DATABASE_VOLUME_SIZE_LABEL, '5');
+        enterLogAndFilesSize('4');
+        enterDatabaseSize('5');
         next(true);
         submit();
 
@@ -49,14 +48,14 @@ describe('WorkspaceEditor', () => {
     });
 
     it('should enables and disables submit button at proper times', () => {
-        enterValue(ID_LABEL, 'a');
-        enterValue(NAME_LABEL, 'b');
+        enterId('a');
+        enterName('b');
 
         expect(utils.getByTestId('submit-button')).toHaveProperty('disabled');
 
         next();
-        enterValue(LOG_AND_FILES_VOLUME_SIZE_LABEL, '4');
-        enterValue(DATABASE_VOLUME_SIZE_LABEL, '5');
+        enterLogAndFilesSize('4');
+        enterDatabaseSize('5');
 
         expect(utils.getByTestId('submit-button')).toHaveProperty('disabled');
 
@@ -67,10 +66,10 @@ describe('WorkspaceEditor', () => {
     });
 
     it('should require an identifier', () => {
-        enterValue(NAME_LABEL, 'b');
+        enterName('b');
         next();
-        enterValue(LOG_AND_FILES_VOLUME_SIZE_LABEL, '4');
-        enterValue(DATABASE_VOLUME_SIZE_LABEL, '5');
+        enterLogAndFilesSize('4');
+        enterDatabaseSize('5');
         next(true);
         submit();
 
@@ -78,10 +77,10 @@ describe('WorkspaceEditor', () => {
     });
 
     it('should require a name', () => {
-        enterValue(ID_LABEL, 'a');
+        enterId('a');
         next();
-        enterValue(LOG_AND_FILES_VOLUME_SIZE_LABEL, '4');
-        enterValue(DATABASE_VOLUME_SIZE_LABEL, '5');
+        enterLogAndFilesSize('4');
+        enterDatabaseSize('5');
         next(true);
         submit();
 
@@ -89,11 +88,11 @@ describe('WorkspaceEditor', () => {
     });
 
     it('should require PV sizes larger than 0', () => {
-        enterValue(ID_LABEL, 'a');
-        enterValue(NAME_LABEL, 'b');
+        enterId('a');
+        enterName('b');
         next();
-        enterValue(LOG_AND_FILES_VOLUME_SIZE_LABEL, '0');
-        enterValue(DATABASE_VOLUME_SIZE_LABEL, '5');
+        enterLogAndFilesSize('0');
+        enterDatabaseSize('5');
         next(true);
         submit();
 
@@ -101,11 +100,11 @@ describe('WorkspaceEditor', () => {
     });
 
     it('should require PV sizes larger than 0 (databaseVolumeSize is 0)', () => {
-        enterValue(ID_LABEL, 'a');
-        enterValue(NAME_LABEL, 'b');
+        enterId('a');
+        enterName('b');
         next();
-        enterValue(LOG_AND_FILES_VOLUME_SIZE_LABEL, '1');
-        enterValue(DATABASE_VOLUME_SIZE_LABEL, '0');
+        enterLogAndFilesSize('1');
+        enterDatabaseSize('0');
         next(true);
         submit();
 
