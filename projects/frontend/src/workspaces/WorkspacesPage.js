@@ -42,7 +42,7 @@ export default () => {
 
         try {
             await WorkspaceAPI.updateWorkspace(workspace);
-            setSnackbarMessage("The workspace is being updated, this migh take a few minutes before the changes take affect.");
+            setSnackbarMessage("The workspace is being updated, this might take a few minutes before the changes take affect.");
         } catch (e) {
             setSnackbarMessage("An error occurred while updating your workspace. Please try again later.");
         }
