@@ -15,8 +15,8 @@ hyperspace:
 keycloak:
   keycloak:
     password: keycloak-ci-123
-  postgresql:
-    postgresPassword: "9FGwLKpEu$4w/knG"
+    persistence:
+      postgresqlPassword: "9FGwLKpEu$4w/knG"
 
 rabbitmq:
   rabbitmq:
