@@ -34,11 +34,9 @@ const ControlledTextFieldWrapper = ({
     />
 );
 
-export default ({onSubmit, onClose, title, details, configuration, submitDisabled, submitText}) => {
+export default ({onSubmit, onClose, title, fieldsGroups, submitDisabled, submitText}) => {
     const [activeStep, setActiveStep] = React.useState(0);
     const [allStepsSeen, setAllStepsSeen] = React.useState(false);
-
-    const allSteps = [details, configuration];
 
     useEffect(() => {
         if (activeStep === TOTAL_STEPS) {
@@ -76,7 +74,7 @@ export default ({onSubmit, onClose, title, details, configuration, submitDisable
                 >
                     <Stepper activeStep={activeStep} orientation="vertical">
                         {
-                            allSteps.map(({fields, label, helperText}) => (
+                            fieldsGroups.map(({fields, label, helperText}) => (
                                 <Step key={label}>
                                     <StepLabel error={fieldsHaveError(fields)}>{label}</StepLabel>
                                     <StepContent>

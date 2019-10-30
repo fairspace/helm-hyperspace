@@ -95,8 +95,7 @@ export default ({onSubmit, onClose, isUpdate, workspace: {id = '', name = '', de
             }}
             onClose={onClose}
             title={isUpdate ? `Update workspace ${id}` : "New Workspace"}
-            details={details}
-            configuration={configuration}
+            fieldsGroups={[details, configuration]}
             submitDisabled={Boolean(!formValid || (isUpdate && !modified))}
             submitText={isUpdate ? "Update Workspace" : "Create Workspace"}
         />
