@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-export const useFormField = (initialValue) => {
+export const useFormField = (initialValue, validator) => {
     const [value, setValue] = useState(initialValue);
     const [touched, setTouched] = useState(false);
 
@@ -11,6 +11,7 @@ export const useFormField = (initialValue) => {
     return {
         value,
         setValue,
+        valid: validator(value),
         touched,
         declareTouched,
     };

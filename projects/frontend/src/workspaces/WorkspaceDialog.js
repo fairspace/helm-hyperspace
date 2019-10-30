@@ -1,44 +1,58 @@
-import React from "react";
+import React, {useEffect} from "react";
 
 import {
     Dialog, DialogTitle, Typography,
-    DialogActions, Button, DialogContent, TextField,
+    DialogActions, Button, DialogContent,
+    Stepper, Step, StepLabel, StepContent
 } from "@material-ui/core";
-import {useFormField} from "../common/hooks/UseFormField";
-import ControlledField from "../common/components/ControlledField";
+import ControlledTextField from "../common/components/ControlledTextField";
 
-const DEFAULT_LOG_AND_FILES_SIZE = 100;
-const DEFAULT_DATABASE_VOLUME_SIZE = 50;
-const ID_PATTERN = /^[a-z]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
+const TOTAL_STEPS = 2;
 
-export default ({onSubmit, onClose, workspace: {id = '', name = '', description = '', logAndFilesVolumeSize = DEFAULT_LOG_AND_FILES_SIZE, databaseVolumeSize = DEFAULT_DATABASE_VOLUME_SIZE} = {}}) => {
-    const isUpdate = !!id;
-    const idControl = useFormField(id);
-    const nameControl = useFormField(name);
-    const descriptionControl = useFormField(description);
-    const logAndFilesVolumeSizeControl = useFormField(logAndFilesVolumeSize);
-    const databaseVolumeSizeControl = useFormField(databaseVolumeSize);
+const ControlledTextFieldWrapper = ({
+    control, type, autoFocus = false, required = false,
+    id, label, name, disabled, multiline = false, helperText, inputProps
+}) => (
+    <ControlledTextField
+        key={id}
+        fullWidth
+        margin="dense"
+        autoFocus={autoFocus}
+        control={control}
+        type={type}
+        disabled={disabled}
+        id={id}
+        label={label}
+        name={name}
+        multiline={multiline}
+        required={required}
+        helperText={helperText}
+        inputProps={{
+            'aria-label': label,
+            ...inputProps
+        }}
+    />
+);
 
-    const idValid = !!idControl.value && ID_PATTERN.test(idControl.value);
-    const nameValid = !!nameControl.value;
-    const minLogAndFilesVolumeSize = isUpdate ? logAndFilesVolumeSize : 1;
-    const logAndFilesVolumeSizeValid = logAndFilesVolumeSizeControl.value >= minLogAndFilesVolumeSize;
-    const minDatabaseVolumeSize = isUpdate ? databaseVolumeSize : 1;
-    const databaseVolumeSizeValid = databaseVolumeSizeControl.value >= minDatabaseVolumeSize;
+export default ({onSubmit, onClose, title, fieldsGroups, submitDisabled, submitText}) => {
+    const [activeStep, setActiveStep] = React.useState(0);
+    const [allStepsSeen, setAllStepsSeen] = React.useState(false);
 
-    const formValid = idValid && nameValid && logAndFilesVolumeSizeValid && databaseVolumeSizeValid;
-
-    const validateAndSubmit = () => formValid && onSubmit(
-        {
-            id: idControl.value,
-            name: nameControl.value,
-            description: descriptionControl.value,
-            logAndFilesVolumeSize: logAndFilesVolumeSizeControl.value,
-            databaseVolumeSize: databaseVolumeSizeControl.value
+    useEffect(() => {
+        if (activeStep === TOTAL_STEPS) {
+            setAllStepsSeen(true);
         }
-    );
+    }, [activeStep]);
 
-    const modified = [nameControl, descriptionControl, logAndFilesVolumeSizeControl, databaseVolumeSizeControl].some(ctrl => ctrl.touched);
+    const handleNext = () => {
+        setActiveStep(prevActiveStep => prevActiveStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep(prevActiveStep => prevActiveStep - 1);
+    };
+
+    const fieldsHaveError = (fields) => fields.some(({control}) => control.touched && !control.valid);
 
     return (
         <Dialog
@@ -49,80 +63,53 @@ export default ({onSubmit, onClose, workspace: {id = '', name = '', description 
             maxWidth="sm"
         >
             <DialogTitle disableTypography id="form-dialog-title">
-                <Typography variant="h5">{isUpdate ? `Update workspace ${id}` : "New Workspace"}</Typography>
+                <Typography variant="h5">{title}</Typography>
             </DialogTitle>
             <DialogContent style={{overflowX: 'hidden'}}>
                 <form
+                    data-testid="form"
                     id="formId"
                     noValidate
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        validateAndSubmit();
-                    }}
+                    onSubmit={onSubmit}
                 >
-                    <ControlledField
-                        component={TextField}
-                        control={idControl}
-                        valid={idValid}
-                        autoFocus
-                        margin="dense"
-                        id="id"
-                        label="Id"
-                        name="id"
-                        fullWidth
-                        required
-                        disabled={isUpdate}
-                        helperText="Only lower case letters, numbers, hyphens and should start with a letter."
-                    />
-                    <ControlledField
-                        component={TextField}
-                        control={nameControl}
-                        valid={nameValid}
-                        margin="dense"
-                        id="name"
-                        label="Name"
-                        name="name"
-                        fullWidth
-                        required
-                    />
-                    <ControlledField
-                        component={TextField}
-                        control={descriptionControl}
-                        valid
-                        margin="dense"
-                        id="description"
-                        label="Description"
-                        name="description"
-                        multiline
-                        fullWidth
-                    />
-                    <ControlledField
-                        component={TextField}
-                        control={logAndFilesVolumeSizeControl}
-                        valid={logAndFilesVolumeSizeValid}
-                        margin="dense"
-                        id="logAndFilesVolumeSize"
-                        label="Log and files volume size in gigabytes"
-                        name="logAndFilesVolumeSize"
-                        type="number"
-                        inputProps={{min: minLogAndFilesVolumeSize}}
-                        fullWidth
-                        required
-                    />
-                    <ControlledField
-                        component={TextField}
-                        control={databaseVolumeSizeControl}
-                        valid={databaseVolumeSizeValid}
-                        margin="dense"
-                        id="databaseVolumeSize"
-                        label="Database volume size in gigabytes"
-                        name="databaseVolumeSize"
-                        type="number"
-                        inputProps={{min: minDatabaseVolumeSize}}
-                        fullWidth
-                        required
-                    />
+                    <Stepper activeStep={activeStep} orientation="vertical">
+                        {
+                            fieldsGroups.map(({fields, label, helperText}) => (
+                                <Step key={label}>
+                                    <StepLabel error={fieldsHaveError(fields)}>{label}</StepLabel>
+                                    <StepContent>
+                                        {helperText && (
+                                            <Typography color="textPrimary" variant="subtitle2" gutterBottom>
+                                                {helperText}
+                                            </Typography>
+                                        )}
+                                        {fields.map(ControlledTextFieldWrapper)}
+                                        <div style={{marginTop: 10}}>
+                                            <Button
+                                                disabled={activeStep === 0}
+                                                onClick={handleBack}
+                                                style={{marginRight: 4}}
+                                            >
+                                                Back
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={handleNext}
+                                            >
+                                                {activeStep === TOTAL_STEPS - 1 ? 'Finish' : 'Next'}
+                                            </Button>
+                                        </div>
+                                    </StepContent>
+                                </Step>
+                            ))
+                        }
+                    </Stepper>
+                    {activeStep === TOTAL_STEPS && (
+                        <Button onClick={() => setActiveStep(0)}>
+                            Go to details
+                        </Button>
+                    )}
                 </form>
             </DialogContent>
             <DialogActions>
@@ -134,13 +121,14 @@ export default ({onSubmit, onClose, workspace: {id = '', name = '', description 
                     Cancel
                 </Button>
                 <Button
+                    data-testid="submit-button"
                     type="submit"
                     form="formId"
-                    disabled={!formValid || (isUpdate && !modified)}
+                    disabled={submitDisabled || !allStepsSeen}
                     color="primary"
                     variant="contained"
                 >
-                    {isUpdate ? "Update Workspace" : "Create Workspace"}
+                    {submitText}
                 </Button>
             </DialogActions>
         </Dialog>

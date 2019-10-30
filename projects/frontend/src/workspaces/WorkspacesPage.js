@@ -3,7 +3,7 @@ import {Button} from "@material-ui/core";
 import {BreadCrumbs, BreadcrumbsContext, usePageTitleUpdater, UserContext} from '@fairspace/shared-frontend';
 
 import WorkspaceList from "./WorkspaceList";
-import WorkspaceDialog from "./WorkspaceDialog";
+import WorkspaceEditor from "./WorkspaceEditor";
 import WorkspaceAPI from "../common/services/WorkspaceAPI";
 import {isOrganisationAdmin} from "../common/utils/userUtils";
 import NotificationSnackbar from "../common/components/NotificationSnackbar";
@@ -17,6 +17,8 @@ export default () => {
     const [workspaceIdToDelete, setWorkspaceIdToDelete] = useState('');
 
     const {currentUser: {authorizations}} = useContext(UserContext);
+
+    const isUpdate = !!selectedWorkspace;
 
     usePageTitleUpdater("Workspaces");
 
@@ -103,8 +105,9 @@ export default () => {
                 Add New Workspace
             </Button>
             {showWorkspaceDialog && (
-                <WorkspaceDialog
-                    onSubmit={selectedWorkspace ? updateWorkspace : createWorkspace}
+                <WorkspaceEditor
+                    isUpdate={isUpdate}
+                    onSubmit={isUpdate ? updateWorkspace : createWorkspace}
                     onClose={() => {
                         setShowWorkspaceDialog(false);
                         setSelectedWorkspace(undefined);
