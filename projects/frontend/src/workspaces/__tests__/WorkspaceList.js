@@ -111,9 +111,9 @@ describe('WorkspaceList', () => {
             // This one doesn't work as Mui doesn't assign the 'disabled' attribute even if the component is a button!
             // expect(rolesMenuItem).toBeDisabled();
 
-            expect(configMenuItem.className).not.toMatch(/MuiButtonBase-disabled/);
-            expect(rolesMenuItem.className).not.toMatch(/MuiButtonBase-disabled/);
-            expect(appsMenuItem.className).not.toMatch(/MuiButtonBase-disabled/);
+            expect(configMenuItem.className).not.toMatch(/Mui-disabled/);
+            expect(rolesMenuItem.className).not.toMatch(/Mui-disabled/);
+            expect(appsMenuItem.className).not.toMatch(/Mui-disabled/);
         });
     });
 
@@ -143,9 +143,9 @@ describe('WorkspaceList', () => {
             // This one doesn't work as Mui doesn't assign the 'disabled' attribute even if the component is a button!
             // expect(rolesMenuItem).toBeDisabled();
 
-            expect(configMenuItem.className).toMatch(/MuiButtonBase-disabled/);
-            expect(rolesMenuItem.className).toMatch(/MuiButtonBase-disabled/);
-            expect(appsMenuItem.className).toMatch(/MuiButtonBase-disabled/);
+            expect(configMenuItem.className).toMatch(/Mui-disabled/);
+            expect(rolesMenuItem.className).toMatch(/Mui-disabled/);
+            expect(appsMenuItem.className).toMatch(/Mui-disabled/);
         });
     });
 
@@ -170,7 +170,7 @@ describe('WorkspaceList', () => {
 
             const rolesMenuItem = await findByTestId('roles-menu-item');
 
-            expect(rolesMenuItem.className).not.toMatch(/MuiButtonBase-disabled/);
+            expect(rolesMenuItem.className).not.toMatch(/Mui-disabled/);
         });
     });
 });

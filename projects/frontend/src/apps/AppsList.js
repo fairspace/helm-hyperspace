@@ -43,7 +43,7 @@ const styles = theme => ({
     warning: {
         color: theme.palette.error.main,
         verticalAlign: "middle",
-        marginLeft: theme.spacing.unit
+        marginLeft: theme.spacing(1)
     }
 });
 

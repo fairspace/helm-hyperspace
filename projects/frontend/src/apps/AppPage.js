@@ -46,7 +46,7 @@ const AppPage = ({workspaceId, appId}) => {
     return (
         <AppBreadcrumbsContextProvider workspaceId={workspaceId} appId={app.id} appType={app.type}>
             <BreadCrumbs />
-            <Grid container spacing={40}>
+            <Grid container spacing={10}>
                 <Grid item>
                     <List>
                         <ListItem>

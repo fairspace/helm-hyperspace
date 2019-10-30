@@ -38,7 +38,7 @@ const WorkspacePage = ({workspaceId}) => {
     return (
         <WorkspaceBreadcrumbsContextProvider workspaceId={workspaceId}>
             <BreadCrumbs />
-            <Grid container spacing={40}>
+            <Grid container spacing={10}>
                 <Grid item>
                     <List>
                         <ListItem>
