@@ -11,14 +11,14 @@ import withStyles from "@material-ui/core/styles/withStyles";
 
 const styles = theme => ({
     paper: {
-        padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit}px ${theme.spacing.unit}px ${theme.spacing.unit * 2}px`
+        padding: theme.spacing(2, 1, 1, 2)
     },
     avatar: {
         backgroundColor: theme.palette.error.main
     },
     button: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1)
     }
 });
 
@@ -28,7 +28,7 @@ const ErrorBanner = ({classes, onDismiss, onRefresh, message, showRefreshButton 
     return (
         <>
             <Paper elevation={0} className={classes.paper}>
-                <Grid container wrap="nowrap" spacing={16} alignItems="center">
+                <Grid container wrap="nowrap" spacing={2} alignItems="center">
                     <Grid item>
                         <Avatar className={classes.avatar}>
                             <WarningIcon />
@@ -40,7 +40,7 @@ const ErrorBanner = ({classes, onDismiss, onRefresh, message, showRefreshButton 
                         </Typography>
                     </Grid>
                 </Grid>
-                <Grid container justify="flex-end" spacing={8}>
+                <Grid container justify="flex-end" spacing={1}>
                     <Grid item>
                         {dismissButton}
                         {showRefreshButton

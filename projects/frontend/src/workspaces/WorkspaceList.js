@@ -54,7 +54,7 @@ const styles = theme => ({
     warning: {
         color: theme.palette.error.main,
         verticalAlign: "middle",
-        marginLeft: theme.spacing.unit
+        marginLeft: theme.spacing(1)
     },
     hideOnSmallScreens: {
         [theme.breakpoints.down('sm')]: {
@@ -115,7 +115,7 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorksp
             <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
-                        <TableCell padding="dense">
+                        <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'access'}
                                 direction={orderAscending ? 'asc' : 'desc'}
@@ -168,7 +168,7 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorksp
                                     if (access) window.location.href = url;
                                 }}
                             >
-                                <TableCell padding="dense">
+                                <TableCell>
                                     {!access && (
                                         <Tooltip
                                             title={(
@@ -195,7 +195,7 @@ export const WorkspaceList = ({classes, history, onEditWorkspace, onDeleteWorksp
                                     {version}
                                 </TableCell>
                                 <TableCell>
-                                    <Grid container alignItems="center" spacing={8}>
+                                    <Grid container alignItems="center" spacing={1}>
                                         <Grid item xs={11}>{status}</Grid>
                                         <Grid item xs={1}>
                                             {!ready && <Link to={`/workspaces/${id}`} className={classes.warning}><ErrorIcon fontSize="small" /></Link>}

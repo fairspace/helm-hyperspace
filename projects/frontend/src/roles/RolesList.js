@@ -22,7 +22,7 @@ const styles = theme => ({
         minWidth: 700,
     },
     roleCheckbox: {
-        padding: theme.spacing.unit
+        padding: theme.spacing(1)
     },
 });
 
