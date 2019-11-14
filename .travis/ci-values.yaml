@@ -16,8 +16,9 @@ keycloak:
   keycloak:
     password: keycloak-ci-123
     persistence:
-      postgresqlPassword: "9FGwLKpEu$4w/knG"
-
+      dbPassword: "9FGwLKpEu$4w/knG"
+  postgresql:
+    postgresqlPassword: "9FGwLKpEu$4w/knG"
 rabbitmq:
   rabbitmq:
     password: "X6SXtXV3Jzg4gyVR"

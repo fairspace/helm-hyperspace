@@ -14,7 +14,9 @@ keycloak:
   keycloak:
     password: keycloak-demo-123
     persistence:
-      postgresqlPassword: "mf5-Y5Q5E5_P33eB"
+      dbPassword: "mf5-Y5Q5E5_P33eB"
+  postgresql:
+    postgresqlPassword: "mf5-Y5Q5E5_P33eB"
 
 rabbitmq:
   rabbitmq:

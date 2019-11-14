@@ -81,8 +81,9 @@ keycloak:
         persistence:
             deployPostgres: true
             dbVendor: postgres
-            postgresqlPassword:
+            dbPassword:
     postgresql:
+        postgresqlPassword:
         resources:
             # Request values are set by default in postgresql chart
             limits:
