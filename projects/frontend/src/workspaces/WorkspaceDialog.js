@@ -1,13 +1,11 @@
-import React, {useEffect} from "react";
+import React, {useRef} from "react";
 
 import {
     Dialog, DialogTitle, Typography,
     DialogActions, Button, DialogContent,
-    Stepper, Step, StepLabel, StepContent
+    Stepper, Step, StepLabel, StepContent, TableRow, TableCell, Table, TableBody
 } from "@material-ui/core";
 import ControlledTextField from "../common/components/ControlledTextField";
-
-const TOTAL_STEPS = 2;
 
 const ControlledTextFieldWrapper = ({
     control, type, autoFocus = false, required = false,
@@ -35,16 +33,21 @@ const ControlledTextFieldWrapper = ({
 );
 
 export default ({onSubmit, onClose, title, fieldsGroups, submitDisabled, submitText}) => {
-    const [activeStep, setActiveStep] = React.useState(0);
-    const [allStepsSeen, setAllStepsSeen] = React.useState(false);
+    const totalSteps = fieldsGroups.length + 1; // filedGroups + confirmation
+    const [activeStep, setActiveStep] = React.useState(1);
 
-    useEffect(() => {
-        if (activeStep === TOTAL_STEPS) {
-            setAllStepsSeen(true);
-        }
-    }, [activeStep]);
+    const allStepsSeen = useRef(false);
+    allStepsSeen.current = allStepsSeen.current || activeStep === totalSteps;
 
     const handleNext = () => {
+        // Consider clicking next as all fields on the current steps are touched
+        fieldsGroups.forEach(({fields}) => {
+            fields.forEach(({control}, index) => {
+                if (activeStep >= index) {
+                    control.declareTouched();
+                }
+            });
+        });
         setActiveStep(prevActiveStep => prevActiveStep + 1);
     };
 
@@ -53,6 +56,16 @@ export default ({onSubmit, onClose, title, fieldsGroups, submitDisabled, submitT
     };
 
     const fieldsHaveError = (fields) => fields.some(({control}) => control.touched && !control.valid);
+
+    const backButton = () => (
+        <Button
+            disabled={activeStep === 1}
+            onClick={handleBack}
+            style={{marginRight: 4}}
+        >
+            Back
+        </Button>
+    );
 
     return (
         <Dialog
@@ -72,44 +85,75 @@ export default ({onSubmit, onClose, title, fieldsGroups, submitDisabled, submitT
                     noValidate
                     onSubmit={onSubmit}
                 >
-                    <Stepper activeStep={activeStep} orientation="vertical">
+                    <Stepper activeStep={activeStep - 1} orientation="vertical">
                         {
-                            fieldsGroups.map(({fields, label, helperText}) => (
-                                <Step key={label}>
-                                    <StepLabel error={fieldsHaveError(fields)}>{label}</StepLabel>
-                                    <StepContent>
-                                        {helperText && (
-                                            <Typography color="textPrimary" variant="subtitle2" gutterBottom>
-                                                {helperText}
-                                            </Typography>
-                                        )}
-                                        {fields.map(ControlledTextFieldWrapper)}
-                                        <div style={{marginTop: 10}}>
-                                            <Button
-                                                disabled={activeStep === 0}
-                                                onClick={handleBack}
-                                                style={{marginRight: 4}}
-                                            >
-                                                Back
-                                            </Button>
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                onClick={handleNext}
-                                            >
-                                                {activeStep === TOTAL_STEPS - 1 ? 'Finish' : 'Next'}
-                                            </Button>
-                                        </div>
-                                    </StepContent>
-                                </Step>
-                            ))
+                            fieldsGroups
+                                .map(({fields, label, helperText}) => (
+                                    <Step key={label}>
+                                        <StepLabel error={fieldsHaveError(fields)}>{label}</StepLabel>
+                                        <StepContent>
+                                            {helperText && (
+                                                <Typography color="textPrimary" variant="subtitle2" gutterBottom>
+                                                    {helperText}
+                                                </Typography>
+                                            )}
+                                            {fields.map(ControlledTextFieldWrapper)}
+                                            <div style={{marginTop: 10}}>
+                                                {backButton()}
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={handleNext}
+                                                >
+                                                    Next
+                                                </Button>
+                                            </div>
+                                        </StepContent>
+                                    </Step>
+                                ))
                         }
+                        <Step key="lastStep">
+                            <StepLabel>Confirmation</StepLabel>
+                            <StepContent>
+                                <Table size="small">
+                                    <TableBody>
+                                        {
+                                            fieldsGroups.map(({fields}) => fields.map(({id, label, control}) => {
+                                                const cellErrorStyle = control.touched && !control.valid ? {color: 'red'} : {};
+                                                return (
+                                                    <TableRow key={id}>
+                                                        <TableCell
+                                                            style={cellErrorStyle}
+                                                            variant="head"
+                                                        >{label}
+                                                        </TableCell>
+                                                        <TableCell
+                                                            style={cellErrorStyle}
+                                                        >
+                                                            {control.value}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            }))
+                                        }
+                                    </TableBody>
+                                </Table>
+                                <div style={{marginTop: 10}}>
+                                    {backButton()}
+                                    <Button
+                                        data-testid="submit-button"
+                                        type="submit"
+                                        form="formId"
+                                        disabled={submitDisabled || !allStepsSeen.current}
+                                        color="primary"
+                                        variant="contained"
+                                    >
+                                        {submitText}
+                                    </Button>
+                                </div>
+                            </StepContent>
+                        </Step>
                     </Stepper>
-                    {activeStep === TOTAL_STEPS && (
-                        <Button onClick={() => setActiveStep(0)}>
-                            Go to details
-                        </Button>
-                    )}
                 </form>
             </DialogContent>
             <DialogActions>
@@ -119,16 +163,6 @@ export default ({onSubmit, onClose, title, fieldsGroups, submitDisabled, submitT
                     color="secondary"
                 >
                     Cancel
-                </Button>
-                <Button
-                    data-testid="submit-button"
-                    type="submit"
-                    form="formId"
-                    disabled={submitDisabled || !allStepsSeen}
-                    color="primary"
-                    variant="contained"
-                >
-                    {submitText}
                 </Button>
             </DialogActions>
         </Dialog>
