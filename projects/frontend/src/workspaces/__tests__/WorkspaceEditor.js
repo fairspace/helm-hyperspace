@@ -17,7 +17,7 @@ describe('WorkspaceEditor', () => {
     const submit = () => fireEvent.submit(utils.getByTestId('form'));
 
     // Click next to render next fields (not sure why 'finish' is returning multiple elements, possibly a bug?)
-    const next = (finish) => fireEvent.click(finish ? utils.getAllByText(/finish/i)[0] : utils.getByText(/next/i));
+    const next = (finish) => fireEvent.click(finish ? utils.getAllByText(/create/i)[0] : utils.getByText(/next/i));
 
     beforeEach(() => {
         onSubmit = jest.fn();
