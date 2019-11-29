@@ -16,8 +16,8 @@ describe('WorkspaceEditor', () => {
 
     const submit = () => fireEvent.submit(utils.getByTestId('form'));
 
-    // Click next to render next fields (not sure why 'finish' is returning multiple elements, possibly a bug?)
-    const next = (finish) => fireEvent.click(finish ? utils.getAllByText(/create/i)[0] : utils.getByText(/next/i));
+    // Click next to render next fields (not sure why 'create' is returning multiple elements, possibly a bug?)
+    const next = (create) => fireEvent.click(create ? utils.getAllByText(/create/i)[0] : utils.getAllByText(/next/i)[0]);
 
     beforeEach(() => {
         onSubmit = jest.fn();
@@ -47,20 +47,22 @@ describe('WorkspaceEditor', () => {
             });
     });
 
-    it('should enables and disables submit button at proper times', () => {
+    it('should not enable and submit button when mandatory information is missing', () => {
+        next();
+        next();
+
+        expect(utils.getByTestId('submit-button')).toHaveProperty('disabled', true);
+    });
+
+    it('should enable submit button when all mandatory fields are filled', () => {
         enterId('a');
         enterName('b');
-
-        expect(utils.getByTestId('submit-button')).toHaveProperty('disabled');
 
         next();
         enterLogAndFilesSize('4');
         enterDatabaseSize('5');
 
-        expect(utils.getByTestId('submit-button')).toHaveProperty('disabled');
-
-        next(true);
-        submit();
+        next();
 
         expect(utils.getByTestId('submit-button')).toHaveProperty('disabled', false);
     });
