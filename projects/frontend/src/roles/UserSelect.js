@@ -17,7 +17,7 @@ const UserSelect = ({debounce = 300, ...otherProps}) => {
                 return {
                     label: displayLabel,
                     iri,
-                    user
+                    ...user
                 };
             })
         );
