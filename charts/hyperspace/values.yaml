@@ -79,16 +79,7 @@ keycloak:
                 cpu: "500m"
                 memory: "2048Mi"
         persistence:
-            deployPostgres: true
-            dbVendor: postgres
             dbPassword:
-    postgresql:
-        postgresqlPassword:
-        resources:
-            # Request values are set by default in postgresql chart
-            limits:
-                cpu: "500m"
-                memory: "512Mi"
 
 #################################################
 # RabbitMQ configuration
