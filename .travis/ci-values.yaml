@@ -44,3 +44,8 @@ portal:
 frontend:
   image:
     pullPolicy: Always
+
+pluto:
+  image:
+    tag: 0.6.11-SNAPSHOT
+    pullPolicy: Always
