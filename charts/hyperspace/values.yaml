@@ -79,6 +79,7 @@ keycloak:
                 cpu: "500m"
                 memory: "2048Mi"
         persistence:
+            dbVendor: h2
             dbPassword:
 
 #################################################
