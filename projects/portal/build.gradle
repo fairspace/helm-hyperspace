@@ -7,6 +7,7 @@ buildscript {
 plugins {
     id "com.google.osdetector" version "1.6.2"
     id 'java'
+    id "io.eganjs.yarn" version "1.0.1" apply false
     id 'io.franzbecker.gradle-lombok' version '2.0'
     id 'application'
     id 'jacoco'
@@ -17,8 +18,8 @@ group 'io.fairspace'
 version '1.0-SNAPSHOT'
 
 compileJava {
-    sourceCompatibility = 11
-    targetCompatibility = 11
+    sourceCompatibility = 12
+    targetCompatibility = 12
 }
 
 application {
@@ -32,21 +33,29 @@ dependencyCheck {
 repositories {
     mavenCentral()
 
-    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-releases/" }
-    maven { url "https://repo.thehyve.nl/content/repositories/fairspace-snapshots/" }
+}
+
+
+subprojects {
+    if (name.startsWith('web')) {
+        apply plugin: 'io.eganjs.yarn'
+    }
+}
+
+
+task copyStatic(type: Copy) {
+    from 'mercury/build'
+    into 'src/main/resources/web'
+}
+
+compileJava{
+    dependsOn copyStatic
 }
 
 dependencies {
-    compile 'com.google.guava:guava:28.1-jre'
-
-    implementation "com.sparkjava:spark-core:2.9.0"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.9.10"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.9.10.1"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.10"
-    implementation "io.fairspace:oidc-auth-base:${oidcAuthVersion}"
-    implementation("org.microbean:microbean-helm:2.8.2.1.1.1" ) { exclude group: 'io.netty', module: 'netty-tcnative-boringssl-static' }
-    implementation "io.netty:netty-tcnative-boringssl-static:2.0.26.Final:${osdetector.classifier}"
     implementation 'org.slf4j:slf4j-log4j12:1.7.28'
+    implementation 'io.javalin:javalin:3.6.0'
+
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.23.0"

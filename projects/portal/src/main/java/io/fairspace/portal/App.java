@@ -1,105 +1,14 @@
 package io.fairspace.portal;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fairspace.oidc_auth.JwtTokenValidator;
-import io.fairspace.oidc_auth.model.OAuthAuthenticationToken;
-import io.fairspace.portal.apps.ClusterApp;
-import io.fairspace.portal.apps.SearchApp;
-import io.fairspace.portal.apps.WorkspacesApp;
-import io.fairspace.portal.errors.ConflictException;
-import io.fairspace.portal.errors.ForbiddenException;
-import io.fairspace.portal.errors.NotFoundException;
-import io.fairspace.portal.services.*;
-import io.fairspace.portal.services.releases.AppReleaseRequestBuilder;
-import io.fairspace.portal.services.releases.JupyterReleaseRequestBuilder;
+import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
-import org.microbean.helm.ReleaseManager;
-import org.microbean.helm.chart.URLChartLoader;
-import spark.Request;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import static io.fairspace.portal.Authentication.getUserInfo;
-import static io.fairspace.portal.ConfigLoader.CONFIG;
-import static io.fairspace.portal.errors.ErrorHelper.errorBody;
-import static io.fairspace.portal.errors.ErrorHelper.exceptionHandler;
-import static io.fairspace.portal.utils.HelmUtils.JUPYTER_CHART;
-import static io.fairspace.portal.utils.HelmUtils.WORKSPACE_CHART;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
-import static javax.servlet.http.HttpServletResponse.*;
-import static spark.Spark.*;
 
 @Slf4j
 public class App {
-    private static final JwtTokenValidator tokenValidator = JwtTokenValidator.create(CONFIG.auth.jwksUrl, CONFIG.auth.jwtAlgorithm);
-    private static Function<Request, OAuthAuthenticationToken> tokenProvider;
-
-    public static void main(String[] args) throws IOException {
-        if(CONFIG.auth.enabled) {
-            tokenProvider = (request) -> getUserInfo(request, tokenValidator);
-        } else {
-            tokenProvider = (request) -> new OAuthAuthenticationToken("", Map.of(
-                    "sub", "subject-identifier",
-                    "authorities", List.of("user-fairspace", "organisation-admin")
-            ));
-        }
-
-        initSpark();
-    }
-
-    private static void initSpark() throws IOException {
-        port(8080);
-
-        if (CONFIG.auth.enabled) {
-            before((request, response) -> {
-                if (request.uri().equals("/api/v1/health")) {
-                    return;
-                }
-
-                var token = tokenProvider.apply(request);
-
-                if (token == null) {
-                    halt(SC_UNAUTHORIZED);
-                }
-            });
-        }
-
-        // Setup workspaces app
-        DefaultKubernetesClient kubernetesClient = new DefaultKubernetesClient();
-        ReleaseManager releaseManager = TillerConnectionFactory.getReleaseManager(kubernetesClient);
-        CachedReleaseList releaseList = new CachedReleaseList(releaseManager);
-
-        // Setup chart repo
-        ChartRepo repo = new ChartRepo(new URLChartLoader());
-        repo.init(CONFIG.charts);
-
-        // Define the available apps to install
-        Map<String, AppReleaseRequestBuilder> appRequestBuilders = Map.of(JUPYTER_CHART, new JupyterReleaseRequestBuilder(CONFIG.defaultConfig.get(JUPYTER_CHART)));
-
-        ReleaseService releaseService = new ReleaseService(releaseManager, releaseList, newSingleThreadScheduledExecutor());
-        WorkspaceAppService workspaceAppService = new WorkspaceAppService(releaseService, repo, appRequestBuilders);
-        WorkspaceService workspaceService = new WorkspaceService(releaseService, workspaceAppService, repo.get(WORKSPACE_CHART), CONFIG.domain, CONFIG.defaultConfig);
-        ClusterService clusterService = new ClusterService(kubernetesClient);
-
-        path("/api/v1", () -> {
-            path("/workspaces", new WorkspacesApp(workspaceService, workspaceAppService, tokenProvider));
-            get("/health", (request, response) -> "OK");
-            path("/cluster", new ClusterApp(clusterService));
-            post("/search/hyperspace/_search", new SearchApp(tokenProvider));
-        });
-
-        notFound((req, res) -> errorBody(SC_NOT_FOUND, "Not found"));
-        exception(JsonMappingException.class, exceptionHandler(SC_BAD_REQUEST, "Invalid request body"));
-        exception(IllegalArgumentException.class, exceptionHandler(SC_BAD_REQUEST, null));
-        exception(NotFoundException.class, exceptionHandler(SC_NOT_FOUND, "Not found"));
-        exception(ForbiddenException.class, exceptionHandler(SC_FORBIDDEN, "Forbidden"));
-        exception(ConflictException.class, exceptionHandler(SC_CONFLICT, "Conflict"));
-        exception(IllegalStateException.class, exceptionHandler(SC_CONFLICT, null));
-        exception(Exception.class, exceptionHandler(SC_INTERNAL_SERVER_ERROR, "Internal server error"));
+    public static void main(String[] args) {
+        Javalin.create(config -> config.addStaticFiles("/web"))
+                .get("/hi", ctx -> ctx.result("Hello World"))
+                .start(8080);
     }
 }
