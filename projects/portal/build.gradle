@@ -44,7 +44,7 @@ subprojects {
 
 
 task copyStatic(type: Copy) {
-    from 'mercury/build'
+    from 'web/build'
     into 'src/main/resources/web'
 }
 
