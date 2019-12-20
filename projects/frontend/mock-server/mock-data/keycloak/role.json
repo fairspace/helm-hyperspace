@@ -1,9 +1,0 @@
-{
-  "id":"ffced7fa-ecea-4627-8b90-064a30bdb2b2",
-  "name":"coordinator-jochem",
-  "description":"User can coordinate workspace jochem",
-  "scopeParamRequired":false,
-  "composite":false,
-  "clientRole":false,
-  "containerId":"c98aae77-02f2-4868-a8a9-b556c2c8ed84"
-}
