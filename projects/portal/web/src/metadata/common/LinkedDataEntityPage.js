@@ -1,6 +1,6 @@
 import React from 'react';
 import {Paper} from "@material-ui/core";
-import {BreadCrumbs, usePageTitleUpdater} from "@fairspace/shared-frontend";
+import {BreadCrumbs, usePageTitleUpdater} from "../../common";
 import {LinkedDataEntityFormContainer, LinkedDataEntityHeader} from './index';
 import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
 import useLinkedData from '../UseLinkedData';

@@ -2,6 +2,7 @@ const express = require('express');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const bodyParser = require('body-parser');
 const path = require('path');
+const cors = require('cors');
 
 const mockDataDir = path.join(__dirname, '/mock-data');
 const port = process.env.PORT || 5000;
@@ -13,6 +14,8 @@ const app = express();
 
 // parse application/json
 app.use(bodyParser.json());
+
+app.use(cors());
 
 app.get('/api/v1/status/:httpStatus(\\d+)', (req, res) => res.status(req.params.httpStatus).send({status: req.params.httpStatus}));
 
