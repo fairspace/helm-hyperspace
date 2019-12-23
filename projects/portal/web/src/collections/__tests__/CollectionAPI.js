@@ -13,7 +13,7 @@ describe('CollectionAPI', () => {
 
         expect(collections).toEqual([{name: 'collection1'}]);
         expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('http://localhost:8081/api/v1/collections/', {headers: {Accept: 'application/json'}});
+        expect(mockAxios.get).toHaveBeenCalledWith('/api/v1/collections/', {headers: {Accept: 'application/json'}});
     });
 
     it('makes a proper call to add a collection', async () => {
@@ -21,7 +21,7 @@ describe('CollectionAPI', () => {
 
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
         expect(mockAxios.put).toHaveBeenCalledWith(
-            'http://localhost:8081/api/v1/collections/',
+            '/api/v1/collections/',
             JSON.stringify({
                 name: 'name',
                 description: 'description',
@@ -37,7 +37,7 @@ describe('CollectionAPI', () => {
 
         expect(mockAxios.patch).toHaveBeenCalledTimes(1);
         expect(mockAxios.patch).toHaveBeenCalledWith(
-            'http://localhost:8081/api/v1/collections/',
+            '/api/v1/collections/',
             JSON.stringify({
                 iri: 'iri',
                 name: 'name',
@@ -54,7 +54,7 @@ describe('CollectionAPI', () => {
 
         expect(mockAxios.delete).toHaveBeenCalledTimes(1);
         expect(mockAxios.delete).toHaveBeenCalledWith(
-            `http://localhost:8081/api/v1/collections/?iri=${encodeURIComponent('id')}`,
+            `/api/v1/collections/?iri=${encodeURIComponent('id')}`,
             {headers: {'Content-Type': 'application/json'}}
         );
     });

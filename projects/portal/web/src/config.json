@@ -2,31 +2,31 @@
   "urls": {
     "logout": "/logout",
     "userInfo": "http://localhost:5000/api/v1/account",
-    "collections": "http://localhost:8081/api/v1/collections/",
-    "permissions": "http://localhost:8081/api/v1/permissions/",
-    "files": "http://localhost:8081/api/v1/webdav",
-    "download": "http://localhost:8081/api/v1/webdav",
+    "collections": "/api/v1/collections/",
+    "permissions": "/api/v1/permissions/",
+    "files": "/api/v1/webdav",
+    "download": "/api/v1/webdav",
     "metadata": {
-      "statements": "http://localhost:8081/api/v1/metadata/",
-      "entities": "http://localhost:8081/api/v1/metadata/entities/"
+      "statements": "/api/v1/metadata/",
+      "entities": "/api/v1/metadata/entities/"
     },
     "vocabulary": {
-      "statements": "http://localhost:8081/api/v1/vocabulary/",
-      "entities": "http://localhost:8081/api/v1/vocabulary/entities/"
+      "statements": "/api/v1/vocabulary/",
+      "entities": "/api/v1/vocabulary/entities/"
     },
     "metaVocabulary": {
-      "statements": "http://localhost:8081/api/v1/meta-vocabulary/"
+      "statements": "/api/v1/meta-vocabulary/"
     },
-    "users": "http://localhost:5000/api/v1/users/",
-    "userSearch": "http://localhost:5000/api/keycloak/users",
-    "version": "http://localhost:5000/config/version.json"
+    "users": "/api/v1/users/",
+    "userSearch": "/api/keycloak/users",
+    "version": "/config/version.json"
   },
   "elasticsearch": {
     "host": "/api/v1/search",
     "log": "error"
   },
   "externalConfigurationFiles": [
-    "http://localhost:5000/config/config.json"
+    "/config/config.json"
   ],
   "roles": {
     "user": "",
