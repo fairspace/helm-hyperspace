@@ -1,5 +1,7 @@
 package io.fairspace.portal;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import lombok.extern.slf4j.Slf4j;
@@ -9,15 +11,20 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import java.io.File;
+import java.io.IOException;
+
 
 @Slf4j
 public class App {
+    private static final Config config = loadConfig();
+
     public static void main(String[] args) {
         Javalin.create(config ->
                 config.server(App::server)
-                .addSinglePageRoot("/", "web/index.html")
-                .addStaticFiles("/web")
-                .addStaticFiles("config", Location.EXTERNAL)
+                        .addSinglePageRoot("/", "web/index.html")
+                        .addStaticFiles("/web")
+                        .addStaticFiles("config", Location.EXTERNAL)
         ).start(8080);
     }
 
@@ -30,5 +37,13 @@ public class App {
         handlers.setHandlers(new Handler[]{context});
         server.setHandler(handlers);
         return server;
+    }
+
+    private static Config loadConfig() {
+        try {
+            return new ObjectMapper(new YAMLFactory()).readValue(new File("application.yaml"), Config.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading configuration", e);
+        }
     }
 }

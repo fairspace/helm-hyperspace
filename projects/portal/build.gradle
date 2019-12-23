@@ -57,6 +57,11 @@ dependencies {
     implementation 'io.javalin:javalin:3.6.0'
     implementation 'org.eclipse.jetty:jetty-proxy:9.4.20.v20190813'
 
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.8'
+
+    implementation 'com.nimbusds:nimbus-jose-jwt:7.1'
+
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:2.23.0"
