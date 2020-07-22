@@ -17,6 +17,8 @@ keycloak:
     postgresPassword: "mf5-Y5Q5E5_P33eB"
 
 rabbitmq:
+  enabled: false
+  expose: false
   rabbitmq:
     password: "gtzb28355LFqxbar"
     erlangCookie: "fLbZs6ncGzp9Q2R35V3zv9uQyDEjgyDy"

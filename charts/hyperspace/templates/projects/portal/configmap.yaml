@@ -29,6 +29,8 @@ data:
             realm: {{ .Values.hyperspace.keycloak.realm }}
             clientSecret: {{ .Values.hyperspace.keycloak.clientSecret }}
           rabbitmq:
+            enabled: {{ .Values.rabbitmq.enabled }}
+            required: {{ .Values.rabbitmq.enabled }}
             host: {{ template "rabbitmq.host" . }}
             username: {{ .Values.rabbitmq.rabbitmq.username }}
             password: {{ .Values.rabbitmq.rabbitmq.password }}
