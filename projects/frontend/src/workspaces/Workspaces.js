@@ -50,7 +50,7 @@ export default () => {
                 disabled={showNewWorkspaceDialog || !isOrganisationAdmin(authorizations)}
                 onClick={() => setShowNewWorkspaceDialog(true)}
             >
-                Add New Workspace
+                Add a New Workspace
             </Button>
             {showNewWorkspaceDialog && (
                 <NewWorkspaceDialog
