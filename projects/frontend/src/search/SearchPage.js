@@ -32,7 +32,7 @@ export const SearchPage = ({classes, loading, error, results}) => {
     }
 
     if (!results || results.total === 0) {
-        return <MessageDisplay message="No results found!" isError={false} />;
+        return <MessageDisplay message="No results found" isError={false} />;
     }
 
     return (
