@@ -22,7 +22,8 @@ export default () => {
                 setSnackbarVisible(true);
                 setSnackbarMessage("The workspace is being created, this might take a while");
             })
-            .catch(() => {
+            .catch(e => {
+                console.error('Error creating a workspace', e);
                 setSnackbarVisible(true);
                 setSnackbarMessage("An error occurred while creating your workspace. Please try again later.");
             });
