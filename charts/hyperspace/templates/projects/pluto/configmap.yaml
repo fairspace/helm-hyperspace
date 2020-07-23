@@ -61,7 +61,7 @@ data:
 
     rabbitmq:
       enabled: {{ .Values.rabbitmq.enabled }}
-      required: {{ .Values.rabbitmq.enabled }}
+      required: false
       host: {{ template "rabbitmq.host" . }}
       username: {{ .Values.rabbitmq.user.username }}
       password: {{ .Values.rabbitmq.user.password }}
