@@ -18,6 +18,8 @@ keycloak:
     persistence:
       dbPassword: "9FGwLKpEu$4w/knG"
 rabbitmq:
+  enabled: false
+  expose: false
   rabbitmq:
     password: "X6SXtXV3Jzg4gyVR"
     erlangCookie: "x6w5BVsp8HaQ3uXMvpt5YE46tSBARTNv"
@@ -44,6 +46,9 @@ portal:
 frontend:
   image:
     pullPolicy: Always
+
+logaggregator:
+  replicaCount: 0
 
 pluto:
   image:
