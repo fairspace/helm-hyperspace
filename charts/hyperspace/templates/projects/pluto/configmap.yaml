@@ -60,8 +60,8 @@ data:
           url: {{ .Values.pluto.backends.frontend | default (printf "http://%s-frontend.%s.svc.cluster.local" .Release.Name .Release.Namespace)}}
 
     rabbitmq:
-      enabled: true
-      required: true
+      enabled: {{ .Values.rabbitmq.enabled }}
+      required: {{ .Values.rabbitmq.enabled }}
       host: {{ template "rabbitmq.host" . }}
       username: {{ .Values.rabbitmq.user.username }}
       password: {{ .Values.rabbitmq.user.password }}
