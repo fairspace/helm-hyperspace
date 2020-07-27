@@ -13,6 +13,8 @@ hyperspace:
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
+  username: keycloak
+  password: keycloak-ci-123
   keycloak:
     password: keycloak-ci-123
     persistence:
