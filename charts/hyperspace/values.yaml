@@ -70,7 +70,6 @@ keycloak:
             port: 80
         ingress:
             enabled: false
-        extraArgs: "-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled"
         resources:
             requests:
                 cpu: "10m"
