@@ -13,8 +13,8 @@ hyperspace:
 keycloak:
   keycloak:
     password: keycloak-demo-123
-    persistence:
-      dbPassword: "mf5-Y5Q5E5_P33eB"
+  postgresql:
+    postgresPassword: "mf5-Y5Q5E5_P33eB"
 
 rabbitmq:
   rabbitmq:

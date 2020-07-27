@@ -1,12 +1,12 @@
 dependencies:
 - name: keycloak
-  repository: https://codecentric.github.io/helm-charts
-  version: 6.0.3
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 2.0.0
 - name: elasticsearch
   repository: https://kubernetes-charts.storage.googleapis.com
   version: 1.31.0
 - name: rabbitmq
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 6.5.0
-digest: sha256:3d7e0b89094e2af31cb0ac6e1a49ea32fa981650bef63f33ba17ef7539739ae1
-generated: "2019-11-14T11:16:27.969993114+01:00"
+digest: sha256:e0e9a32e57d6be282bf5c1586f00eb265a0ba11d0713a837566c486516323e48
+generated: "2020-07-27T10:33:16.278526532+02:00"
