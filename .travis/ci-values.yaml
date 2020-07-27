@@ -5,6 +5,9 @@ hyperspace:
     realm: ci
   ingress:
     domain: ci.fairway.app
+    tls:
+      certificate:
+        force: true
   testuser:
     generate: true
     password: fairspace123
