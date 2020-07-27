@@ -20,9 +20,9 @@ spec:
   commonName: '*.{{ $ingress.domain }}'
   dnsNames:
   - '{{ $ingress.domain }}'
-{{- if $ingress.tls.certificate.force -}}
-  - 'dummy{{ randAlphaNum 8 }}.{{ $ingress.domain }}'
-{{- end -}}
+{{- if $ingress.tls.certificate.force }}
+  - '{{ randAlphaNum 8 | b64enc }}.{{ $ingress.domain }}'
+{{- end }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
