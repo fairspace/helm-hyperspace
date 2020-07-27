@@ -21,7 +21,7 @@ spec:
   dnsNames:
   - '{{ $ingress.domain }}'
 {{- if $ingress.tls.certificate.force }}
-  - '{{ randAlphaNum 8 }}.{{ $ingress.domain }}'
+  - 'dummy{{ randAlphaNum 8 }}.{{ $ingress.domain }}'
 {{- end }}
 {{- end -}}
 {{- end -}}
