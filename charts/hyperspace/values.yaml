@@ -17,6 +17,9 @@ hyperspace:
         domain: ci.test.fairdev.app
         annotations:
             kubernetes.io/ingress.class: nginx
+            nginx.ingress.kubernetes.io/configuration-snippet: |
+                proxy_set_header  X-Forwarded-Proto \$scheme;
+
         tls:
             enabled: true
             secretNameOverride:
