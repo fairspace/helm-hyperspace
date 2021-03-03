@@ -31,26 +31,6 @@ rabbitmq:
   user:
     password: "VjwXg7wTEQETjSMN"
 
-portal:
-  charts:
-    workspace:
-      file: workspace-0.6.9-SNAPSHOT.tgz
-  image:
-    pullPolicy: Always
-  mail:
-    mail.from: pavel@thehyve.nl
-    mail.user: AKIAISXHGXUIMMU75YVA
-    mail.password: Avjpey3XBSvnlPfWGTS2qEjiJykvbDJtj6zWW3fCZILl
-    mail.transport.protocol: smtp
-    mail.smtp.auth: true
-    mail.smtp.host: email-smtp.us-east-1.amazonaws.com
-    mail.smtp.port: 587
-    mail.smtp.starttls.enable: true
-
-frontend:
-  image:
-    pullPolicy: Always
-
 logaggregator:
   replicaCount: 0
 

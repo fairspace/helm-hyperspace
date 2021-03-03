@@ -56,8 +56,6 @@ jobs:
         - ci/gcp/install.sh
         - ci/gcp/login.sh
       script:
-        - .travis/build.sh projects/portal
-        - .travis/build.sh projects/frontend
         - .travis/build.sh projects/logaggregator
     - stage: build
       cache: false
