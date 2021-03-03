@@ -21,16 +21,6 @@ keycloak:
   postgresql:
     postgresPassword: "9FGwLKpEu$4w/knG"
 
-rabbitmq:
-  enabled: false
-  expose: false
-  rabbitmq:
-    password: "X6SXtXV3Jzg4gyVR"
-    erlangCookie: "x6w5BVsp8HaQ3uXMvpt5YE46tSBARTNv"
-    diskFreeLimit: '"1GiB"'
-  user:
-    password: "VjwXg7wTEQETjSMN"
-
 pluto:
   image:
     tag: 0.6.11-SNAPSHOT

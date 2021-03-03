@@ -72,11 +72,3 @@ Create the keycloak baseUrl, either by using the override value or constructing 
 {{- define "pluto.fullname" -}}
 {{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
 {{- end -}}
-
-{{- define "rabbitmq.prefix" -}}
-{{- printf "%s-%s" .Release.Name "rabbitmq" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "rabbitmq.host" -}}
-{{- printf "%s-rabbitmq.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
-{{- end -}}
