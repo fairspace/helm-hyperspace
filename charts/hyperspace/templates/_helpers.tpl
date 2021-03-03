@@ -68,7 +68,3 @@ Create the keycloak baseUrl, either by using the override value or constructing 
 
 {{- end -}}
 {{- end -}}
-
-{{- define "pluto.fullname" -}}
-{{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
-{{- end -}}

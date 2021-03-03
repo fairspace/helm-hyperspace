@@ -20,8 +20,3 @@ keycloak:
     password: keycloak-ci-123
   postgresql:
     postgresPassword: "9FGwLKpEu$4w/knG"
-
-pluto:
-  image:
-    tag: 0.6.11-SNAPSHOT
-    pullPolicy: Always

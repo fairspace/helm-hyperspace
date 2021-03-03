@@ -9,5 +9,4 @@ metadata:
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
 data:
   redirect.urls: |-
-    {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}/*
 {{- end -}}
