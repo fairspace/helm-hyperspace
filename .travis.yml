@@ -35,7 +35,7 @@ cache:
   directories:
   - $HOME/downloads
   - $HOME/.gradle
-  -
+
 before_install:
   - nvm install $NODE_VERSION
   - export KUBE_CONFIG_ENC_KEY=$encrypted_985abdf32880_key
@@ -50,13 +50,6 @@ before_install:
 
 jobs:
   include:
-    - stage: build
-      name: Build projects
-      install:
-        - ci/gcp/install.sh
-        - ci/gcp/login.sh
-      script:
-        - .travis/build.sh projects/logaggregator
     - stage: build
       cache: false
       name: Build helm charts

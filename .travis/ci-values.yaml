@@ -31,9 +31,6 @@ rabbitmq:
   user:
     password: "VjwXg7wTEQETjSMN"
 
-logaggregator:
-  replicaCount: 0
-
 pluto:
   image:
     tag: 0.6.11-SNAPSHOT
