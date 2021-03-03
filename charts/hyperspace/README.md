@@ -1,11 +1,13 @@
-# A Helm chart for VRE hyperspace
-This helm chart will install and setup a VRE hyperspace, including keycloak. 
+# A Helm chart for a hyperspace for Fairspace
+
+This helm chart will install and setup Keycloak. 
 
 Contains:
 - (optional) Ingress NGINX controller
 - Keycloak
 
 ## Prerequisites
+
 This chart relies on the following prerequisites:
 - If ingress is enabled, an active nginx ingress controller should be present in the cluster. 
 - If a TLS certificate is to be obtained automatically, an installation of `cert-manager` should be present in the cluster. See
@@ -16,9 +18,9 @@ This chart relies on the following prerequisites:
 ## How to install
 
 ```
-helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
+helm repo add fairspace https://storage.googleapis.com/fairspace-helm
 helm repo update
-helm install --name=hyperspace chartmuseum/hyperspace --namespace=hyperspace -f config.yaml
+helm install --name=hyperspace fairspace/hyperspace --namespace=hyperspace -f config.yaml
 ```
 
 Helm install will wait for the pods to be initialized and all jobs being run. Please
@@ -26,27 +28,14 @@ note that starting postgres sometimes takes a long time. If it takes longer than
 helm install will timeout and not show the installation notes. Besides that, there are no 
 problems with the installation. Consider adding `--timeout 600` to increase the timeout.
 
-## Install on minikube
-```
-helm repo add chartmuseum https://chartmuseum.jx.test.fairdev.app/
-helm repo update
-helm install --name=hyperspace chartmuseum/hyperspace --namespace=hyperspace --set hyperspace.ingress.enabled=false  --set keycloak.keycloak.service.type=NodePort --set hyperspace.keycloak.realm=hyperspace
-```
-
-To retrieve the port that keycloak is running on, run:
-`kubectl get svc hyperspace-keycloak-http --namespace=hyperspace  -o jsonpath="{.spec.ports[0].nodePort}"`
-
 ## Configuration
-Use `helm ... -f config.yaml` to override default configuration parameters from `values.yaml`.
 
+Use `helm ... -f config.yaml` to override default configuration parameters from `values.yaml`.
 
 | Parameter  | Description  | Default |
 |---|---|---|
 | `hyperspace.name`  | Name of the hyperspace | Fairspace |
-| `hyperspace.keycloak.realm`  | Realm to be used within keycloak |  |
 | `keycloak.keycloak.service.type`  | [Servicetype](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for the Keycloak service. |  ClusterIP |
-| `hyperspace.organisationadmin.username` | Username for the organisation admin that will be created for this hyperspace | `organisation-admin-<realm>` |
-| `hyperspace.organisationadmin.password` | Password for the organisation admin that will be created for this hyperspace | `fairspace123` |
 | `ingress.enabled`  | Whether or not an ingress is setup for the hyperspace components. Should be set to false when running locally.  | true  |
 | `ingress.domain`   | Domain that is used for setting up the hyperspace. Is used as postfix for the hostname for the specific components. For example setting `fairspace.app` as domain will setup keycloak at `keycloak.fairspace.app`  | ci.test.fairdev.app  |
 | `ingress.tls.enabled`  | Whether or not an TLS is enabled on the ingresses for hyperspace  | true  |
@@ -58,6 +47,7 @@ To retrieve the initial user password run:
 `kubectl get secret --namespace hyperspace hyperspace-keycloak-http -o jsonpath="{.data.password}" | base64 --decode; echo`
 
 ## Upgrading installations
+
 Please note that some values in the chart have a random default. These work fine on first installation, but may break upgrades 
 of the chart, as the random values may be computed again. 
 
