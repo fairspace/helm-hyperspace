@@ -10,7 +10,7 @@ env:
     - ARTIFACT_BUILD_FILE=""
     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
     - DEPLOYMENT_CONFIG_DIR="./.travis"
-    - RELEASE_BRANCH="master"
+    - RELEASE_BRANCH="release"
     - SNAPSHOT_BRANCH="dev"
     - GCP_PROJECT="fairspace-207108"
     - SNAPSHOT_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
@@ -28,9 +28,6 @@ env:
     # GITHUB_PASSWORD=....
     - secure: "JGk+4XeLruK1LMZ4zJcmX4k4T7nR7DVwPcl/IaPNKaR2+MdiN2Wi5gAXrsXDDKIs4fJzHtRBK1K+VNam4K8vwb5aOX0MnYDoHPZc3ye+UYUXLlTeoozSmfMy08zGaNtz+GjP+QSzvFcRMlhFRLjJ+Cae+Rwpt9gldSLhc04VPGBCMmnHAIg86m2PFqfEfm3Kjy7HkvrPYkAN8JvMRzSjXfBi0JmDjSFuXS0mcp/UOUZLtTzfASpaApijbkp2iposBfN83TbkmnZ/DbZULHtXcKB+mZWADRsh7vyIQQQLVkRWx3HcQSJKSEyCazYoINBufKXDek8v6EbPpIupwF8MVIZTL+vZKXteaNVkcad69ZD3iBhSje8M41ev1Q+m68z6+0IFm6xwajVPL02P3P64zaqWShrG8MLwNiZ7bYmZnziik+fKLGG0/ABiiTxVbUD4qW7XHzbdDNPSE4D9xTuKg+A2naydSNAdozKZLQUNK4/sk5S4xj5Ot0An3Jt9lHKMb/ayqn2b42MfvO3b6cW2pbJTd6f79z2O3bSjL0tNAWbkLrtQLnEPcr0d/CDPBnjWWk4N+1kcOaYqd6/KegkgxXCXSwDnbEhDp/GlEKiIvGo/F3JduqMnVZFfEK8IBIL0pm1z3T7Kvv2Fq5hE19TUB22dlExwudM1nDu8UUFjuig="
 
-    # Azure credentials:
-    - secure: "l8XP3jxyw7ufpMmwygEpVawwfuNFg2sEZirmENUVHRd3XLEuFUgIz4jGEY/nPeOfHCx7QL8sb41eR7dvZuZvT5OgdHwHFqxN5F79AGvzdKOFPn8MkmyhG1G2AwX44vHGOv1E6NQ06mKBKDoA/ieECnT6L+wxzQlM5PCl4+GJHniqlEnhQTwZO0o4yb/AdSBxMtCngx1mWAWDfmuTzg+IzOzkYbxTlf1M8jNfuiLc5qr3WS9qqGN2EddEoFaW+XANF8vk2g1ClZsjO/smGMEa84WCXSXziyYZ2R1F9uNyBm1NsTrbNggWnX7Ipu6KIN+1WXK6MmyMmiRnp03AO5N/FlmIGRMjFgrI3zO/O6uxnWTRep4cRPCARnfMrK+bgjRMI66HLuu2GWmF4GbXp/+8+Hu6zwIwa17+GMFVoOutB51tVS+WyyvnSkdLgc4X6o+aS1IDhvTd8g52UqQmMgjSmZ1quC8bM3ceLkTKcK+jkoHRg0o5z2LAfgs5koVDB+6TktDLdRi2TVefvMyYXTAIml+ws2ZqVxK/F9tFZFT3/GRMtbjbRthpwlt4GvnqMWQZloq6p8MuZ7HCSjU6p+ar9pVaX6tjDMhgQyLVIy92eE7aHa1IDpiqqUDwF2Cjs7+EnSOla+yUQh08d4F4z3VJay9ixdlS2pubuzvh9BLTRN0="
-
 cache:
   directories:
   - $HOME/downloads
@@ -43,7 +40,6 @@ before_install:
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - export BUILD_SCRIPTS_DIR=$(pwd)/ci
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" CLUSTER_NAME="$SNAPSHOT_CLUSTER_NAME" CLUSTER_ZONE="$SNAPSHOT_CLUSTER_ZONE"; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=demo KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" DEPLOY_PLATFORM="GCP" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE"; fi'
   -  export INFRASTRUCTURE_PLATFORM="${DEPLOY_PLATFORM:-NONE}"
   -  source ./ci/setup_env.sh
   -  'if [[ "$SHOULD_RELEASE" ]] ; then export NEED_INTERNAL_HELM=1 ; fi'
@@ -67,7 +63,7 @@ jobs:
         - "ci/versioning/set_next_version.sh"
     - stage: deploy
       cache: false
-      if: branch in (dev, master) and type != pull_request
+      if: branch in (dev, release) and type != pull_request
       install:
         - source charts/.travis/install.sh
       script:
