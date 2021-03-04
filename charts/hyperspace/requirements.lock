@@ -2,11 +2,5 @@ dependencies:
 - name: keycloak
   repository: https://charts.helm.sh/stable
   version: 2.0.0
-- name: elasticsearch
-  repository: https://charts.helm.sh/stable
-  version: 1.31.0
-- name: rabbitmq
-  repository: https://charts.helm.sh/stable
-  version: 6.5.0
-digest: sha256:b79b7c7944e38def5439f450a7a9b6d5094fa09fa423b8da8c96fea05144925f
-generated: "2020-12-22T21:27:17.425487732+01:00"
+digest: sha256:4e71600e9401d0b167c5dfa84a789b6dafc8bd5ac790cf4c9b3b60fe98906700
+generated: "2021-03-04T16:48:07.616036019+01:00"
