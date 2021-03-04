@@ -1,25 +1,15 @@
-# The fairspace container images are in a private repository
-# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-# on how to store and specify the credentials for it
-fairspaceImagePullSecret:
-
 # Setup ingress for hyperspace components
 hyperspace:
     name: Fairspace
     rbac:
         enabled: true
-    keycloak:
-        clientId: hyperspace
-        clientSecret:
-        realm:
     ingress:
         enabled: true
-        domain: ci.test.fairdev.app
+        domain: ci.fairway.app
         annotations:
             kubernetes.io/ingress.class: nginx
             nginx.ingress.kubernetes.io/configuration-snippet: |
                 proxy_set_header  X-Forwarded-Proto \$scheme;
-
         tls:
             enabled: true
             secretNameOverride:
@@ -43,12 +33,6 @@ hyperspace:
                 limits:
                     cpu: "1"
                     memory: "2048Mi"
-    organisationadmin:
-        username:
-        password: fairspace123
-    testuser:
-        generate: false
-        password:
     locationOverrides: {}
 
 # Keycloak configuration
