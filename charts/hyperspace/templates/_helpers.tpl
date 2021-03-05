@@ -60,10 +60,10 @@ Create the keycloak baseUrl, either by using the override value or constructing 
 {{- else -}}
 {{- if .Values.hyperspace.ingress.tls.enabled -}}
 {{- $scheme := "https" -}}
-{{- printf "%s://keycloak.%s" $scheme .Values.hyperspace.ingress.domain -}}
+{{- printf "%s://%s" $scheme .Values.hyperspace.ingress.domain -}}
 {{- else -}}
 {{- $scheme := "http" -}}
-{{- printf "%s://keycloak.%s" $scheme .Values.hyperspace.ingress.domain -}}
+{{- printf "%s://%s" $scheme .Values.hyperspace.ingress.domain -}}
 {{- end -}}
 
 {{- end -}}

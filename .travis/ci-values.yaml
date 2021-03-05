@@ -1,16 +1,19 @@
 hyperspace:
-  name: "ci"
+  name: ci
   ingress:
-    domain: ci.fairway.app
+    domain: keycloak.ci.fairway.app
     tls:
       certificate:
         force: true
-  configurationScripts:
-    pullPolicy: Always
 
 # Set passwords to prevent having a new password at every upgrade
 keycloak:
-  keycloak:
-    password: keycloak-ci-123
   postgresql:
     postgresPassword: "9FGwLKpEu$4w/knG"
+  extraEnv: |
+    - name: KEYCLOAK_USER
+      value: keycloak
+    - name: KEYCLOAK_PASSWORD
+      value: keycloak-ci-123
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
