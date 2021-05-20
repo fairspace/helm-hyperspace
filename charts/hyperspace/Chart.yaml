@@ -3,5 +3,5 @@ appVersion: "1.0"
 description: A Helm chart for Kubernetes
 name: hyperspace
 namespace: hyperspace
-icon: https://raw.githubusercontent.com/fairspace/hyperspace/master/hyperspace/logo.jpg
+icon: https://raw.githubusercontent.com/fairspace/hyperspace/dev/charts/hyperspace/logo.jpg
 version: 0.0.0-RELEASEVERSION

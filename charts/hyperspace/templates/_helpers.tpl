@@ -60,42 +60,11 @@ Create the keycloak baseUrl, either by using the override value or constructing 
 {{- else -}}
 {{- if .Values.hyperspace.ingress.tls.enabled -}}
 {{- $scheme := "https" -}}
-{{- printf "%s://keycloak.%s" $scheme .Values.hyperspace.ingress.domain -}}
+{{- printf "%s://%s" $scheme .Values.hyperspace.ingress.domain -}}
 {{- else -}}
 {{- $scheme := "http" -}}
-{{- printf "%s://keycloak.%s" $scheme .Values.hyperspace.ingress.domain -}}
+{{- printf "%s://%s" $scheme .Values.hyperspace.ingress.domain -}}
 {{- end -}}
 
 {{- end -}}
-{{- end -}}
-
-{{- define "pluto.fullname" -}}
-{{- .Values.pluto.nameOverride | default (printf "%s-pluto" .Release.Name) -}}
-{{- end -}}
-
-{{/* Organisation portal external hostname */}}
-{{- define "portal.hostname" -}}
-{{- printf "hyperspace.%s" .Values.hyperspace.ingress.domain -}}
-{{- end -}}
-{{- define "portal.fullname" -}}
-{{- .Values.portal.nameOverride | default (printf "%s-portal" .Release.Name) -}}
-{{- end -}}
-{{- define "hyperspace.url" -}}
-https://{{ template "portal.hostname" . }}
-{{- end -}}
-
-{{- define "frontend.fullname" -}}
-{{- .Values.frontend.nameOverride | default (printf "%s-frontend" .Release.Name) -}}
-{{- end -}}
-
-{{- define "rabbitmq.prefix" -}}
-{{- printf "%s-%s" .Release.Name "rabbitmq" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "rabbitmq.host" -}}
-{{- printf "%s-rabbitmq.%s.svc.cluster.local" .Release.Name .Release.Namespace -}}
-{{- end -}}
-
-{{- define "logaggregator.fullname" -}}
-{{- .Values.logaggregator.nameOverride | default (printf "%s-logaggregator" .Release.Name) -}}
 {{- end -}}

@@ -1,5 +1,0 @@
-rabbitmq:
-  username: fairspace
-  password: test
-  routingKeyWildcards:
-    - "*.*.*"

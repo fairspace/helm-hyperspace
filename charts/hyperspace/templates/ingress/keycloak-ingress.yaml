@@ -18,11 +18,11 @@ spec:
 {{- if $ingress.tls }}
   tls:
     - hosts:
-      - keycloak.{{ $ingress.domain }}
+      - {{ $ingress.domain }}
       secretName: {{ template "hyperspace.tlsSecretName" $ }}
 {{- end }}
   rules:
-    - host: keycloak.{{ $ingress.domain }}
+    - host: {{ $ingress.domain }}
       http:
         paths:
           - path: /

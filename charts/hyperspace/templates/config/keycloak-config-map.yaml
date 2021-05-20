@@ -7,8 +7,4 @@ metadata:
     heritage: {{.Release.Service | quote }}
     release: {{.Release.Name | quote }}
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-data:
-  redirect.urls: |-
-    {{ template "hyperspace.url" . }}/*
-    {{ .Values.pluto.keycloak.redirectAfterLogoutUrl }}/*
 {{- end -}}

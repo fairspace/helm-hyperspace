@@ -1,7 +1,7 @@
 hyperspace:
-  name: ci
+  name: test
   ingress:
-    domain: keycloak.ci.fairway.app
+    domain: keycloak.test.fairway.app
     tls:
       certificate:
         force: true
