@@ -16,8 +16,8 @@ env:
     - SNAPSHOT_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
     - SNAPSHOT_CLUSTER_NAME="fairspacecicluster"
     - SNAPSHOT_CLUSTER_ZONE="europe-west1-b"
-    - RELEASE_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacedemocluster"
-    - RELEASE_CLUSTER_NAME="fairspacedemocluster"
+    - RELEASE_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
+    - RELEASE_CLUSTER_NAME="fairspacecicluster"
     - RELEASE_CLUSTER_ZONE="europe-west1-b"
     - DOCKER_USERNAME="fairspace"
     - GITHUB_USERNAME="fairspace-ci"
@@ -53,7 +53,7 @@ jobs:
         - source charts/.travis/install.sh
       script:
         - charts/.travis/build.sh
-    - if: branch = env(RELEASE_BRANCH) AND type != "pull_request"
+    - if: branch = release AND type != pull_request
       cache: false
       stage: Versioning
       name: Set tag and update version
@@ -63,7 +63,7 @@ jobs:
         - "ci/versioning/set_next_version.sh"
     - stage: deploy
       cache: false
-      if: branch in (dev, release) and type != pull_request
+      if: branch = dev and type != pull_request
       install:
         - source charts/.travis/install.sh
       script:
