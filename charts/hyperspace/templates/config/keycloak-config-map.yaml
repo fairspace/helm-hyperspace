@@ -4,7 +4,5 @@ kind: ConfigMap
 metadata:
   name: "{{.Release.Name}}-keycloak-config-map"
   labels:
-    heritage: {{.Release.Service | quote }}
-    release: {{.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    {{- include "hyperspace.labels" . | nindent 4 }}
 {{- end -}}
