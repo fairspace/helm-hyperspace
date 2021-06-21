@@ -8,9 +8,7 @@ metadata:
   name: {{ .Release.Name }}-hyperspace
   labels:
     app: {{ template "hyperspace.name" . }}
-    chart: {{ template "hyperspace.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    {{- include "hyperspace.labels" . | nindent 4 }}
 spec:
   secretName: {{ template "hyperspace.tlsSecretName" . }}
 {{- with $ingress.tls.certificate.issuerRef }}
