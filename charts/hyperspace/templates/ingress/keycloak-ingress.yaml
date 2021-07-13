@@ -13,7 +13,7 @@ metadata:
     app: {{ template "hyperspace.name" . }}
     {{- include "hyperspace.labels" . | nindent 4 }}
 spec:
-{{- if $ingress.tls }}
+{{- if $ingress.tls.enabled }}
   tls:
     - hosts:
       - {{ $ingress.domain }}
