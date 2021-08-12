@@ -10,6 +10,7 @@ env:
     - ARTIFACT_BUILD_FILE=""
     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
     - DEPLOYMENT_CONFIG_REPO="fairspace/fairspace-config-priv"
+    - ACCOUNT_CONFIG_DIR="./.travis"
     - RELEASE_BRANCH="release"
     - SNAPSHOT_BRANCH="dev"
     - GCP_PROJECT="fairspace-207108"
