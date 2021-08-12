@@ -36,8 +36,8 @@ cache:
 
 before_install:
   - nvm install $NODE_VERSION
-  - export KUBE_CONFIG_ENC_KEY=$encrypted_985abdf32880_key
-  - export KUBE_CONFIG_ENC_IV=$encrypted_985abdf32880_iv
+  - export KUBE_CONFIG_ENC_KEY=$encrypted_6c9f30024cb1_key
+  - export KUBE_CONFIG_ENC_IV=$encrypted_6c9f30024cb1_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - export BUILD_SCRIPTS_DIR=$(pwd)/ci
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$DEPLOYMENT_CONFIG_REPO ci-config
