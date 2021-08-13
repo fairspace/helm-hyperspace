@@ -11,11 +11,9 @@ metadata:
 {{- end }}
   labels:
     app: {{ template "hyperspace.name" . }}
-    chart: {{ template "hyperspace.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    {{- include "hyperspace.labels" . | nindent 4 }}
 spec:
-{{- if $ingress.tls }}
+{{- if $ingress.tls.enabled }}
   tls:
     - hosts:
       - {{ $ingress.domain }}

@@ -31,6 +31,21 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/*
+Common labels
+*/}}
+{{- define "hyperspace.labels" -}}
+chart: {{ include "hyperspace.chart" . }}
+release: {{ .Release.Name }}
+heritage: {{ .Release.Service }}
+helm.sh/chart: {{ include "hyperspace.chart" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/release-name: {{ .Release.Name }}
+{{- end }}
+
 {{- define "keycloak.prefix" -}}
 {{- printf "%s-%s" .Release.Name "keycloak" | trunc 20 | trimSuffix "-" -}}
 {{- end -}}
