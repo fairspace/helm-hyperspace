@@ -1,37 +1,37 @@
-Fairspace Hyperspace
+Fairspace Keycloak
 
 Keycloak can be accessed:
 
-* Within your cluster, at the following DNS name at port {{ .Values.keycloak.keycloak.service.port }}:
+* Within your cluster, at the following DNS name at port {{ .Values.fairspaceKeycloak.keycloak.service.port }}:
 
 keycloak-http.{{ .Release.Namespace }}.svc.cluster.local
 
-{{- if .Values.hyperspace.ingress.enabled }}
+{{- if .Values.ingress.enabled }}
 
 * From outside the cluster:
 
-  - http{{ if $.Values.hyperspace.ingress.tls.enabled }}s{{ end }}://{{ .Values.hyperspace.ingress.domain }}
+  - http{{ if $.Values.ingress.tls.enabled }}s{{ end }}://{{ .Values.ingress.domain }}
 
 {{- else }}
 
 * From outside the cluster, run these commands in the same shell:
 
-{{- if contains "NodePort" .Values.keycloak.keycloak.service.type }}
+{{- if contains "NodePort" .Values.fairspaceKeycloak.keycloak.service.type }}
 
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ template "keycloak.prefix" .}}-http)
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 
-{{- else if contains "LoadBalancer" .Values.keycloak.keycloak.service.type }}
+{{- else if contains "LoadBalancer" .Values.fairspaceKeycloak.keycloak.service.type }}
 
   NOTE:
   It may take a few minutes for the LoadBalancer IP to be available.
-  You can watch the status of by running 'kubectl get svc -w hyperspace-keycloak-http'
+  You can watch the status of by running 'kubectl get svc -w keycloak-http'
 
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "keycloak.prefix" .}}-http -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-  echo http://$SERVICE_IP:{{ .Values.keycloak.keycloak.service.port }}
+  echo http://$SERVICE_IP:{{ .Values.fairspaceKeycloak.keycloak.service.port }}
 
-{{- else if contains "ClusterIP" .Values.keycloak.keycloak.service.type }}
+{{- else if contains "ClusterIP" .Values.fairspaceKeycloak.keycloak.service.type }}
 
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l app={{ template "keycloak.prefix" .}}-http,release={{ .Release.Name }} -o jsonpath="{.items[0].metadata.name}")
   echo "Visit http://127.0.0.1:8080 to use Keycloak"

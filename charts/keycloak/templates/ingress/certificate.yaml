@@ -1,16 +1,15 @@
-{{- $ingress := .Values.hyperspace.ingress -}}
+{{- $ingress := .Values.ingress -}}
 {{- if $ingress.enabled -}}
 {{- if $ingress.tls.enabled -}}
 {{- if $ingress.tls.certificate.obtain -}}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: {{ .Release.Name }}-hyperspace
+  name: {{ .Release.Name }}-keycloak
   labels:
-    app: {{ template "hyperspace.name" . }}
-    {{- include "hyperspace.labels" . | nindent 4 }}
+    {{- include "fairspaceKeycloak.labels" . | nindent 4 }}
 spec:
-  secretName: {{ template "hyperspace.tlsSecretName" . }}
+  secretName: {{ template "tlsSecretName" $ }}
 {{- with $ingress.tls.certificate.issuerRef }}
   issuerRef:
 {{ toYaml . | indent 4 }}

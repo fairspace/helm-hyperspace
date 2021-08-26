@@ -1,5 +1,4 @@
-{{ if .Values.keycloak.enabled -}}
-{{- $ingress := .Values.hyperspace.ingress -}}
+{{- $ingress := .Values.ingress -}}
 {{- if $ingress.enabled -}}
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -10,14 +9,13 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
   labels:
-    app: {{ template "hyperspace.name" . }}
-    {{- include "hyperspace.labels" . | nindent 4 }}
+    {{- include "fairspaceKeycloak.labels" . | nindent 4 }}
 spec:
 {{- if $ingress.tls.enabled }}
   tls:
     - hosts:
       - {{ $ingress.domain }}
-      secretName: {{ template "hyperspace.tlsSecretName" $ }}
+      secretName: {{ template "tlsSecretName" $ }}
 {{- end }}
   rules:
     - host: {{ $ingress.domain }}
@@ -28,4 +26,3 @@ spec:
               serviceName: {{ template "keycloak.prefix" . }}-http
               servicePort: http
 {{- end -}}
-{{ end -}}

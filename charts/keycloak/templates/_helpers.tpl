@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "hyperspace.name" -}}
+{{- define "fairspaceKeycloak.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "hyperspace.fullname" -}}
+{{- define "fairspaceKeycloak.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -27,18 +27,18 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "hyperspace.chart" -}}
+{{- define "fairspaceKeycloak.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "hyperspace.labels" -}}
-chart: {{ include "hyperspace.chart" . }}
+{{- define "fairspaceKeycloak.labels" -}}
+chart: {{ include "fairspaceKeycloak.chart" . }}
 release: {{ .Release.Name }}
 heritage: {{ .Release.Service }}
-helm.sh/chart: {{ include "hyperspace.chart" . }}
+helm.sh/chart: {{ include "fairspaceKeycloak.chart" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -47,15 +47,15 @@ app.kubernetes.io/release-name: {{ .Release.Name }}
 {{- end }}
 
 {{- define "keycloak.prefix" -}}
-{{- printf "%s-%s" .Release.Name "keycloak" | trunc 20 | trimSuffix "-" -}}
+{{ .Release.Name }}
 {{- end -}}
 
 {{/*
-Create a name for the tls secret for hyperspace
+Create a name for the tls secret for keycloak
 */}}
-{{- define "hyperspace.tlsSecretName" -}}
-{{- if .Values.hyperspace.ingress.tls.secretNameOverride -}}
-{{- .Values.hyperspace.ingress.tls.secretNameOverride | trunc 63 | trimSuffix "-" -}}
+{{- define "tlsSecretName" -}}
+{{- if .Values.ingress.tls.secretNameOverride -}}
+{{- .Values.ingress.tls.secretNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- if contains $name .Release.Name -}}
@@ -70,15 +70,15 @@ Create a name for the tls secret for hyperspace
 Create the keycloak baseUrl, either by using the override value or constructing it ourselves
 */}}
 {{- define "keycloak.baseUrl" -}}
-{{- if .Values.hyperspace.locationOverrides.keycloak -}}
-{{- .Values.hyperspace.locationOverrides.keycloak -}}
+{{- if .Values.fairspaceKeycloak.locationOverrides.keycloak -}}
+{{- .Values.fairspaceKeycloak.locationOverrides.keycloak -}}
 {{- else -}}
-{{- if .Values.hyperspace.ingress.tls.enabled -}}
+{{- if .Values.ingress.tls.enabled -}}
 {{- $scheme := "https" -}}
-{{- printf "%s://%s" $scheme .Values.hyperspace.ingress.domain -}}
+{{- printf "%s://%s" $scheme .Values.ingress.domain -}}
 {{- else -}}
 {{- $scheme := "http" -}}
-{{- printf "%s://%s" $scheme .Values.hyperspace.ingress.domain -}}
+{{- printf "%s://%s" $scheme .Values.ingress.domain -}}
 {{- end -}}
 
 {{- end -}}
