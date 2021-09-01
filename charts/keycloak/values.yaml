@@ -1,30 +1,10 @@
-# Setup ingress for hyperspace components
-hyperspace:
-  name: Fairspace
+# Default values for fairspace-keycloak.
+
+fairspaceKeycloak:
+  name: fairspace-keycloak
   rbac:
     enabled: true
-  ingress:
-    enabled: true
-    domain: keycloak.ci.fairway.app
-    annotations:
-      kubernetes.io/ingress.class: nginx
-      nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-      nginx.ingress.kubernetes.io/configuration-snippet: |
-        proxy_set_header  X-Forwarded-Proto \$scheme;
-    tls:
-      enabled: true
-      secretNameOverride:
-      certificate:
-        obtain: true
-        issuerRef:
-          name: letsencrypt-prod
-          kind: ClusterIssuer
-
   locationOverrides: { }
-
-# Keycloak configuration
-keycloak:
-  enabled: true
   keycloak:
     username: keycloak
     service:
@@ -48,10 +28,28 @@ keycloak:
         cpu: "500m"
         memory: "512Mi"
 
+ingress:
+  enabled: true
+  domain:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header  X-Forwarded-Proto \$scheme;
+  tls:
+    enabled: true
+    secretNameOverride:
+    certificate:
+      obtain: true
+      issuerRef:
+        name: letsencrypt-prod
+        kind: ClusterIssuer
+
 # Generic settings for tracing
 tracing:
   enabled: true
   samplingRate: 0.1
   baseUrl: http://jaeger-collector.jaeger:9411
 
+# Pod annotations should remain empty. They are filled within the build process
 podAnnotations: { }

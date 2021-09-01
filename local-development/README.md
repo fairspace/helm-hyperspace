@@ -2,7 +2,7 @@
 
 You can run the chart locally for testing.
 
-## Run Hyperspace using minikube
+## Run Keycloak using minikube
 
 Please check the [deploy.sh](deploy.sh) script.
 It assumes Helm3 to be available in `~/bin/helm3/helm`.
@@ -12,7 +12,7 @@ The ingress node will listen to http://keycloak.local, so make sure to add `$(mi
 echo "$(minikube ip) keycloak.local" >> /etc/hosts
 ```
 
-To start Hyperspace:
+To start Fairspace Keycloak:
 ```shell
 # Start minikube
 minikube start
@@ -24,7 +24,7 @@ minikube dashboard
 # Push images to minikube repository and start Keycloak
 ./deploy.sh
 ```
-The script creates the `hyperspace-dev` namespace where all other objects are created.
+The script creates the `keycloak-dev` namespace where all other objects are created.
 
 Keycloak will be available at http://keycloak.local. Login with username `keycloak` and password `keycloak`.
 Create a new realm named `fairspace`:
@@ -42,8 +42,8 @@ You need to add users to the realm manually. Please create a user with username 
 
 To shutdown Keycloak, use one of the following:
 ```shell
-# Uninstall Hyperspace using Helm
-helm uninstall hyperspace-local -n hyperspace-dev
-# Delete hyperspace-dev namespace
-kubectl delete ns hyperspace-dev
+# Uninstall Keycloak using Helm
+helm uninstall keycloak-local -n keycloak-dev
+# Delete keycloak-dev namespace
+kubectl delete ns keycloak-dev
 ```

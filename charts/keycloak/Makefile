@@ -1,6 +1,6 @@
 CHART_REPO := http://jenkins-x-chartmuseum:8080
 CURRENT=$(pwd)
-NAME := hyperspace
+NAME := fairspace-keycloak
 OS := $(shell uname)
 RELEASE_VERSION := $(shell jx-release-version)
 
