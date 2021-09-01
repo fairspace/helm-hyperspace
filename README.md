@@ -2,7 +2,7 @@
 
 This repository contains the helm chart to install and setup Keycloak.
 
-See [charts/keycloak](charts/keycloak/README.md) for more information.
+See [charts/fairspace-keycloak](charts/fairspace-keycloak/README.md) for more information.
 
 # Deployment scripts
 Deployment scripts can be found in the [fairspace-build-scripts](https://github.com/fairspace/fairspace-build-scripts) repository. They are
