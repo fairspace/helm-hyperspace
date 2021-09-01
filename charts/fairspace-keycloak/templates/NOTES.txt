@@ -4,7 +4,7 @@ Keycloak can be accessed:
 
 * Within your cluster, at the following DNS name at port {{ .Values.fairspaceKeycloak.keycloak.service.port }}:
 
-keycloak-http.{{ .Release.Namespace }}.svc.cluster.local
+fairspace-keycloak-http.{{ .Release.Namespace }}.svc.cluster.local
 
 {{- if .Values.ingress.enabled }}
 
@@ -26,7 +26,7 @@ keycloak-http.{{ .Release.Namespace }}.svc.cluster.local
 
   NOTE:
   It may take a few minutes for the LoadBalancer IP to be available.
-  You can watch the status of by running 'kubectl get svc -w keycloak-http'
+  You can watch the status of by running 'kubectl get svc -w fairspace-keycloak-http'
 
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ template "keycloak.prefix" .}}-http -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   echo http://$SERVICE_IP:{{ .Values.fairspaceKeycloak.keycloak.service.port }}

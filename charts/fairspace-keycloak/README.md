@@ -20,7 +20,7 @@ This chart relies on the following prerequisites:
 ```
 helm repo add fairspace https://storage.googleapis.com/fairspace-helm
 helm repo update
-helm install --name=keycloak fairspace/keycloak --namespace=keycloak -f config.yaml
+helm install --name=keycloak fairspace/fairspace-keycloak --namespace=keycloak -f config.yaml
 ```
 
 Helm install will wait for the pods to be initialized and all jobs being run. Please
