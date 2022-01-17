@@ -64,13 +64,13 @@ jobs:
         - "./ci/helm/tag.sh"
         - "ci/versioning/add_tag_to_git.sh"
         - "ci/versioning/set_next_version.sh"
-    - stage: deploy
-      cache: false
-      if: branch = dev and type != pull_request
-      install:
-        - source charts/.travis/install.sh
-      script:
-        - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET
+#     - stage: deploy
+#       cache: false
+#       if: branch = dev and type != pull_request
+#       install:
+#         - source charts/.travis/install.sh
+#       script:
+#         - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET
 
 notifications:
   slack:
