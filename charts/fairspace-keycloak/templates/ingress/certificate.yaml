@@ -2,7 +2,7 @@
 {{- if $ingress.enabled -}}
 {{- if $ingress.tls.enabled -}}
 {{- if $ingress.tls.certificate.obtain -}}
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-keycloak
