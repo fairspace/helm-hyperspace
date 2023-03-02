@@ -19,6 +19,6 @@ if $DIR/build-condition.sh $TRAVIS_COMMIT_RANGE projects/; then
     sed -i -e "s/podAnnotations: { }//" charts/fairspace-keycloak/values.yaml
 
     # Add a pod annotation in the values.yaml file
-    echo -e "\npodAnnotations:" >> charts/fairspace- keycloak/values.yaml
+    echo -e "\npodAnnotations:" >> charts/fairspace-keycloak/values.yaml
     echo -e "  fairspace-keycloak:\n    commit: \"$COMMIT_ID\"\n" >> charts/fairspace-keycloak/values.yaml
 fi

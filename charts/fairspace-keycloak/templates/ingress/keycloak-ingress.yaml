@@ -25,7 +25,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: {{ template "keycloak.prefix" . }}-http
+                name: {{ template "keycloak.prefix" . }}-keycloakx-http
                 port:
                   name: http
 {{- end -}}
