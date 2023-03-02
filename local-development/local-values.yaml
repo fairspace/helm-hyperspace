@@ -9,6 +9,8 @@ keycloakx:
       value: keycloak
     - name: KEYCLOAK_ADMIN_PASSWORD
       value: keycloak
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
     - name: JAVA_OPTS_APPEND
       value: >-
         -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
