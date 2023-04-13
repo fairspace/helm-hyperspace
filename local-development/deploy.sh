@@ -9,11 +9,11 @@ helm_cmd=$(realpath ~/bin/helm3/helm)
 
 pushd "${here}"
 
-(kubectl get ns hyperspace-dev || kubectl create ns hyperspace-dev) && \
+(kubectl get ns keycloak-dev || kubectl create ns keycloak-dev) && \
 ((${helm_cmd} repo list | cut -f1 | grep '^codecentric') || ${helm_cmd} repo add codecentric https://codecentric.github.io/helm-charts) && \
-${helm_cmd} dependency update ../charts/hyperspace && \
-${helm_cmd} package ../charts/hyperspace && \
-${helm_cmd} upgrade hyperspace-local --install --namespace hyperspace-dev hyperspace-0.0.0-RELEASEVERSION.tgz \
+${helm_cmd} dependency update ../charts/fairspace-keycloak && \
+${helm_cmd} package ../charts/fairspace-keycloak && \
+${helm_cmd} upgrade keycloak-local --install --namespace keycloak-dev fairspace-keycloak-0.0.0-RELEASEVERSION.tgz \
   -f local-values.yaml
 
 popd

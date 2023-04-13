@@ -1,18 +1,32 @@
-hyperspace:
-  name: hyperspace-local
-  ingress:
-    domain: keycloak.local
-    tls:
-      enabled: false
-
-# Set passwords to prevent having a new password at every upgrade
-keycloak:
+fairspaceKeycloak:
+  name: keycloak-local
   postgresql:
-    postgresPassword: "keycloak"
+    postgresPassword: "keycloak" # Set passwords to prevent having a new password at every upgrade
+
+keycloakx:
   extraEnv: |
-    - name: KEYCLOAK_USER
+    - name: KEYCLOAK_ADMIN
       value: keycloak
-    - name: KEYCLOAK_PASSWORD
+    - name: KEYCLOAK_ADMIN_PASSWORD
       value: keycloak
     - name: PROXY_ADDRESS_FORWARDING
       value: "true"
+    - name: JAVA_OPTS_APPEND
+      value: >-
+        -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
+    
+  command: 
+    - "/opt/keycloak/bin/kc.sh"
+    - "start"
+    - "--http-enabled=true"
+    - "--http-port=8080"
+    - "--hostname-strict=false"
+    - "--hostname-strict-https=false"
+  http:
+    # For backwards compatibility reasons we set this to the value used by previous Keycloak versions.
+    relativePath: "/"
+
+ingress:
+  domain: keycloak.local
+  tls:
+    enabled: false

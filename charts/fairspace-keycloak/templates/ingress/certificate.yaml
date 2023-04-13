@@ -1,0 +1,22 @@
+{{- $ingress := .Values.ingress -}}
+{{- if $ingress.enabled -}}
+{{- if $ingress.tls.enabled -}}
+{{- if $ingress.tls.certificate.obtain -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-keycloak
+  labels:
+    {{- include "fairspaceKeycloak.labels" . | nindent 4 }}
+spec:
+  secretName: {{ template "tlsSecretName" $ }}
+{{- with $ingress.tls.certificate.issuerRef }}
+  issuerRef:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  commonName: '{{ $ingress.domain }}'
+  dnsNames:
+  - '{{ $ingress.domain }}'
+{{- end -}}
+{{- end -}}
+{{- end -}}

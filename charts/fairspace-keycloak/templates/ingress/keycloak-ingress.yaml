@@ -1,7 +1,6 @@
-{{ if .Values.keycloak.enabled -}}
-{{- $ingress := .Values.hyperspace.ingress -}}
+{{- $ingress := .Values.ingress -}}
 {{- if $ingress.enabled -}}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "keycloak.prefix" . }}-ingress
@@ -10,22 +9,23 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
   labels:
-    app: {{ template "hyperspace.name" . }}
-    {{- include "hyperspace.labels" . | nindent 4 }}
+    {{- include "fairspaceKeycloak.labels" . | nindent 4 }}
 spec:
 {{- if $ingress.tls.enabled }}
   tls:
     - hosts:
       - {{ $ingress.domain }}
-      secretName: {{ template "hyperspace.tlsSecretName" $ }}
+      secretName: {{ template "tlsSecretName" $ }}
 {{- end }}
   rules:
     - host: {{ $ingress.domain }}
       http:
         paths:
           - path: /
+            pathType: ImplementationSpecific
             backend:
-              serviceName: {{ template "keycloak.prefix" . }}-http
-              servicePort: http
+              service:
+                name: {{ template "keycloak.prefix" . }}-keycloakx-http
+                port:
+                  name: http
 {{- end -}}
-{{ end -}}
