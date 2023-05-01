@@ -6,6 +6,10 @@ icon: https://raw.githubusercontent.com/thehyve/fairspace-keycloak/dev/charts/fa
 version: 0.0.0-RELEASEVERSION
 
 dependencies:
+  - name: postgresql
+    version: 12.4.1
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
   - name: keycloakx
     version: 2.1.1
     repository: https://codecentric.github.io/helm-charts
