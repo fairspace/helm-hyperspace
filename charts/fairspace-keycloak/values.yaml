@@ -20,13 +20,30 @@ fairspaceKeycloak:
         cpu: "500m"
         memory: "2048Mi"
   postgresql:
-    persistence:
-      enabled: true
-    resources:
-      # Request values are set by default in postgresql chart
-      limits:
-        cpu: "500m"
-        memory: "512Mi"
+
+keycloakx:
+  dbchecker:
+    enabled: true
+  database:
+    vendor: postgres
+    hostname: keycloak-db-postgresql
+    port: 5432
+    database: keycloak
+    existingSecret: keycloak-postgresql
+    username: keycloak
+
+postgresql:
+  fullnameOverride: keycloak-db-postgresql
+  auth:
+    username: keycloak
+    database: keycloak
+    existingSecret: keycloak-postgresql
+  persistence:
+    enabled: true
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
 
 ingress:
   enabled: true
