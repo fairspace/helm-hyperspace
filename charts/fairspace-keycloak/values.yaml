@@ -20,7 +20,6 @@ fairspaceKeycloak:
         cpu: "500m"
         memory: "2048Mi"
   postgresql:
-    password: ""
 
 keycloakx:
   dbchecker:
