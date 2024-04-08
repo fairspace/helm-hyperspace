@@ -4,9 +4,10 @@ This repository contains the helm chart to install and setup Keycloak.
 
 See [charts/fairspace-keycloak](charts/fairspace-keycloak/README.md) for more information.
 
-# Deployment scripts
-Deployment scripts can be found in the [fairspace-build-scripts](https://github.com/fairspace/fairspace-build-scripts) repository. They are
-run by travis-ci, as setup in the `.travis.yml` file.
+# Helm chart
+Helm charts are packaged and published to the GitHub package registry (Packages) with GitHub Actions workflow, can be found in `.github/workflows/package_and_push_helm_chart.yaml `
+
+```yaml
 
 # License
 
