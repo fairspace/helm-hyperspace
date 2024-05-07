@@ -1,8 +1,9 @@
 {
   "id": "fairspace",
   "realm": "fairspace",
-  "displayName": "Fairspace (local environment)",
-  "displayNameHtml": "<span style=\"text-transform: none\">Local environment<br><strong>Fairspace</strong></span>",
+  "displayName": "Fairspace (test environment)",
+  "displayNameHtml": "<div class=\"kc-logo-text\"><span>Fairspace</span></div>",
+  "loginTheme": "fairspace_theme",
   "notBefore": 0,
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,

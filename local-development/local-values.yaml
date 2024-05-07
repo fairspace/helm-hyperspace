@@ -4,6 +4,20 @@ fairspaceKeycloak:
     postgresPassword: "keycloak" # Set passwords to prevent having a new password at every upgrade
 
 keycloakx:
+  extraInitContainers: |
+    - name: theme-provider
+      image: keycloak-fairspace-theme:latest
+      imagePullPolicy: IfNotPresent
+      command:
+        - sh
+      args:
+        - -c
+        - |
+          echo "Copying Fairspace theme..."
+          cp -R /fairspace_theme/* /theme
+      volumeMounts:
+        - name: theme
+          mountPath: /theme
   extraEnv: |
     - name: KEYCLOAK_ADMIN
       value: keycloak

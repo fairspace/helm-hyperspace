@@ -1,0 +1,62 @@
+/*# Overwrites login page style of keycloak theme.
+See: https://github.com/keycloak/keycloak/blob/main/themes/src/main/resources/theme/keycloak/login/resources/css/login.css */
+
+:root {
+    --kc-blue-light: rgba(106,134,232,1);
+    --kc-blue-light-transp-25: rgba(106,134,232,0.25);
+    --kc-blue-medium: rgba(52,95,157,1);
+    --kc-blue-dark: rgba(8,65,92,1);
+}
+
+.login-pf body {
+    background: radial-gradient(circle, var(--kc-blue-light) 5%, var(--kc-blue-medium) 25%, var(--kc-blue-dark) 75%);
+    background-size: cover;
+    height: 100%;
+}
+
+#kc-header-wrapper {
+    padding: 30px 10px 0;
+}
+
+div.kc-logo-text {
+    background-image: url(../../img/fairspace_logo_white.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.card-pf {
+    color: white;
+    margin: 0 auto;
+    box-shadow: none;
+    max-width: 500px;
+    border: 1px solid;
+    border-radius: 25px;
+    border-color: var(--kc-blue-light-transp-25);
+    background-color: var(--kc-blue-light-transp-25);
+}
+
+.login-pf-page .card-pf {
+    padding: 60px 30px 70px;
+}
+
+.login-pf-page .login-pf-header h1 {
+    text-align: left;
+    font-weight: bold;
+}
+
+.pf-c-button.pf-m-primary {
+    background-color: var(--kc-blue-dark);
+    border-radius: 5px;
+}
+
+#kc-form-buttons {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.pf-c-form-control:not(textarea) {
+    border-radius: 5px;
+}

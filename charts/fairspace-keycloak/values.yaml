@@ -31,6 +31,26 @@ keycloakx:
     database: keycloak
     existingSecret: keycloak-postgresql
     username: keycloak
+  extraInitContainers: |
+    - name: theme-provider
+      image: keycloak-fairspace-theme:latest
+      imagePullPolicy: IfNotPresent
+      command:
+        - sh
+      args:
+        - -c
+        - |
+          echo "Copying Fairspace theme..."
+          cp -R /fairspace_theme/* /theme
+      volumeMounts:
+        - name: theme
+          mountPath: /theme
+  extraVolumeMounts: |
+    - name: theme
+      mountPath: /opt/keycloak/themes/fairspace_theme
+  extraVolumes: |
+    - name: theme
+      emptyDir: { }
 
 postgresql:
   fullnameOverride: keycloak-db-postgresql
