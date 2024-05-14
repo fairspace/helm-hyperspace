@@ -4,12 +4,12 @@ See: https://github.com/keycloak/keycloak/blob/main/themes/src/main/resources/th
 :root {
     --kc-blue-light: rgba(106,134,232,1);
     --kc-blue-light-transp-25: rgba(106,134,232,0.25);
-    --kc-blue-medium: rgba(52,95,157,1);
-    --kc-blue-dark: rgba(8,65,92,1);
+    --kc-blue-medium: rgba(63,102,177,1);
+    --kc-blue-dark: rgb(7, 59, 82);
 }
 
 .login-pf body {
-    background: radial-gradient(circle, var(--kc-blue-light) 5%, var(--kc-blue-medium) 25%, var(--kc-blue-dark) 75%);
+    background: radial-gradient(circle, var(--kc-blue-light) 10%, var(--kc-blue-medium) 25%, var(--kc-blue-dark) 75%);
     background-size: cover;
     height: 100%;
 }
