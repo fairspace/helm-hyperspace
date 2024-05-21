@@ -7,6 +7,17 @@ helm_cmd=$(realpath ~/bin/helm3/helm)
 # $ minikube start
 # $ minikube addons enable ingress
 
+eval $(minikube docker-env)
+
+pushd "${here}"
+
+pushd ../themes
+(docker build . -t keycloak-fairspace-theme:latest) || {
+  echo "Building Fairspace theme image failed."
+  popd
+  exit 1
+}
+
 pushd "${here}"
 
 (kubectl get ns keycloak-dev || kubectl create ns keycloak-dev) && \

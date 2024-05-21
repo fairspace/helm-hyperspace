@@ -1,0 +1,55 @@
+# Jobs to build and deploy a Docker image for Fairspace Keycloak theme on push to the dev or release branches
+
+name: Build & Upload Fairspace Keycloak Theme Docker image
+
+env:
+  DOCKER_REGISTRY: ghcr.io
+
+on:
+  push:
+    branches:
+      - dev
+      - release
+
+jobs:
+  build-and-upload-docker-image-for-keycloak-fairspace-theme:
+    needs: [generate-version]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare version
+        run: |
+          # EXTRACT VERSION
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Building theme image from the branch: $BRANCH"
+          VER=$(cat ./themes/VERSION)
+          echo "Building theme image of version: $VER"
+          if [ $BRANCH != "release" ]
+          then
+            VER=$VER-SNAPSHOT
+          fi
+          echo "Docker tag to be attached to images: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/keycloak-fairspace-theme
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./themes/
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/keycloak-fairspace-theme:${{ env.VERSION }}
+          labels: ${{ steps.meta.outputs.labels }}
