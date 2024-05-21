@@ -13,3 +13,14 @@ This directory contains the custom Fairspace theme for Keycloak. The theme is ba
 The theme is packaged into a Docker image and made available in the Kubernetes setup using init container as theme provider. 
 
 More information about the theme setup with Kubernetes and Helm can be found in [Keycloakx Helm chart documentation](https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx#providing-a-custom-theme).
+
+### Selecting Fairspace theme for user login page
+To use a Fairspace theme for the user login page, the `fairspace_theme` needs to be selected in the Keycloak admin console,
+in the Fairspace client settings.
+The theme should be configured under *Client details >> Settings >> Login settings >> Login theme*.
+
+To have the Fairspace logo displayed on the login page, the *HTML Display name* needs to be changed to:
+```
+<div class="kc-logo-text"><span>Fairspace</span></div>
+```
+in *Realm settings >> General >> HTML Display name*.
