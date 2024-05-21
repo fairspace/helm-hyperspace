@@ -13,7 +13,6 @@ on:
 
 jobs:
   build-and-upload-docker-image-for-keycloak-fairspace-theme:
-    needs: [generate-version]
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
