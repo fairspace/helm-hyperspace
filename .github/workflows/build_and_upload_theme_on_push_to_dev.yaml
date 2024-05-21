@@ -29,8 +29,8 @@ jobs:
           then
             VER=$VER-SNAPSHOT
           fi
-          echo "Docker tag to be attached to images: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Docker tag to be attached to images: $VER"
+          echo "VERSION=$VER" >> $GITHUB_ENV
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
